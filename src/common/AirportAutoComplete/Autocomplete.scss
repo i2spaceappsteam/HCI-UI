@@ -1,0 +1,147 @@
+.css-for-search-flight {
+    font-size: 22px;
+    position: absolute;
+    margin-top: -11%;
+    margin-left: 91%;
+    color: rgb(170, 170, 170);
+
+    @media (max-width: 991px) {
+        margin-top: -15%;
+    }
+
+    @media (max-width: 767px) {
+        margin-top: -17%;
+
+    }
+}
+
+.css-for-search-flight1 {
+    font-size: 22px;
+    position: absolute;
+    margin-top: -18% !important;
+    margin-left: 91%;
+    color: rgb(170, 170, 170);
+
+    @media (max-width: 991px) {
+        margin-top: -26% !important;
+    }
+
+    @media (max-width: 770px) {
+        margin-top: -18% !important;
+    }
+
+    @media (max-width: 767px) {
+        margin-top: -16% !important;
+
+    }
+
+}
+
+.search-opti-cod-flg {
+    border: 1px solid transparent;
+    width: 100%;
+    text-align: right;
+}
+
+
+.plane-icon-opt-search {
+    font-size: 20px;
+    margin-right: 4%;
+    margin-top: -15px;
+
+    @media (max-width: 767px) {
+        margin-top: -9px;
+    }
+}
+
+.for-elepsis-work-dropdownflight {
+    // display: flex;
+    white-space: nowrap;
+    width: 184px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    // border: 1px solid #000000;
+    margin-left: 10% !important;
+    font-size: 18px;
+    font-weight: bold;
+
+    @media (max-width: 991px) {
+        margin-left: 18%;
+    }
+
+    @media (max-width: 770px) {
+        margin-left: 18%;
+    }
+
+}
+
+.for-elepsis-work-dropdownhotels {
+    white-space: nowrap;
+    width: 228px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    // border: 1px solid #000000;
+    margin-left: 13%;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: "Nunito";
+
+    @media (max-width: 991px) {
+        margin-left: 19%;
+    }
+
+    @media (max-width: 770px) {
+        margin-left: 18%;
+    }
+
+    @media (max-width: 767px) {
+        width: 240px;
+    }
+}
+
+.for-elepsis-work-dropdowncar {
+    white-space: nowrap;
+    width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: "Nunito";
+    // border: 1px solid #000000;
+    margin-left: 10%;
+
+    @media (max-width: 991px) {
+        margin-left: 26%;
+    }
+
+    @media (max-width: 770px) {
+        margin-left: 26%;
+    }
+}
+
+.for-elepsis-work-dropdowncartrans {
+    white-space: nowrap;
+    width: 330px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: "Nunito";
+    // border: 1px solid #000000;
+    margin-left: 7%;
+
+    @media (max-width: 767px) {
+        margin-left: 13%;
+    }
+}
+
+.forplace-wor-dropdownflight {
+    position: absolute;
+    font-size: 20px;
+    color: #5969c7;
+    top: 26%;
+}
+
+.HCI-airport-select.ant-select-open .ant-select-selection-item {
+    visibility: hidden !important;
+}

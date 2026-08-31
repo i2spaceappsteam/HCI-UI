@@ -1,0 +1,356 @@
+/* ============================================================
+   DASHBOARD STYLING
+   ============================================================ */
+
+.dashboard-container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- Dashboard Header ---- */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dashboard-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #262626;
+}
+
+.dashboard-header p {
+  margin: 0;
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+/* ---- Statistics Row ---- */
+.stats-row {
+  margin-bottom: 32px;
+  width: 100%;
+}
+
+.stat-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  background: #fff;
+  padding: 20px !important;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.stat-card:hover {
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  margin-right: 8px;
+  color: #1890ff;
+  font-size: 24px;
+}
+
+.ant-statistic-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #8c8c8c;
+  margin-bottom: 8px !important;
+}
+
+.ant-statistic-content {
+  font-size: 28px;
+  font-weight: 700;
+  color: #262626;
+}
+
+.ant-progress {
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+
+/* ---- Summary Row ---- */
+.summary-row {
+  margin-bottom: 32px;
+  width: 100%;
+}
+
+.activity-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+}
+
+.activity-card .ant-card-head {
+  padding: 16px 24px !important;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+.activity-card h4 {
+  margin: 0 !important;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.activity-card .ant-table {
+  margin: 0;
+}
+
+.activity-card .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.activity-card .ant-table-tbody > tr:hover > td {
+  background-color: #fafafa;
+}
+
+/* ---- Quick Stats Card ---- */
+.quick-stats-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  height: 100%;
+}
+
+.quick-stats-card .ant-card-head {
+  padding: 16px 24px !important;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+.quick-stats-card h4 {
+  margin: 0 !important;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.quick-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.quick-stat-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* ---- Action Row ---- */
+.action-row {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.action-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  padding: 20px !important;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 100%;
+}
+
+.action-card:hover {
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  transform: translateY(-4px);
+}
+
+.action-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.action-card h5 {
+  margin: 0 0 8px 0 !important;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.action-card .ant-typography {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.action-card .ant-btn-link {
+  padding: 0 !important;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.action-card .ant-btn-link:hover {
+  color: #40a9ff;
+}
+
+/* ---- Ant Tag Styling ---- */
+.ant-tag {
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ---- Responsive Design ---- */
+@media (max-width: 1024px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-header h2 {
+    font-size: 24px;
+  }
+
+  .stats-row {
+    margin-bottom: 24px;
+  }
+
+  .action-row {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    margin-bottom: 24px;
+  }
+
+  .dashboard-header h2 {
+    font-size: 20px;
+  }
+
+  .stats-row {
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    padding: 16px !important;
+  }
+
+  .ant-statistic-content {
+    font-size: 24px;
+  }
+
+  .activity-card,
+  .quick-stats-card {
+    margin-bottom: 16px;
+  }
+
+  .summary-row {
+    margin-bottom: 24px;
+  }
+
+  .action-row {
+    margin-bottom: 0;
+  }
+
+  .action-card {
+    padding: 16px !important;
+  }
+
+  .action-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .action-icon svg {
+    font-size: 24px !important;
+  }
+
+  .action-card h5 {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header {
+    margin-bottom: 16px;
+  }
+
+  .dashboard-header h2 {
+    font-size: 18px;
+  }
+
+  .dashboard-header p {
+    font-size: 12px;
+  }
+
+  .stat-card {
+    padding: 12px !important;
+  }
+
+  .ant-statistic-title {
+    font-size: 12px;
+  }
+
+  .ant-statistic-content {
+    font-size: 20px;
+  }
+
+  .activity-card .ant-table-thead > tr > th,
+  .activity-card .ant-table-tbody > tr > td {
+    padding: 8px 12px !important;
+    font-size: 12px;
+  }
+
+  .quick-stat-item {
+    padding: 8px 0;
+  }
+
+  .action-card {
+    padding: 12px !important;
+  }
+
+  .action-card h5 {
+    font-size: 13px;
+  }
+
+  .action-card .ant-typography {
+    font-size: 12px;
+  }
+}
+
+/* ---- Card Animations ---- */
+.stat-card,
+.action-card {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Print Styles ---- */
+@media print {
+  .dashboard-header {
+    display: none;
+  }
+
+  .action-row {
+    display: none;
+  }
+}

@@ -1,0 +1,388 @@
+/* ========================================
+   FLIGHT CHECKOUT - BOOKING SUMMARY FIX
+   Fixes design disturbance in booking summary sidebar
+   ======================================== */
+
+/* Main checkout container */
+.flight-checkout {
+  width: 100%;
+  max-width: 96%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Checkout row - prevent overflow */
+.flight-checkout .ant-row {
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Checkout columns */
+.flight-checkout .ant-col {
+  max-width: 100%;
+  box-sizing: border-box;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Right sidebar with booking summary */
+.checkout-right {
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Booking summary box */
+.booking-summary-box {
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.12);
+  background: #fff;
+  margin-bottom: 20px;
+}
+
+/* Booking summary header */
+.booking-summary-header {
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 14px 20px;
+  background: #f8f9fa;
+}
+
+.booking-summary-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Sticky part container */
+.checkout-sticky-part {
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+/* Grand total card */
+.grand-total-card {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.grand-total-card .ant-card {
+  max-width: 100%;
+  box-sizing: border-box;
+  border: none;
+  box-shadow: none;
+}
+
+.grand-total-card .ant-card-body {
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 15px 0px;
+}
+
+/* Grand total card rows */
+.grand_total_card_row {
+  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* padding: 8px 0; */
+  border-bottom: 1px solid #f0f0f0;
+  flex-wrap: nowrap;
+}
+
+.grand_total_card_row:last-child {
+  border-bottom: none;
+}
+
+.grand_total_card_row p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.grand_total_card_row p:first-child {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 10px;
+}
+
+.grand_total_card_row p:last-child {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: #0284c7;
+  white-space: nowrap;
+}
+
+/* Flight details card */
+.flight-cards-details {
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 15px;
+}
+
+.flight-cards-details .ant-card-body {
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.flight-cards-details .fareTitle {
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #1a3a52 0%, #2c5aa0 100%);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+/* Pax count card */
+.pax-count-card {
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.pax-total-price {
+  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f2ff 100%);
+  border-top: 2px solid #0284c7;
+  flex-wrap: nowrap;
+}
+
+.pax-total-price .pax-type {
+  flex: 1;
+  min-width: 0;
+}
+
+.pax-total-price .pax-type p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pax-total-price .total {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 10px;
+}
+
+.pax-total-price .total p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.pax-total-price .total .amount {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0284c7;
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .checkout-right {
+    position: static !important;
+    margin-top: 20px;
+  }
+
+  .booking-summary-box {
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 767px) {
+  .flight-checkout {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+
+  .booking-summary-header {
+    padding: 12px 15px;
+  }
+
+  .booking-summary-header h3 {
+    font-size: 16px;
+  }
+
+  .grand-total-card .ant-card-body {
+    padding: 10px 0px;
+  }
+
+  .grand_total_card_row {
+    padding: 6px 0;
+  }
+
+  .grand_total_card_row p {
+    font-size: 14px;
+  }
+
+  .pax-total-price {
+    padding: 12px 15px;
+  }
+
+  .pax-total-price .pax-type p {
+    font-size: 14px;
+  }
+
+  .pax-total-price .total p {
+    font-size: 14px;
+  }
+
+  .pax-total-price .total .amount {
+    font-size: 22px;
+  }
+
+  .flight-cards-details .fareTitle {
+    padding: 12px 15px;
+    font-size: 15px;
+  }
+}
+
+/* Prevent horizontal scroll on entire page */
+body.flight-checkout-page {
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+/* Fix for Ant Design Row/Col system */
+.flight-checkout .ant-row {
+  overflow-x: hidden;
+}
+
+.flight-checkout .ant-col {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Ensure all cards respect container width */
+.flight-checkout .ant-card {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix for long text in booking summary */
+.booking-summary-box * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.booking-summary-box p,
+.booking-summary-box h1,
+.booking-summary-box h2,
+.booking-summary-box h3,
+.booking-summary-box h4,
+.booking-summary-box h5,
+.booking-summary-box h6 {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Addons section */
+.addons-section {
+  max-width: 100%;
+  box-sizing: border-box;
+  background: #fafafa;
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin: 6px 0;
+}
+
+.addons-section .grand_total_card_row {
+  border-bottom: 1px dashed #e8e8e8;
+}
+
+.addons-section .grand_total_card_row p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Sticky card container */
+.sticky-card-container {
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+.sticky-card-container .ant-card {
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: none;
+}
+
+.sticky-card-container .ant-card-body {
+  padding: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* All taxes text */
+.all-taxes {
+  font-size: 12px;
+  color: #999;
+  text-align: right;
+  padding: 0 24px 12px 24px;
+  margin: 0;
+  font-style: italic;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Collapse items */
+.checkout-right .ant-collapse {
+  max-width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+}
+
+.checkout-right .ant-collapse-item {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.checkout-right .ant-collapse-content-box {
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px 5px 0 5px;
+}

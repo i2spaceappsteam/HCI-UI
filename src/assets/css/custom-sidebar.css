@@ -1,0 +1,310 @@
+/* ============================================================
+   Custom Sidebar Overrides
+   ============================================================ */
+
+/* ---- Sidebar Scroll Container ---- */
+/* Make the sidebar wrapper fill full viewport height */
+.sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow: hidden;
+    width: 280px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+/* Logo area — fixed height, never scrolls */
+.sidebar-wrapper>div>.logo-wrapper,
+.sidebar-wrapper>div>.logo-icon-wrapper {
+    flex-shrink: 0;
+}
+
+/* nav.sidebar-main fills all remaining height and scrolls */
+.sidebar-wrapper .sidebar-main {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* height = viewport minus page-header (~80px) minus logo wrapper (~70px) */
+    max-height: calc(100vh - 150px);
+}
+
+/* #sidebar-menu and .sidebar-links must allow content to grow */
+.sidebar-wrapper .sidebar-main #sidebar-menu,
+.sidebar-wrapper .sidebar-main .sidebar-links {
+    height: auto !important;
+    overflow: visible !important;
+}
+
+/* Thin custom scrollbar for the sidebar */
+.sidebar-wrapper .sidebar-main::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-wrapper .sidebar-main::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-wrapper .sidebar-main::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.sidebar-wrapper .sidebar-main::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+
+/* ---- Base Link Styles ---- */
+.sidebar-wrapper .sidebar-links .sidebar-list .sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    transition: all 0.25s ease;
+    position: relative;
+    color: #475569;
+    font-weight: 600;
+    border-radius: 8px;
+    margin: 2px 10px;
+}
+
+.sidebar-wrapper .sidebar-links .sidebar-list .sidebar-link:hover,
+.sidebar-wrapper .sidebar-links .sidebar-list .sidebar-link.active {
+    color: #1e4a8b;
+    background-color: #f1f5f9;
+}
+
+.sidebar-wrapper .sidebar-links .sidebar-list .sidebar-link i {
+    margin-right: 14px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    transition: all 0.25s ease;
+    min-width: 18px;
+}
+
+/* ---- Arrow Icon ---- */
+.according-menu {
+    margin-left: auto;
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.2s ease;
+}
+
+/* ---- Submenu Styles (expanded state) ---- */
+.sidebar-submenu {
+    background-color: #ffffff;
+    padding: 4px 0;
+    margin: 0;
+    transition: all 0.25s ease;
+}
+
+.sidebar-submenu li {
+    padding-left: 0;
+    list-style: none;
+}
+
+.sidebar-submenu li a {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 18px 9px 48px;
+    display: block;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.sidebar-submenu li a:hover,
+.sidebar-submenu li a.active-link,
+.sidebar-submenu li.active a {
+    color: #1e4a8b !important;
+    font-weight: 700;
+    background-color: #f8fafc;
+    padding-left: 52px;
+}
+
+/* ============================================================
+   COLLAPSED SIDEBAR (close_icon) DESKTOP
+   ============================================================ */
+
+.sidebar-wrapper.close_icon {
+    width: 80px !important;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+/* In collapsed mode, sidebar-main must be overflow:visible for floating submenus */
+.sidebar-wrapper.close_icon .sidebar-main {
+    overflow: visible !important;
+    max-height: none !important;
+}
+
+.sidebar-wrapper.close_icon>div {
+    overflow: visible !important;
+}
+
+.sidebar-wrapper.close_icon .sidebar-main,
+.sidebar-wrapper.close_icon #sidebar-menu,
+.sidebar-wrapper.close_icon .sidebar-links {
+    overflow: visible !important;
+}
+
+/* Hide text, arrows, badges in collapsed state */
+.sidebar-wrapper.close_icon .sidebar-main .sidebar-links .sidebar-list .sidebar-link span {
+    display: none !important;
+    opacity: 0;
+}
+
+.sidebar-wrapper.close_icon .according-menu,
+.sidebar-wrapper.close_icon .badge,
+.sidebar-wrapper.close_icon .sidebar-main-title {
+    display: none !important;
+}
+
+/* Collapsed link layout — icon only, centered */
+.sidebar-wrapper.close_icon .sidebar-main .sidebar-links .sidebar-list .sidebar-link {
+    justify-content: center;
+    padding: 14px 0;
+    margin: 4px 10px;
+}
+
+.sidebar-wrapper.close_icon .sidebar-main .sidebar-links .sidebar-list .sidebar-link i {
+    margin-right: 0;
+    font-size: 22px;
+}
+
+/* Page body margin adjustment for desktop sidebar */
+.page-wrapper.compact-wrapper .page-body-wrapper .page-body {
+    margin-left: 0 !important;
+    transition: all 0.3s ease;
+}
+
+/* Page header margin adjustment for desktop collapsed sidebar */
+.page-wrapper.compact-wrapper .page-header.close_icon,
+.page-wrapper.compact-wrapper.modern-type .page-header.close_icon {
+    margin-left: 80px !important;
+    width: calc(100% - 80px) !important;
+    transition: all 0.3s ease;
+}
+
+/* Removed floating submenu styles since we are using Ant Design */
+
+/* ============================================================
+   RESPONSIVE MOBILE / TABLET OVERRIDES (<992px)
+   ============================================================ */
+
+@media (max-width: 991px) {
+    .sidebar-wrapper.close_icon {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .page-wrapper.compact-wrapper .page-body-wrapper .sidebar-wrapper.close_icon~.page-body {
+        margin-left: 0 !important;
+    }
+
+    .sidebar-wrapper:not(.close_icon) {
+        position: fixed !important;
+        top: 80px;
+        bottom: 0;
+        left: 0;
+        width: 260px !important;
+        z-index: 1000 !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+        background: #ffffff !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    /* In mobile expanded, sidebar-main should not restrict height */
+    .sidebar-wrapper:not(.close_icon) .sidebar-main {
+        overflow: visible !important;
+        max-height: none !important;
+    }
+
+    .page-wrapper.compact-wrapper .page-body-wrapper .sidebar-wrapper:not(.close_icon)~.page-body {
+        margin-left: 0 !important;
+    }
+}
+
+/* Logo handling */
+.sidebar-wrapper.close_icon .logo-wrapper {
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    height: auto;
+}
+
+.sidebar-wrapper.close_icon .logo-wrapper .back-btn,
+.sidebar-wrapper.close_icon .logo-wrapper img.for-light,
+.sidebar-wrapper.close_icon .logo-wrapper img.for-dark {
+    display: none !important;
+}
+
+.sidebar-wrapper.close_icon .logo-icon-wrapper {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.sidebar-wrapper.close_icon .logo-icon-wrapper img {
+    width: 36px;
+}
+
+.sidebar-wrapper:not(.close_icon) .logo-icon-wrapper {
+    display: none !important;
+}
+
+/* Onhover dropdown */
+.onhover-dropdown:hover .onhover-show-div {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0px) !important;
+    display: block !important;
+}
+
+.onhover-show-div {
+    display: none;
+}
+
+/* ---- Fixed Footer at Bottom ---- */
+.footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 280px !important;
+    width: calc(100% - 280px) !important;
+    z-index: 99 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.3s ease;
+    margin-left: 0 !important;
+    padding: 15px 30px !important;
+    box-sizing: border-box;
+}
+
+/* Adjust footer when sidebar is collapsed */
+.sidebar-wrapper.close_icon~.page-body .footer {
+    left: 0 !important;
+    width: 100% !important;
+}
+
+/* Add padding to page-body to prevent content from being hidden behind fixed footer */
+.page-body {
+    padding-bottom: 70px !important;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+@media (max-width: 991px) {
+    .footer {
+        left: 0 !important;
+        width: 100% !important;
+    }
+}

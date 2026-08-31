@@ -1,0 +1,228 @@
+/* ============================================================
+   PAGE BODY OVERFLOW FIX - Prevent Horizontal Scroll
+   ============================================================ */
+
+/* ---- Main Page Wrapper ---- */
+.page-wrapper {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.page-body-wrapper {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* ---- Page Body Content ---- */
+.page-body {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+/* ---- Prevent Horizontal Overflow ---- */
+.page-wrapper,
+.page-body-wrapper,
+.page-body,
+.container,
+.container-fluid,
+.content-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* ---- Sidebar Wrapper Sizing ---- */
+.sidebar-wrapper {
+  flex-shrink: 0;
+  width: 280px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.sidebar-wrapper.close_icon {
+  width: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---- Main Content Area ---- */
+.page-body-wrapper .page-body {
+  flex: 1;
+  padding: 20px 15px;
+  min-width: 0;
+}
+
+/* ---- All Rows and Columns ---- */
+.row {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box;
+}
+
+.col,
+.col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+.col-7, .col-8, .col-9, .col-10, .col-11, .col-12,
+.col-auto, .col-sm, .col-md, .col-lg, .col-xl, .col-xxl {
+  box-sizing: border-box;
+  padding-left: 7.5px;
+  padding-right: 7.5px;
+}
+
+/* ---- Card Styling ---- */
+.card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* ---- Ant Design Components ---- */
+.ant-layout {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ant-layout-sider {
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.ant-layout-content {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* ---- Table Responsiveness ---- */
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.table {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* ---- Form Elements ---- */
+.form-group,
+.ant-form-item,
+.ant-input,
+.ant-select,
+.ant-picker {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---- Modal/Drawer Styling ---- */
+.ant-modal,
+.ant-drawer {
+  max-width: calc(100% - 32px);
+}
+
+/* ---- Mobile Responsive ---- */
+@media (max-width: 991px) {
+  .page-wrapper {
+    overflow-x: hidden;
+  }
+
+  .page-body-wrapper {
+    overflow-x: hidden;
+  }
+
+  .sidebar-wrapper:not(.close_icon) {
+    position: fixed;
+    left: 0;
+    top: 64px;
+    bottom: 0;
+    width: 260px;
+    z-index: 1000;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .page-body-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .page-body {
+    padding: 15px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-body {
+    padding: 12px 10px;
+  }
+
+  .col,
+  .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+  .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-body {
+    padding: 10px 8px;
+  }
+
+  .col,
+  .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+  .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .card {
+    padding: 10px !important;
+  }
+}
+
+/* ---- Prevent Scrollbar Flicker ---- */
+html {
+  overflow-y: scroll;
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* ---- Header Sizing ---- */
+.page-header {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---- Footer Sizing ---- */
+.footer {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}

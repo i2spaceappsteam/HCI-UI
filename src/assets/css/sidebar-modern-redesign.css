@@ -1,0 +1,598 @@
+/* ===================================
+   MODERN SIDEBAR REDESIGN - COMPLETE
+   =================================== */
+
+/* ===================================
+   1. PAGE WRAPPER & BODY ADJUSTMENT
+   =================================== */
+
+.page-wrapper {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* When sidebar is open */
+.page-wrapper:not(.sidebar-close) .page-body-wrapper {
+  margin-left: 260px;
+}
+
+/* When sidebar is closed */
+.page-wrapper.sidebar-close .page-body-wrapper {
+  /*margin-left: 80px; */
+}
+
+.page-body-wrapper {
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+.page-body {
+  /* padding: 20px; */
+  min-height: calc(100vh - 70px);
+  background: #f8fafc;
+}
+
+/* Adjust content width when sidebar opens */
+.page-body .container-fluid {
+  max-width: 100%;
+  /* padding-left: 20px; */
+  /* padding-right: 20px; */
+  transition: all 0.3s ease;
+}
+
+/* ===================================
+   2. SIDEBAR WRAPPER - REDESIGNED
+   =================================== */
+
+.sidebar-wrapper {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 260px;
+  height: calc(100vh - 70px);
+  background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+  box-shadow: 4px 0 20px rgba(30, 58, 138, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  overflow: visible;
+}
+
+/* Closed sidebar */
+.sidebar-wrapper.close_icon {
+  width: 80px;
+}
+
+/* Logo wrapper adjustment */
+.sidebar-wrapper .logo-wrapper {
+  display: none;
+  /* Hide in fixed sidebar, logo stays in header */
+}
+
+.sidebar-wrapper .logo-icon-wrapper {
+  display: none;
+}
+
+/* ===================================
+   3. SIDEBAR NAVIGATION - MODERN
+   =================================== */
+
+.sidebar-main {
+  padding: 20px 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+.sidebar-main::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-main::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-main::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.sidebar-main::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+#sidebar-menu {
+  width: 100%;
+}
+
+.sidebar-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ===================================
+   4. SIDEBAR LIST ITEMS - ENHANCED
+   =================================== */
+
+.sidebar-list {
+  margin: 4px 12px;
+  position: relative;
+}
+
+.sidebar-link.sidebar-title {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  font-size: 14px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Hover effect */
+.sidebar-link.sidebar-title:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+/* Active state */
+.sidebar-link.sidebar-title.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  font-weight: 600;
+}
+
+/* Active indicator */
+.sidebar-link.sidebar-title.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: #ffffff;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Icon styling */
+.sidebar-link.sidebar-title i[data-feather],
+.sidebar-link.sidebar-title svg {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  margin-right: 12px;
+  stroke-width: 2.5;
+  transition: all 0.25s ease;
+}
+
+.sidebar-link.sidebar-title.active i[data-feather],
+.sidebar-link.sidebar-title.active svg {
+  stroke-width: 3;
+  transform: scale(1.1);
+}
+
+/* Text */
+.sidebar-link.sidebar-title span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  transition: opacity 0.25s ease;
+}
+
+/* Collapsed sidebar - hide text */
+.sidebar-wrapper.close_icon .sidebar-link.sidebar-title span {
+  opacity: 0;
+  width: 0;
+}
+
+/* Arrow icon for submenu */
+.according-menu {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  transition: transform 0.25s ease;
+}
+
+.sidebar-link.sidebar-title.active .according-menu {
+  transform: rotate(0deg);
+}
+
+.according-menu i {
+  font-size: 14px;
+  transition: transform 0.25s ease;
+}
+
+/* Rotate arrow when open */
+.sidebar-link.sidebar-title.active .according-menu i.fa-angle-down {
+  transform: rotate(180deg);
+}
+
+/* Hide arrow in collapsed mode */
+.sidebar-wrapper.close_icon .according-menu {
+  display: none;
+}
+
+/* ===================================
+   5. SUBMENU - REDESIGNED
+   =================================== */
+
+.sidebar-submenu {
+  list-style: none;
+  padding: 4px 0;
+  margin: 6px 0 6px 12px;
+  border-left: 2px solid rgba(255, 255, 255, 0.15);
+  display: none;
+  animation: slideDown 0.3s ease;
+}
+
+.sidebar-submenu.d-block {
+  display: block;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sidebar-submenu li {
+  margin: 2px 0;
+  padding: 0;
+}
+
+.sidebar-submenu li a {
+  display: block;
+  padding: 10px 16px 10px 24px;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  margin-left: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Submenu item hover */
+.sidebar-submenu li a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  transform: translateX(4px);
+  padding-left: 28px;
+}
+
+/* Submenu item active */
+.sidebar-submenu li.active a,
+.sidebar-submenu li a.active-link {
+  background: rgba(59, 130, 246, 0.25);
+  color: #ffffff;
+  font-weight: 600;
+  padding-left: 28px;
+}
+
+/* Active indicator dot */
+.sidebar-submenu li.active a::before,
+.sidebar-submenu li a.active-link::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: #ffffff;
+  border-radius: 50%;
+}
+
+/* ===================================
+   6. FLOATING SUBMENU (Collapsed Mode)
+   =================================== */
+
+.HCI-floating-submenu {
+  position: fixed !important;
+  min-width: 220px !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 12px 32px rgba(30, 58, 138, 0.2) !important;
+  border-radius: 12px !important;
+  z-index: 9999 !important;
+  padding: 8px !important;
+  margin: 0 !important;
+  list-style: none !important;
+  animation: fadeInRight 0.25s ease !important;
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.HCI-floating-submenu li {
+  margin: 2px 0 !important;
+  padding: 0 !important;
+}
+
+.HCI-floating-submenu li a {
+  padding: 12px 18px !important;
+  display: block !important;
+  color: #334155 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+  border-radius: 8px !important;
+  position: relative;
+}
+
+.HCI-floating-submenu li a:hover {
+  background: #f1f5f9 !important;
+  color: #1e40af !important;
+  transform: translateX(4px) !important;
+}
+
+/* Active state in floating menu */
+.HCI-floating-submenu li a[style*="font-weight: 800"] {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+  box-shadow: inset 4px 0 0 #3b82f6 !important;
+}
+
+/* ===================================
+   7. TOGGLE SIDEBAR BUTTON
+   =================================== */
+
+.toggle-sidebar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+}
+
+.toggle-sidebar:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.toggle-sidebar i {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-close .toggle-sidebar i {
+  transform: rotate(180deg);
+}
+
+/* ===================================
+   8. RESPONSIVE DESIGN
+   =================================== */
+
+/* Tablet */
+@media (max-width: 991px) {
+  .page-wrapper:not(.sidebar-close) .page-body-wrapper {
+    margin-left: 0;
+  }
+
+  .sidebar-wrapper {
+    transform: translateX(-100%);
+  }
+
+  .page-wrapper:not(.sidebar-close) .sidebar-wrapper {
+    transform: translateX(0);
+  }
+
+  .sidebar-wrapper::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: -1;
+  }
+
+  .page-wrapper:not(.sidebar-close) .sidebar-wrapper::before {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* Mobile */
+@media (max-width: 575px) {
+  .sidebar-wrapper {
+    width: 280px;
+  }
+
+  .sidebar-wrapper.close_icon {
+    width: 280px;
+    transform: translateX(-100%);
+  }
+
+  .page-body {
+    padding: 15px;
+  }
+
+  .page-body .container-fluid {
+    /* padding-left: 10px; */
+    /* padding-right: 10px; */
+  }
+}
+
+/* ===================================
+   9. LINK NAV (Dashboard - No submenu)
+   =================================== */
+
+.sidebar-link.link-nav {
+  background: transparent;
+}
+
+.sidebar-link.link-nav:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(4px);
+}
+
+.sidebar-link.link-nav.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* ===================================
+   10. PAGE HEADER ADJUSTMENT
+   =================================== */
+
+.page-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  z-index: 1001;
+  transition: all 0.3s ease;
+}
+
+.page-body-wrapper {
+  margin-top: 70px;
+}
+
+/* ===================================
+   11. SMOOTH TRANSITIONS
+   =================================== */
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a,
+button,
+.sidebar-link,
+.sidebar-submenu li a {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* ===================================
+   12. ACCESSIBILITY & FOCUS STATES
+   =================================== */
+
+.sidebar-link:focus,
+.sidebar-submenu li a:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+/* ===================================
+   13. DARK MODE SUPPORT (Optional)
+   =================================== */
+
+.dark-mode .sidebar-wrapper {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+}
+
+.dark-mode .HCI-floating-submenu {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.dark-mode .HCI-floating-submenu li a {
+  color: #e2e8f0 !important;
+}
+
+/* ===================================
+   14. FOOTER ADJUSTMENT
+   =================================== */
+
+.footer {
+  margin-left: 260px;
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+}
+
+.page-wrapper.sidebar-close .footer {
+  margin-left: 80px;
+}
+
+@media (max-width: 991px) {
+  .footer {
+    margin-left: 0 !important;
+  }
+}
+
+/* ===================================
+   15. PREVENT CONTENT SHIFT
+   =================================== */
+
+.page-body .container-fluid {
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.page-body .row {
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+.page-body .col,
+.page-body [class*="col-"] {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* ===================================
+   16. BADGE & NOTIFICATION SUPPORT
+   =================================== */
+
+.sidebar-link .badge {
+  margin-left: auto;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.sidebar-wrapper.close_icon .sidebar-link .badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 2px 6px;
+  font-size: 10px;
+}

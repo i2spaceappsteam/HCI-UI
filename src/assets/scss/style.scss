@@ -1,0 +1,111 @@
+@use "utils/variables" as *;
+
+// Base
+@use "base/reset" as *;
+@use "base/typography" as *;
+
+// Components
+@use "components/according" as *;
+@use "components/alert" as *;
+@use "components/avatars" as *;
+@use "components/badge" as *;
+@use "components/bookmark" as *;
+@use "components/breadcrumb" as *;
+@use "components/builders" as *;
+@use "components/custome" as *;
+@use "components/buttons" as *;
+@use "components/card" as *;
+// @use "components/color" as *;
+// @use "components/datatable" as *;
+// @use "components/datepicker" as *;
+// @use "components/dropdown" as *;
+// @use "components/form-builder" as *;
+// @use "components/form-input" as *;
+// @use "components/form-wizard" as *;
+// @use "components/forms" as *;
+// @use "components/form_builder-2" as *;
+// @use "components/icons" as *;
+// @use "components/list" as *;
+// @use "components/loader" as *;
+// @use "components/popover" as *;
+// @use "components/print" as *;
+// @use "components/radio" as *;
+// @use "components/ratio" as *;
+// @use "components/ribbon" as *;
+// @use "components/switch" as *;
+// @use "components/tab" as *;
+// @use "components/table" as *;
+// @use "components/touchspin" as *;
+// @use "components/tour" as *;
+// @use "components/tree" as *;
+// @use "components/typeahead-search" as *;
+// @use "components/scrollbar" as *;
+// @use "components/modal" as *;
+
+// // Pages
+// @use "pages/blog" as *;
+// @use "pages/bookmark-app" as *;
+// @use "pages/cart" as *;
+// @use "pages/chart" as *;
+// @use "pages/chat" as *;
+// @use "pages/checkout" as *;
+// @use "pages/comingsoon" as *;
+// @use "pages/contacts" as *;
+// @use "pages/dashboard_2" as *;
+// @use "pages/dashboard_default" as *;
+// @use "pages/ecommerce" as *;
+// @use "pages/email-application" as *;
+// @use "pages/errorpage" as *;
+// @use "pages/faq" as *;
+// @use "pages/file" as *;
+// @use "pages/gallery" as *;
+// @use "pages/internationalization" as *;
+// @use "pages/job-search" as *;
+// @use "pages/jsgrid" as *;
+// @use "pages/kanban" as *;
+// @use "pages/knowledgebase" as *;
+// @use "pages/landing" as *;
+// @use "pages/language" as *;
+// @use "pages/learning" as *;
+// @use "pages/login" as *;
+// @use "pages/megaoption" as *;
+// @use "pages/order-history" as *;
+// @use "pages/page" as *;
+// @use "pages/pricing" as *;
+// @use "pages/progress" as *;
+// @use "pages/projectlist" as *;
+// @use "pages/social-app" as *;
+// @use "pages/task" as *;
+// @use "pages/timeline-v" as *;
+// @use "pages/timeliny" as *;
+// @use "pages/user-profile" as *;
+// @use "pages/wishlist" as *;
+// @use "pages/reviewpage" as *;
+// @use "pages/setting" as *;
+// @use "pages/view-page" as *;
+
+// // Themes
+// @use "themes/dark" as *;
+// @use "themes/dark-sidebar" as *;
+// @use "themes/theme-customizer" as *;
+// @use "themes/update" as *;
+
+// // Layout
+ @use "layout/footer" as *;
+ @use "layout/grid" as *;
+//  @use "layout/header" as *;
+ @use "layout/navs" as *;
+ @use "layout/search" as *;
+ @use "layout/select2" as *;
+ @use "layout/sidebar" as *;
+//  @use "layout/rtl" as *;
+ @use "layout/box-layout" as *;
+
+
+// ============================
+// 2️⃣ Normal CSS after @use
+// ============================
+:root {
+  --theme-deafult: #4aa4d9;
+  --theme-secondary: #ef3f3e;
+}

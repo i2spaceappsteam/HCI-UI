@@ -1,0 +1,215 @@
+/* ============================================================
+   GLOBAL OVERFLOW & WIDTH FIX
+   Prevents horizontal scrolling across all pages
+   ============================================================ */
+
+/* ---- Root Elements ---- */
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---- Main Layout Containers ---- */
+#root,
+.app-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+}
+
+.page-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+    display: flex;
+}
+
+.page-body-wrapper {
+    width: 100%;
+    max-width: 100%;
+    flex: 1;
+    overflow-x: hidden !important;
+    box-sizing: border-box;
+}
+
+.page-body {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 !important;
+    /* padding: 20px !important; */
+    box-sizing: border-box;
+    overflow-x: hidden !important;
+}
+
+/* ---- Content Containers ---- */
+.content-wrapper,
+.main-content,
+.result-block,
+.dashboard-container,
+.flight-ticket,
+.fligh-ticket-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+    overflow-x: hidden !important;
+}
+
+/* ---- Ant Design Components ---- */
+.ant-layout {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+}
+
+.ant-layout-sider {
+    overflow-x: hidden !important;
+}
+
+.ant-layout-content {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+    box-sizing: border-box;
+}
+
+.ant-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    box-sizing: border-box;
+}
+
+.ant-card-body {
+    overflow-x: auto !important;
+    box-sizing: border-box;
+}
+
+.ant-row {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box;
+}
+
+.ant-col {
+    box-sizing: border-box;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* ---- Tables ---- */
+.ant-table {
+    width: 100% !important;
+    overflow-x: auto !important;
+}
+
+.ant-table-wrapper {
+    width: 100% !important;
+    overflow-x: auto !important;
+}
+
+.table-responsive {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-desi {
+    width: 100% !important;
+    overflow-x: auto !important;
+}
+
+/* ---- Forms ---- */
+.ant-form {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+.ant-form-item {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ---- Modals ---- */
+.ant-modal-content {
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+.ant-modal-body {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box;
+}
+
+/* ---- Dropdowns & Selects ---- */
+.ant-dropdown,
+.ant-select-dropdown {
+    max-width: calc(100vw - 32px) !important;
+}
+
+/* ---- Sidebar ---- */
+.sidebar-wrapper {
+    flex-shrink: 0;
+    overflow-x: hidden !important;
+}
+
+.sidebar-main {
+    overflow-x: hidden !important;
+}
+
+/* ---- Prevents body scroll when there's overflow ---- */
+body.no-scroll {
+    overflow: hidden;
+}
+
+/* ---- Ensure no margin/padding causes overflow ---- */
+* {
+    box-sizing: border-box;
+}
+
+/* ---- Media Queries for Mobile ---- */
+@media (max-width: 768px) {
+    .page-body {
+        padding: 16px !important;
+    }
+
+    .dashboard-container {
+        padding: 16px !important;
+    }
+
+    .ant-col {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-body {
+        padding: 12px !important;
+    }
+
+    .dashboard-container {
+        padding: 12px !important;
+    }
+
+    .ant-card {
+        margin-bottom: 12px !important;
+    }
+
+    .ant-col {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .ant-row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+}
