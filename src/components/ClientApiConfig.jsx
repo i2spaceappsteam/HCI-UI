@@ -126,12 +126,12 @@ const ClientApiConfig = () => {
 
   function editConfig(record) {
     form.setFieldsValue({
-  usertype: record.userId ? 2 : 1,
-  userId: record.userId,
-  services: record.serviceType
-});
-  setSelectedSuppliers(record.suppliersId || []);
-setIsUser(record.userId == 1 ? false : true);
+      usertype: record.userId ? 2 : 1,
+      userId: record.userId,
+      services: record.serviceType
+    });
+    setSelectedSuppliers(record.suppliersId || []);
+    setIsUser(record.userId == 1 ? false : true);
     setId(record.id)
     setOpen(true);
   }
@@ -154,7 +154,7 @@ setIsUser(record.userId == 1 ? false : true);
   }
   const columns = [
     {
-      title: 'Actions',
+      title: <span style={{ whiteSpace: 'nowrap' }}>Actions</span>,
       key: 'actions',
       render: (_, config) => (
         <div className="d-flex align-items-center gap-3">
@@ -173,13 +173,13 @@ setIsUser(record.userId == 1 ? false : true);
         </div>
       ),
     },
-    { title: 'Company Name', dataIndex: 'companyName', key: 'companyName' },
-    { title: 'Suppliers', dataIndex: 'suppliers', key: 'suppliers' },
-    { title: 'Services', dataIndex: 'serviceTypesList', key: 'serviceTypesList' },
-    { title: 'Created By', dataIndex: 'createdBy', key: 'createdBy' },
-    { title: 'Created Date', dataIndex: 'createdDate', key: 'createdDate' },
-    { title: 'Modified By', dataIndex: 'modifiedBy', key: 'modifiedBy' },
-    { title: 'Modified Date', dataIndex: 'modifiedDate', key: 'modifiedDate' },
+    { title: <span style={{ whiteSpace: 'nowrap' }}>Company Name</span>, dataIndex: 'companyName', key: 'companyName' },
+    { title: <span style={{ whiteSpace: 'nowrap' }}>Suppliers</span>, dataIndex: 'suppliers', key: 'suppliers' },
+    { title: <span style={{ whiteSpace: 'nowrap' }}>Services</span>, dataIndex: 'serviceTypesList', key: 'serviceTypesList' },
+    { title: <span style={{ whiteSpace: 'nowrap' }}>Created By</span>, dataIndex: 'createdBy', key: 'createdBy' },
+    { title: <span style={{ whiteSpace: 'nowrap' }}>Created Date</span>, dataIndex: 'createdDate', key: 'createdDate' },
+    { title: <span style={{ whiteSpace: 'nowrap' }}>Modified By</span>, dataIndex: 'modifiedBy', key: 'modifiedBy' },
+    { title: <span style={{ whiteSpace: 'nowrap' }}>Modified Date</span>, dataIndex: 'modifiedDate', key: 'modifiedDate' },
   ];
 
   return (
@@ -187,12 +187,12 @@ setIsUser(record.userId == 1 ? false : true);
       <div className="col-sm-12">
         <div className="card">
 
-          <div className="card-header card-header--2">
-            <h5>All Client Api Configuration</h5>
+          <div className="card-header card-header--2 d-flex justify-content-between align-items-center" style={{ paddingTop: '5px', paddingBottom: '5px' }}>
+            <h5 className="mb-0">All Client Api Configuration</h5>
 
             <button
               type="button"
-              className="btn btn-theme"
+              className="btn btn-theme m-0"
               onClick={() => setOpen(true)}
             >
               <i data-feather="plus-square"></i> Add New
@@ -202,11 +202,11 @@ setIsUser(record.userId == 1 ? false : true);
 
           <div className="card-body">
             <div className="table-responsive table-desi">
-              <Table 
-                columns={columns} 
-                dataSource={configList} 
-                size="small" 
-                scroll={{ x: 'max-content' }} 
+              <Table
+                columns={columns}
+                dataSource={configList}
+                size="small"
+                scroll={{ x: 'max-content' }}
                 rowKey={(record) => record.id || record.companyName}
                 pagination={{ pageSize: 10 }}
               />
@@ -339,10 +339,10 @@ setIsUser(record.userId == 1 ? false : true);
                       <Select placeholder="Please select Service" style={{ height: "50px" }} maxTagCount="responsive" mode='multiple'>
 
                         <Select.Option key={1} value={1} >
-                          Domestic Flights
+                          Domestic Hotels
                         </Select.Option>
                         <Select.Option key={2} value={2} >
-                          International Flights
+                          International Hotels
                         </Select.Option>
 
                       </Select>

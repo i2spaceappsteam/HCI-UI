@@ -276,7 +276,7 @@ const Operator = () => {
         closable={false}
         width={560}
         centered
-        destroyOnClose
+        destroyOnHidden
       >
         <div className="card mb-0">
           <div className="card-header d-flex justify-content-between align-items-center">

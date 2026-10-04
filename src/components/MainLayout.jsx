@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Layout, Typography, Button, theme, Menu, Dropdown } from 'antd';
 import { LogoutOutlined, DashboardOutlined, UserOutlined, SettingOutlined, MailOutlined, ProfileOutlined, SearchOutlined, LockOutlined } from '@ant-design/icons';
-import { useNavigate, Outlet, Link, useLocation} from "react-router";
+import { useNavigate, Outlet, Link, useLocation } from "react-router";
 
 import Footer from './Footer';
 import ChangePassword from './ChangePassword';
@@ -122,8 +122,8 @@ const MainLayout = ({ children }) => {
 
                     <div className="header-logo-wrapper col-auto p-0">
                         <div className="logo-wrapper"><Link to="/"><img className="img-fluid main-logo"
-                            src={HCILogo} alt="logo" style={{maxWidth:'120px' ,maxHeight: '70px'  }} />
-                            <img className="img-fluid white-logo" src={HCILogo} alt="logo" style={{ maxWidth:'120px' ,maxHeight: '70px'  }} /></Link>
+                            src={HCILogo} alt="logo" style={{ maxWidth: '120px', maxHeight: '70px' }} />
+                            <img className="img-fluid white-logo" src={HCILogo} alt="logo" style={{ maxWidth: '120px', maxHeight: '70px' }} /></Link>
                         </div>
                         <div className="toggle-sidebar" onClick={toggleSidebar}>
                             <i className="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
@@ -134,7 +134,7 @@ const MainLayout = ({ children }) => {
                         <div className="form-group w-100">
                             <div className="Typeahead Typeahead--twitterUsers">
                                 <div className="u-posRelative">
-                                    <input className="demo-input Typeahead-input form-control-plaintext w-100" type="text" style={{marginTop:10}}
+                                    <input className="demo-input Typeahead-input form-control-plaintext w-100" type="text" style={{ marginTop: 10 }}
                                         placeholder="Search .." name="q" title="" autoFocus />
                                     <i className="close-search" data-feather="x"></i>
                                     <div className="spinner-border Typeahead-spinner" role="status"><span
@@ -157,8 +157,8 @@ const MainLayout = ({ children }) => {
 
                             <li>
                                 <div className="mode">
-                                    <Link to="/Admin/FlightSearch">
-                                        <i className="fa fa-plane" aria-hidden="true"></i>
+                                    <Link to="/admin/hotelsearch">
+                                        <i className="fa fa-hotel" aria-hidden="true"></i>
                                     </Link>
                                 </div>
                             </li>
@@ -171,24 +171,26 @@ const MainLayout = ({ children }) => {
                                     <span className="me-2 fw-bold" style={{ fontSize: "14px", color: "#333" }}>
                                         Balance: {balance}
                                     </span>
-                                    <i 
-                                        className="fa fa-refresh" 
-                                        style={{ cursor: "pointer", color: "#1890ff", fontSize: "14px" }} 
-                                        onClick={fetchBalance} 
+                                    <i
+                                        className="fa fa-refresh"
+                                        style={{ cursor: "pointer", color: "#1890ff", fontSize: "14px" }}
+                                        onClick={fetchBalance}
                                         title="Reload Balance"
                                     ></i>
                                 </div>
                             </li>
 
                             <li className="profile-nav pe-0 me-0">
-                                <Dropdown 
-                                    menu={{ items: [
-                                        { key: '1', icon: <UserOutlined />, label: 'Account', onClick: () => navigate('/myprofile') },
-                                        { key: '2', icon: <LockOutlined />, label: 'Change Password', onClick: () => setChangePasswordOpen(true) },
-                                        { key: '3', icon: <DashboardOutlined />, label: 'Dashboard', onClick: () => navigate('/') },
-                                        { key: '4', icon: <SearchOutlined />, label: 'Hotel Booking', onClick: () => navigate('/Admin/FlightSearch') },
-                                        { key: '5', icon: <LogoutOutlined />, label: 'Log out', onClick: handleLogout },
-                                    ] }} 
+                                <Dropdown
+                                    menu={{
+                                        items: [
+                                            { key: '1', icon: <UserOutlined />, label: 'Account', onClick: () => navigate('/myprofile') },
+                                            { key: '2', icon: <LockOutlined />, label: 'Change Password', onClick: () => setChangePasswordOpen(true) },
+                                            { key: '3', icon: <DashboardOutlined />, label: 'Dashboard', onClick: () => navigate('/') },
+                                            { key: '4', icon: <SearchOutlined />, label: 'Hotel Booking', onClick: () => navigate('/admin/hotelsearch') },
+                                            { key: '5', icon: <LogoutOutlined />, label: 'Log out', onClick: handleLogout },
+                                        ]
+                                    }}
                                     trigger={['click']}
                                     placement="bottomRight"
                                 >
@@ -208,9 +210,9 @@ const MainLayout = ({ children }) => {
                 <div className={`sidebar-wrapper ${collapsed ? 'close_icon' : ''}`}>
                     <div>
                         <div className="logo-wrapper">
-                             <Link to="/">
-                                <img className="img-fluid for-light" src={HCILogo} alt="" style={{maxWidth:'120px' ,maxHeight: '70px' }} />
-                                <img className="img-fluid for-dark" src={HCILogo} alt="" style={{ maxWidth:'120px' ,maxHeight: '70px'  }} />
+                            <Link to="/">
+                                <img className="img-fluid for-light" src={HCILogo} alt="" style={{ maxWidth: '120px', maxHeight: '70px' }} />
+                                <img className="img-fluid for-dark" src={HCILogo} alt="" style={{ maxWidth: '120px', maxHeight: '70px' }} />
                             </Link>
                             <div className="back-btn"><i className="fa fa-angle-left"></i></div>
                             <div className="toggle-sidebar" onClick={toggleSidebar}><i className="status_toggle middle sidebar-toggle" data-feather="grid">
@@ -244,7 +246,7 @@ const MainLayout = ({ children }) => {
                                             children: item.mappedScreens.map((screen) => ({
                                                 key: screen.path,
                                                 label: (
-                                                    <Link 
+                                                    <Link
                                                         to={screen.path}
                                                         onClick={() => {
                                                             if (window.innerWidth <= 991) {
@@ -266,22 +268,22 @@ const MainLayout = ({ children }) => {
                     </div>
                 </div>
                 <div className="page-body">
-                   
+
                     <div className="container-fluid">
                         <Outlet />
                     </div>
 
-                  
-                        <footer className="footer">
 
-                            <div className="row">
-                                <div className="col-md-12 footer-copyright text-center">
-                                    <p className="mb-0">© 2026 HCI. All rights reserved. | HCI powered by i2space </p>
-                                </div>
+                    <footer className="footer">
+
+                        <div className="row">
+                            <div className="col-md-12 footer-copyright text-center">
+                                <p className="mb-0">© 2026 HCI. All rights reserved. | HCI powered by i2space </p>
                             </div>
+                        </div>
 
-                        </footer>
-            
+                    </footer>
+
                 </div>
             </div>
         </div>

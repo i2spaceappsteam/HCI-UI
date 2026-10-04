@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_FLIGHT_API_BASE_URL;
+const BASE = import.meta.env.VITE_HOTEL_API_BASE_URL;
 const _getParamString = (obj) => {
   let str = "";
   for (const key in obj) {
@@ -80,7 +80,8 @@ class Apiclient1 {
     try {
       const paramString = _getParamString(params);
       const baseUrl = getFullUrl(url);
-      const fullUrl = Object.keys(params).length > 0 ? `${baseUrl}?${paramString}` : baseUrl;
+      const fullUrl =
+        Object.keys(params).length > 0 ? `${baseUrl}?${paramString}` : baseUrl;
 
       const res = await fetch(fullUrl, {
         method: "GET",
@@ -104,7 +105,8 @@ class Apiclient1 {
     try {
       const paramString = _getParamString(params);
       const baseUrl = getFullUrl(url);
-      const fullUrl = Object.keys(params).length > 0 ? `${baseUrl}?${paramString}` : baseUrl;
+      const fullUrl =
+        Object.keys(params).length > 0 ? `${baseUrl}?${paramString}` : baseUrl;
 
       const res = await fetch(fullUrl, {
         method: "PUT",
@@ -129,7 +131,8 @@ class Apiclient1 {
     try {
       const paramString = _getParamString(params);
       const baseUrl = getFullUrl(url);
-      const fullUrl = Object.keys(params).length > 0 ? `${baseUrl}?${paramString}` : baseUrl;
+      const fullUrl =
+        Object.keys(params).length > 0 ? `${baseUrl}?${paramString}` : baseUrl;
 
       const res = await fetch(fullUrl, {
         method: "DELETE",

@@ -51,7 +51,7 @@ const ChangePassword = ({ isOpen, onClose }) => {
             footer={null}
             closable={false}
             centered
-            destroyOnClose
+            destroyOnHidden
             width={500}
         >
             <div className="card mb-0">

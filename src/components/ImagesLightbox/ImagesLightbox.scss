@@ -1,0 +1,37 @@
+.carousel-wrapper {
+  .carousel.carousel-slider {
+    height: 340px !important;
+  }
+}
+
+.charterFlight-wrapper {
+  .carousel.carousel-slider {
+    height: 400px !important;
+  }
+  .selected {
+    border: 0 !important;
+  }
+  .carousel {
+    .thumbs-wrapper.axis-vertical {
+      padding: 10px;
+    }
+  }
+}
+.carousel-images {
+  max-height: 400px;
+  object-fit: cover;
+  width: 100%;
+}
+.carousel-ima {
+  max-height: 376px;
+  object-fit: cover;
+  width: 100%;
+}
+@media screen and (max-width: 768px) {
+  .main-chater-wrapper .carousel.carousel-slider {
+    height: 280px !important;
+  }
+  .main-chater-wrapper img {
+    height: 280px !important;
+  }
+}

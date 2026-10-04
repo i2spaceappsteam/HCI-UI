@@ -1,0 +1,45 @@
+ 
+.hotel-sort-block {
+  margin-bottom: 15px;
+  .sort-text {
+    margin-bottom: 0;
+    font-weight: 600;
+  }
+  .results-sort-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    .flex-wrapper {
+      display: flex;
+      align-items: center;
+    }
+    .ant-radio-group {
+      display: flex;
+      align-items: center;
+      .ant-radio-wrapper {
+        margin-left: 25px;
+        margin-right: 0;
+        .price-type {
+          span {
+            padding-right: 5px;
+          }
+        }
+      }
+    }
+    .ant-input-group {
+      max-width: 335px;
+      .search-type-box {
+        max-width: 55px;
+        width: 100%;
+      }
+      .search-select-box {
+        max-width: 280px;
+        width: 100%;
+      }
+    }
+  }
+  @media (max-width: 767px) {
+    display: none !important;
+  }
+}

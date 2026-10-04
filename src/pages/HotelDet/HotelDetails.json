@@ -1,0 +1,280 @@
+{
+  "status": 200,
+  "message": "success",
+  "response": {
+    "searchIdentity": "5f06af50357e3e2f23fbe137",
+    "exchangeRate": 0,
+    "searchMaxPrice": 0,
+    "searchMinPrice": 0,
+    "data": [
+      {
+        "hotelId": "153342",
+        "hotelName": "Aditya Park-A Sarovar Portico Hotel",
+        "hotelAddress": "Aditya Trade Centre,Ameerpet,Hyderabad 500 038,Andhra Pradesh",
+        "hotelDescription": "Ideally located in the prime touristic area of Begumpet, Aditya Park -A Sarovar Portico Hotel promises a relaxing and wonderful visit. The hotel has everything you need for a comfortable stay. Facilities like free Wi-Fi in all rooms, 24-hour room service, facilities for disabled guests, Wi-Fi in public areas, valet parking are readily available for you to enjoy. Designed for comfort, selected guestrooms offer internet access ? wireless, internet access ? wireless (complimentary), non smoking rooms, air conditioning, desk to ensure a restful night. The hotel offers various recreational opportunities. Aditya Park -A Sarovar Portico Hotel combines warm hospitality with a lovely ambiance to make your stay in Hyderabad unforgettable.",
+        "zipCode": "500 038",
+        "starRating": "3",
+        "latitude": "17.436449",
+        "longitude": "78.446311",
+        "city": "Hyderabad",
+        "imageList": ["http://images.xmlhub.com/in/20801/153342/main.jpg"],
+        "hotelMinPrice": 0,
+        "provider": "OTAH",
+        "rooms": [
+          {
+            "roomId": "OgthPdPFnl$15942737518471594273751",
+            "roomName": "Executive Dbl - 2 TwinBed or 1 KingBed",
+            "roomDesc": "Free WiFi|Free WiFi",
+            "roomImageList": [
+              "http://images.xmlhub.com/in/20801/153342/main.jpg"
+            ],
+            "roomLeft": 0,
+            "ratePlans": [
+              {
+                "ratePlanId": "MzS1NDEyNzY3NbQwMTeEc3QjPAxNDHQNdI0MjICUua6Bpa6hqbGxiZFuNgA",
+                "ratePlanName": "Breakfast|Breakfast",
+                "refundable": true,
+                "inclusions": [
+                  "24-hour front desk ",
+                  "Accessible bathroom",
+                  "Airport transportation (surcharge) ",
+                  "Bar/lounge ",
+                  "Business center",
+                  "Coffee shop or cafÃ© ",
+                  "Concierge services ",
+                  "Conference center ",
+                  "Conference space",
+                  "Dry cleaning/laundry service ",
+                  "Elevator/lift ",
+                  "Fitness facilities ",
+                  "Free WiFi",
+                  "Free breakfast",
+                  "Free newspapers in lobby",
+                  "Free self parking",
+                  "Free valet parking",
+                  "Health club",
+                  "In-room accessibility",
+                  "Laundry facilities ",
+                  "Limo or Town Car service available ",
+                  "Luggage storage ",
+                  "Meeting rooms2",
+                  "Multilingual staff ",
+                  "Number of buildings/towers - 1",
+                  "Number of floors - 8",
+                  "Number of meeting rooms - 4",
+                  "Number of restaurants - 2",
+                  "Porter/bellhop ",
+                  "Total number of rooms - 88",
+                  "Tours/ticket assistance ",
+                  "Train station pickup (surcharge) ",
+                  "Wedding services ",
+                  "Year Built2002"
+                ],
+                "price": {
+                  "base": 14783.077759256399,
+                  "total": 14783.077759256399,
+                  "discount": 0,
+                  "tax": 0
+                },
+                "soldOut": false,
+                "cancellationPolicy": {
+                  "policyName": "Refundable",
+                  "policies": [""]
+                }
+              }
+            ]
+          },
+          {
+            "roomId": "OgthPdPFnl$15942737518471594273752",
+            "roomName": "Executive Dbl - 2 TwinBed or 1 KingBed",
+            "roomDesc": "Free WiFi|Free WiFi",
+            "roomImageList": [
+              "http://images.xmlhub.com/in/20801/153342/main.jpg"
+            ],
+            "roomLeft": 0,
+            "ratePlans": [
+              {
+                "ratePlanId": "MzS1NDEyNzY3NbQwMTeEc3QjPAxNDHQNdI0MjICUua6Bpa6hqbGxiZFuNgA",
+                "ratePlanName": "Breakfast|Breakfast",
+                "refundable": true,
+                "inclusions": [
+                  "24-hour front desk ",
+                  "Accessible bathroom",
+                  "Airport transportation (surcharge) ",
+                  "Bar/lounge ",
+                  "Business center",
+                  "Coffee shop or cafÃ© ",
+                  "Concierge services ",
+                  "Conference center ",
+                  "Conference space",
+                  "Dry cleaning/laundry service ",
+                  "Elevator/lift ",
+                  "Fitness facilities ",
+                  "Free WiFi",
+                  "Free breakfast",
+                  "Free newspapers in lobby",
+                  "Free self parking",
+                  "Free valet parking",
+                  "Health club",
+                  "In-room accessibility",
+                  "Laundry facilities ",
+                  "Limo or Town Car service available ",
+                  "Luggage storage ",
+                  "Meeting rooms2",
+                  "Multilingual staff ",
+                  "Number of buildings/towers - 1",
+                  "Number of floors - 8",
+                  "Number of meeting rooms - 4",
+                  "Number of restaurants - 2",
+                  "Porter/bellhop ",
+                  "Total number of rooms - 88",
+                  "Tours/ticket assistance ",
+                  "Train station pickup (surcharge) ",
+                  "Wedding services ",
+                  "Year Built2002"
+                ],
+                "price": {
+                  "base": 14783.077759256399,
+                  "total": 14783.077759256399,
+                  "discount": 0,
+                  "tax": 0
+                },
+                "soldOut": true,
+                "cancellationPolicy": {
+                  "policyName": "Refundable",
+                  "policies": [""]
+                }
+              }
+            ]
+          },
+          {
+            "roomId": "OgthPdPFnl$15942737518471594273753",
+            "roomName": "Executive Dbl - 2 TwinBed or 1 KingBed",
+            "roomDesc": "Free WiFi|Free WiFi",
+            "roomImageList": [
+              "http://images.xmlhub.com/in/20801/153342/main.jpg"
+            ],
+            "roomLeft": 0,
+            "ratePlans": [
+              {
+                "ratePlanId": "MzS1NDEyNzY3NbQwMTeEc3QjPAxNDHQNdI0MjICUua6Bpa6hqbGxiZFuNgA",
+                "ratePlanName": "Breakfast|Breakfast",
+                "refundable": true,
+                "inclusions": [
+                  "24-hour front desk ",
+                  "Accessible bathroom",
+                  "Airport transportation (surcharge) ",
+                  "Bar/lounge ",
+                  "Business center",
+                  "Coffee shop or cafÃ© ",
+                  "Concierge services ",
+                  "Conference center ",
+                  "Conference space",
+                  "Dry cleaning/laundry service ",
+                  "Elevator/lift ",
+                  "Fitness facilities ",
+                  "Free WiFi",
+                  "Free breakfast",
+                  "Free newspapers in lobby",
+                  "Free self parking",
+                  "Free valet parking",
+                  "Health club",
+                  "In-room accessibility",
+                  "Laundry facilities ",
+                  "Limo or Town Car service available ",
+                  "Luggage storage ",
+                  "Meeting rooms2",
+                  "Multilingual staff ",
+                  "Number of buildings/towers - 1",
+                  "Number of floors - 8",
+                  "Number of meeting rooms - 4",
+                  "Number of restaurants - 2",
+                  "Porter/bellhop ",
+                  "Total number of rooms - 88",
+                  "Tours/ticket assistance ",
+                  "Train station pickup (surcharge) ",
+                  "Wedding services ",
+                  "Year Built2002"
+                ],
+                "price": {
+                  "base": 14783.077759256399,
+                  "total": 14783.077759256399,
+                  "discount": 0,
+                  "tax": 0
+                },
+                "soldOut": true,
+                "cancellationPolicy": {
+                  "policyName": "Refundable",
+                  "policies": [""]
+                }
+              }
+            ]
+          },
+          {
+            "roomId": "OgthPdPFnl$15942737518471594273754",
+            "roomName": "Executive Dbl - 2 TwinBed or 1 KingBed",
+            "roomDesc": "Free WiFi|Free WiFi",
+            "roomImageList": [
+              "http://images.xmlhub.com/in/20801/153342/main.jpg"
+            ],
+            "roomLeft": 0,
+            "ratePlans": [
+              {
+                "ratePlanId": "MzS1NDEyNzY3NbQwMTeEc3QjPAxNDHQNdI0MjICUua6Bpa6hqbGxiZFuNgA",
+                "ratePlanName": "Breakfast|Breakfast",
+                "refundable": true,
+                "inclusions": [
+                  "24-hour front desk ",
+                  "Accessible bathroom",
+                  "Airport transportation (surcharge) ",
+                  "Bar/lounge ",
+                  "Business center",
+                  "Coffee shop or cafÃ© ",
+                  "Concierge services ",
+                  "Conference center ",
+                  "Conference space",
+                  "Dry cleaning/laundry service ",
+                  "Elevator/lift ",
+                  "Fitness facilities ",
+                  "Free WiFi",
+                  "Free breakfast",
+                  "Free newspapers in lobby",
+                  "Free self parking",
+                  "Free valet parking",
+                  "Health club",
+                  "In-room accessibility",
+                  "Laundry facilities ",
+                  "Limo or Town Car service available ",
+                  "Luggage storage ",
+                  "Meeting rooms2",
+                  "Multilingual staff ",
+                  "Number of buildings/towers - 1",
+                  "Number of floors - 8",
+                  "Number of meeting rooms - 4",
+                  "Number of restaurants - 2",
+                  "Porter/bellhop ",
+                  "Total number of rooms - 88",
+                  "Tours/ticket assistance ",
+                  "Train station pickup (surcharge) ",
+                  "Wedding services ",
+                  "Year Built2002"
+                ],
+                "price": {
+                  "base": 14783.077759256399,
+                  "total": 14783.077759256399,
+                  "discount": 0,
+                  "tax": 0
+                },
+                "soldOut": true,
+                "cancellationPolicy": {
+                  "policyName": "Refundable",
+                  "policies": [""]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

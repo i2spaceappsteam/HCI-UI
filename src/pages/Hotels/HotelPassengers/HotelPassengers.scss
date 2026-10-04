@@ -1,0 +1,22 @@
+.hotel-pax-box {
+  .ages-select {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: end;
+    select {
+      // padding: 7px 9px;
+      padding: 1px 2px;
+      background-color: #fff;
+      font-size: 14px;
+      line-height: 24px;
+      color: #1c2b39;
+      border: 1px solid #bcd5f5;
+      border-radius: 3px;
+      outline: none;
+      // margin: 0 4% 10px;
+      margin: 0 1px;
+      margin-bottom: 4px;
+    }
+  }
+}

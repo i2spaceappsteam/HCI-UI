@@ -1,0 +1,64 @@
+{
+  "status": 200,
+  "message": "Success",
+  "response": {
+    "refId": "1802501100",
+    "provider": "OTAH",
+    "checkIn": "2020-09-25T22:00:00.000+0000",
+    "checkOut": "2020-09-26T22:00:00.000+0000",
+    "providerRoomBlockId": "7VXLkqs2EP2VrL1IITDO4Kq7MLZ5XYOHp4DNFCAMAvEoYw_GX5_G9kwqWdxVKqssVECru9V9zmkxXPue0fy8DjW05BZld8lZ1pF8jdByxUnLRZMMl_xcPm0rxImrRXY9n_M2m9a-u1vIXVfTtviZT2tXtWq7tj69kCh2UDoHz3CSPdFSFrR2EPCmipSIj-5-zVS3Vc42y5aEIj0K49Lm-s5kgeI34z1uOM5uS_eIHSHlFNO615PHi1wamjxu-vejIo-4viDSSLu8IrbHx8e4Jr3PB5zTwpnIEg9-wGXs7Raj_XTAAY9bpnp760jsHz8W_Zlm-Xq1_F16WyiU5e_dcFHobY1ECaE3gefRavXHXx-Lc9c1JB-ytQMvvx1bNi1OAEBOPkiesDW3mB8fyWdCWZKyHAw9zWp5ej93J0i__cJrQYf-nKeA2BotXm-AHSVrxEn8CsH-5pmEMnqZ1t75mi_OeTJ07XrR5uPHK-CjntFurM6unbuLv9AuxcS3sF8bXqA4SxcPXIok7HOW6qDykwjO3RSUilTWT2-3QYdAlm3Un3JsfRK_p35zOWUt6Zw24zN842Otf_dwOWJGXL-Kh6hBfCjoN7x3mMtdNEsgNFNFLaqsEjflLW8UIVPLPq_jMlAkmnj2zMdo1qKbqQyZtaIsQs2X3ztGAYx8MnYRFqsY34YodPqUF420iT-zBpVEZZ9pa9JjO1CbV64RHwypqnAJlq4uFptUMC7PmOXDxxecMmudPdiYXnXU3JmF2wZXfaePZrUpzN1m9Vr0sDWUtPmFrxetLM9cmXd_9t0lqjLFfODnofzw99VggnquRFXa2NUHvba6KDTa2FcuqQD2rb7Sq_1obh97KGsNljaWOMe6vujqLQd2do2bN3qkhhZjkWWNMugK-GFlSgSzOFJZgZxD7spVogZVwkuIbMfCa94KnwcuJ7lMG7vwAJPYhXccXGMVsbR17rqKSoib4tBCqWYXCV4WcAaXhAbTNYuLwrqI-LLMGsKyaVm4sB_xyh3yfMZUrh-4qNATFtvZllHIhR0UCQ-OsgPHrpFgsCi0wI9ddVVEKTYY-M3x1wSTjmhmkQr645wUznn6SVUkBOPMee6OBfTMxaFZRM-6UNT0LBLsgqhv33EHKvuJ6s_1_U0DuuqwCDtDAthBbujZKlMV-p3xwDbkNIsMeNL3zAu2S3oKuR-gvX9beVS_gaKYvn8p4NGNPKYqqyJsDIBeD4hUX2fNldk4hq714hcKLRLNuD8r1_9Xyn-sFJj4OsZKDRxeY98BPfgzz6M5yT8J9A9cTeZ2M5q77rlmjprbfIYO0z9l0zz9m6fi3NfPtf_WXfUP3Z2SWVMQA3sjYF-mmtNDr_TILn_o7cyBwYX8dx2TCXo5eBvx4Oko2O25Y7UZ53WAZW6H0fK6-7Mm4FmR6u9b7lE3Nx5dbrKYfbO-61_Cc3M2dz7ceI_bsXrdeCeisRFuuJXefN9skPel9UACLUkobW16rLLboTK5OZaEBmhg5g3iWOA5W0MK3ZF-9Zm2wI2GJJhG-GkSRtt8l1zy9S_mYZ5cBr5adz0Pa-5P",
+    "providerConfirmationId": "XHUB5ED78847",
+    "bookingTime": "Wed Jun 03 00:00:00 CEST 2020",
+    "propertyId": "161056",
+    "propertyName": "Taj Deccan",
+    "city": "Hyderabad",
+    "country": "India",
+    "starRating": 5,
+    "status": 2,
+    "paymentStatus": "3",
+    "noOfRoom": 1,
+    "totalPrice": 4575.3960123671,
+    "totalTax": 0,
+    "discount": 0,
+    "finalPrice": 4575.3960123671,
+    "sellRate": 4575.3960123671,
+    "roomId": "QLOAl1VpM5$15911832216671591183221",
+    "roomName": "Superior Room, 1 King Bed, City View - 1 KingBed",
+    "ratePlanId": "PccxEQAgEAMwRb1rC1_AARLwgP-djWxRLWk2W8nQD85WJwqmCQZsUMQK7gM",
+    "ratePlanName": "Room Only",
+    "roomDetails": [
+      {
+        "adults": 1,
+        "child": 1
+      }
+    ],
+    "guestInfo": {
+      "mobileNo": "9849885868",
+      "email": "anil.g@i2space.com",
+      "name": "Anil"
+    },
+    "updatedDate": "2020-06-03",
+    "cancelPolicyName": "If you cancel the booking from 03 Jun 2020 00:00:00 to 03 Jun 2020 16:53:35, 100.0% INR will be charged.",
+    "inclusions": "[24-hour front desk , Airport transportation (surcharge) , Bar/lounge, Breakfast available (surcharge) , Business center, Coffee shop or cafÃ© , Coffee/tea in common areas, Conference space, Conference space size (feet) - 28697, Conference space size (meters) - 2666, Dry cleaning/laundry service , Elevator/lift , Express check-in , Express check-out , Free WiFi, Free newspapers in lobby, Free valet parking, Full-service spa, Garden , Gift shops or newsstand , Hair salon  , Health club, Laundry facilities , Library , Limo or Town Car service available , Meeting rooms, Number of buildings/towers - 1, Number of floors - 3, Number of meeting rooms - 7, Number of restaurants - 4, Outdoor pool, Pool sun loungers , Pool umbrellas, Porter/bellhop , Safe-deposit box at front desk , Shopping on site , Spa treatment room(s), Spa tub , Steam room, Total number of rooms - 151, Train station pickup (surcharge) , Wedding services , Wired (high-speed) Internet access - surcharge]",
+    "roomGuestInfoList": [
+      {
+        "pax_info_list": [
+          {
+            "title": "Mr.",
+            "first_name": "Anil",
+            "last_name": "kumar",
+            "type": "AD",
+            "age": null
+          },
+          {
+            "title": "Mstr.",
+            "first_name": "test raj",
+            "last_name": "kumar",
+            "type": "CH",
+            "age": "2"
+          }
+        ]
+      }
+    ]
+  }
+}

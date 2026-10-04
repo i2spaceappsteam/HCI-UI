@@ -1,0 +1,33 @@
+
+.skeleton-layout-container {
+  background-color: #fff;
+  margin-bottom: 20px;
+  .hotel-details {
+    padding: 15px;
+  }
+  .choose-block-container {
+    display: flex;
+    align-items: center;
+    border-left: 1px solid #e8e8e8;
+    @media (max-width: 767px) {
+      display: none;
+    }
+    .ant-skeleton-title {
+      width: 50% !important;
+      margin: 16px auto !important;
+      height: 30px;
+    }
+    .ant-skeleton-paragraph {
+      li {
+        &:nth-child(1) {
+          width: 65%;
+          margin: auto;
+          height: 40px;
+        }
+        &:nth-child(2) {
+          margin: 16px auto;
+        }
+      }
+    }
+  }
+}

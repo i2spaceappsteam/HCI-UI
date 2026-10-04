@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Card, Button, Table } from 'antd';
 import ApiClient from '../Helpers/ApiClient';
-import { Form, Modal, Input, InputNumber, DatePicker,Select } from 'antd';
+import { Form, Modal, Input, InputNumber, Select } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { notifySuccess, notifyError, notifyWarning } from "../../public/js/notify/notify";
-import dayjs from 'dayjs';
-import AirportAutoComplete from '../common/AirportAutoComplete/AirportAutoComplete';
 import { useSelector } from 'react-redux';
 
 const { Option } = Select;
@@ -15,14 +13,10 @@ const CommissionMarkup = () => {
   const { user } = useSelector((state) => state.auth);
   const [dataList, setDataList] = useState([]);
   const [membershipList, setMembershipList] = useState([]);
-  const [operatorList, setOperatorList] = useState([]);
   const [id, setId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [open, setOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [originVal, setOriginVal] = useState(null);
-  const [destinationVal, setDestinationVal] = useState(null);
-
 
   const openDeleteModal = (id) => {
     setDeleteId(id);
@@ -30,31 +24,20 @@ const CommissionMarkup = () => {
   };
 
   const handleSubmit = async () => {
-
     try {
       const values = await form.validateFields();
-      console.log(values)
       const request = {
-        userId: user?.id || 0,
-        commId: id == null ? 0 : id,
-        membershipID: values.membershipID || 0,
+        id: id == null ? 0 : id,
+        membershipId: values.membershipID || 0,
         serviceType: values.serviceType || 0,
-        fareType: values.fareType || 0,
-        airlineCode: values.airlineCode || "",
-        transactionType: values.transactionType || 0,
-        fareCategoryType: values.fareCategoryType || 0,
+        starRating: values.starRating || 0,
         markupType: values.markupType || 0,
         markupValue: values.markupValue || 0,
         commissionType: values.commissionType || 0,
         commissionValue: values.commissionValue || 0,
-        cabinType: values.cabinType || "",
-        origin: values.origin || "",
-        destination: values.destination || "",
-        fromTravelDate: values.fromTravelDate ? values.fromTravelDate.toISOString() : new Date().toISOString(),
-        toTravelDate: values.toTravelDate ? values.toTravelDate.toISOString() : new Date().toISOString()
       };
 
-      const res = await ApiClient.post("CommissionMarkup/AddCommissionMarkup", request);
+      const res = await ApiClient.post("AdminCommission/AddAdminCommission", request);
 
       if (res?.success === true) {
         notifySuccess("success", res.message);
@@ -63,7 +46,7 @@ const CommissionMarkup = () => {
         GetData();
         setId(null);
       } else if (res?.status === 409) {
-        notifyWarning("warning", res.message || "Duplicate Commission Markup");
+        notifyWarning("warning", res.message || "Duplicate Admin Commission");
       } else {
         notifyError("danger", res.message || "Something went wrong");
       }
@@ -76,28 +59,12 @@ const CommissionMarkup = () => {
     form.resetFields();
     setOpen(false);
     setId(null);
-    setOriginVal(null);
-    setDestinationVal(null);
   };
-
 
   useEffect(() => {
     GetData();
     GetMemberships();
-    getOperators();
   }, []);
-
-  const getOperators = () => {
-    ApiClient.get('Operator/GetAll')
-      .then((res) => {
-        if (res?.success === true) {
-          setOperatorList(res.data || []);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
 
   function GetMemberships() {
     ApiClient.get("Membership/GetMemberships")
@@ -110,12 +77,12 @@ const CommissionMarkup = () => {
           notifyError("danger", res.message);
         }
       })
-      .catch((e) => {});
+      .catch((e) => { });
   }
 
   function GetData() {
-    const request = { userId: user?.id || 0 }; // Pass dynamic userId
-    ApiClient.post("CommissionMarkup/GetCommissionMarkup", request)
+    const request = { userId: user?.id || 0 };
+    ApiClient.post("AdminCommission/GetAdminCommission", request)
       .then((res) => {
         if (res?.success === true) {
           setDataList(res.data || []);
@@ -125,36 +92,25 @@ const CommissionMarkup = () => {
           notifyError("danger", res.message);
         }
       })
-      .catch((e) => {});
+      .catch((e) => { });
   }
 
   function editRecord(record) {
     form.setFieldsValue({
-      membershipID: record.membershipId,
+      membershipId: record.membershipID || record.membershipId, // Fallback in case of camelCase mismatch
       serviceType: record.serviceType,
-      fareType: record.fareType,
-      airlineCode: record.airlineCode,
-      transactionType: record.transactionType,
-      fareCategoryType: record.fareCategoryType,
+      starRating: record.starRating,
       markupType: record.markupType,
       markupValue: record.markupValue,
       commissionType: record.commissionType,
       commissionValue: record.commissionValue,
-      cabinType: record.cabinType,
-      origin: record.origin,
-      destination: record.destination,
-      fromTravelDate: record.fromTravelDate ? dayjs(record.fromTravelDate) : null,
-      toTravelDate: record.toTravelDate ? dayjs(record.toTravelDate) : null,
     });
-    setId(record.commId);
-    setOriginVal(record.origin);
-    setDestinationVal(record.destination);
+    setId(record.id || record.commId);
     setOpen(true);
   }
 
-
   function handleDelete() {
-    ApiClient.put(`CommissionMarkup/DeleteCommissionMarkup/${deleteId}`)
+    ApiClient.put(`AdminCommission/DeleteAdminCommission/${deleteId}`)
       .then((res) => {
         if (res?.success === true) {
           setDeleteId(null);
@@ -167,7 +123,7 @@ const CommissionMarkup = () => {
           notifyError("danger", res.message);
         }
       })
-      .catch((e) => {});
+      .catch((e) => { });
   }
 
   const columns = [
@@ -186,33 +142,33 @@ const CommissionMarkup = () => {
             className="fa fa-trash-o text-danger"
             style={{ cursor: "pointer" }}
             title="Delete"
-            onClick={() => openDeleteModal(m.commId)}
+            onClick={() => openDeleteModal(m.id || m.commId)}
           ></i>
         </div>
       ),
     },
-    { 
-      title: 'Membership', 
+    {
+      title: 'Membership',
       key: 'membership',
-      render: (_, m) => membershipList.find(ml => ml.id === m.membershipId)?.membership || m.membershipId
+      render: (_, m) => {
+        const mId = String(m.membershipID || m.membershipId || '');
+        const match = membershipList.find(ml => String(ml.id) === mId);
+        return match ? match.membership : mId;
+      }
     },
-    { title: 'Airline Code', dataIndex: 'airlineCode', key: 'airlineCode' },
-    { title: 'Fare Type', dataIndex: 'fareType', key: 'fareType' },
-    { title: 'Fare Category', dataIndex: 'fareCategoryType', key: 'fareCategoryType' },
-    { title: 'Cabin Type', dataIndex: 'cabinType', key: 'cabinType' },
-    { title: 'Origin', dataIndex: 'origin', key: 'origin' },
-    { title: 'Destination', dataIndex: 'destination', key: 'destination' },
-    { 
-      title: 'Travel Dates', 
-      key: 'travelDates',
-      render: (_, m) => (
-        <>
-          {m.fromTravelDate ? dayjs(m.fromTravelDate).format('YYYY-MM-DD') : ''} to{' '}
-          {m.toTravelDate ? dayjs(m.toTravelDate).format('YYYY-MM-DD') : ''}
-        </>
-      )
+    { title: 'Service Type', dataIndex: 'serviceType', key: 'serviceType', render: (val) => val === 0 ? 'DOMESTIC HOTEL' : 'INTERNATIONAL HOTEL' },
+    {
+      title: 'Star Rating',
+      dataIndex: 'starRating',
+      key: 'starRating',
+      render: (val) => {
+        const ratings = { 0: 'All', 1: 'One Star', 2: 'Two Star', 3: 'Three Star', 4: 'Four Star', 5: 'Five Star' };
+        return ratings[val] || val;
+      }
     },
+    { title: 'Markup Type', dataIndex: 'markupType', key: 'markupType', render: (val) => val === 1 ? 'Percentage' : 'Fixed' },
     { title: 'Markup Value', dataIndex: 'markupValue', key: 'markupValue' },
+    { title: 'Commission Type', dataIndex: 'commissionType', key: 'commissionType', render: (val) => val === 1 ? 'Percentage' : 'Fixed' },
     { title: 'Commission Value', dataIndex: 'commissionValue', key: 'commissionValue' },
   ];
 
@@ -221,7 +177,7 @@ const CommissionMarkup = () => {
       <div className="col-sm-12">
         <div className="card">
           <div className="card-header card-header--2">
-            <h5>All Commission Markups</h5>
+            <h5>All Admin Commissions</h5>
             <button type="button" className="btn btn-theme" onClick={() => setOpen(true)}>
               <i data-feather="plus-square"></i> Add New
             </button>
@@ -229,12 +185,12 @@ const CommissionMarkup = () => {
 
           <div className="card-body">
             <div className="table-responsive table-desi">
-              <Table 
-                columns={columns} 
-                dataSource={dataList} 
-                size="small" 
-                scroll={{ x: 'max-content' }} 
-                rowKey={(record) => record.commId}
+              <Table
+                columns={columns}
+                dataSource={dataList}
+                size="small"
+                scroll={{ x: 'max-content' }}
+                rowKey={(record) => record.id || record.commId}
                 pagination={{ pageSize: 10 }}
               />
             </div>
@@ -267,10 +223,10 @@ const CommissionMarkup = () => {
         </div>
       </Modal>
 
-      <Modal open={open} footer={null} closable={false} centered width={1140} onCancel={handleCancel}>
+      <Modal open={open} footer={null} closable={false} centered width={800} onCancel={handleCancel}>
         <div className="card">
           <div className="card-header d-flex justify-content-between align-items-center">
-            <h5>{id == null ? "Add Commission Markup" : "Update Commission Markup"}</h5>
+            <h5>{id == null ? "Add Admin Commission" : "Update Admin Commission"}</h5>
             <button type="button" className="btn-close" onClick={handleCancel}></button>
           </div>
 
@@ -286,7 +242,7 @@ const CommissionMarkup = () => {
             `}</style>
             <Form layout="vertical" form={form} className="theme-form mega-form">
               <div className="row">
-                <div className="col-md-3 mb-2">
+                <div className="col-md-6 mb-2">
                   <label className="form-label-title">Membership</label>
                   <Form.Item name="membershipID">
                     <Select placeholder="Select Membership" allowClear>
@@ -298,236 +254,56 @@ const CommissionMarkup = () => {
                     </Select>
                   </Form.Item>
                 </div>
-                <div className="col-md-3 mb-2">
+                <div className="col-md-6 mb-2">
                   <label className="form-label-title">Service Type</label>
                   <Form.Item name="serviceType">
-                     <Select placeholder="Please select">
-                    
-                    <Option value={0}>DOMESTIC FLIGHTS</Option>
-                    <Option value={1}>INTERNATIONAL FLIGHTS</Option>
-                  </Select>
-                  </Form.Item>
-                </div>
-                <div className="col-md-3 mb-2">
-                  <label className="form-label-title">Fare Type</label>
-                  <Form.Item name="fareType">
-                  <Select
-                     showSearch
-                     placeholder="Select Fare Type"
-                     filterOption={(input, option) =>
-                       option.children
-                         .toLowerCase()
-                         .indexOf(input.toLowerCase()) >= 0
-                     }
-                   >
-                    <Option value={1}>ALL</Option>
-                    <Option value={2}>GENERAL</Option>
-                    <Option value={3}>PUBLISH</Option>
-                    <Option value={4}>INSTANTPUR</Option>
-                    <Option value={5}>SME</Option>
-                    <Option value={6}>SAVER</Option>
-                    <Option value={7}>CORPORATE</Option>
-                    <Option value={8}>COUPON</Option>
-                    <Option value={9}>FLEXI</Option>
-                    <Option value={10}>NDC</Option>
-                    <Option value={11}>TACTICAL</Option>
-                    <Option value={12}>SUPER6E</Option>
-                    <Option value={13}>SME.CRPCON</Option>
-                    <Option value={14}>SPECIAL</Option>
-                    <Option value={15}>SUPERFARE</Option>
-                    <Option value={16}>ECONOMY LITE</Option>
-                    <Option value={17}>ECONOMY SMART</Option>
-                    <Option value={18}>ECONOMY PRIME</Option>
-                    <Option value={19}>ECONOMY CLASSIC</Option>
-                    <Option value={20}>ECONOMY CONVENIENCE</Option>
-                    <Option value={21}>COMFORT</Option>
-                    <Option value={22}>BASIC FARE</Option>
-                    <Option value={23}>VALUE FARE</Option>
-                    <Option value={24}>EXTRA FARE</Option>
-                    <Option value={25}>YL|ECONOMY LIGHT</Option>
-                    <Option value={26}>EC|ECONOMY SMART</Option>
-                    <Option value={27}>YL|ECONOMY FLEX</Option>
-                    <Option value={28}>SPECIAL CP</Option>
-                    <Option value={29}>SPICE FLEX</Option>
-                    <Option value={30}>XPRESS VALUE CLASS</Option>
-                    <Option value={31}>XPRESS FLEX CLASS</Option>
-                    <Option value={32}>CORPORATE VALUE CLASS</Option>
-                    <Option value={33}>LIGHT</Option>
-                    <Option value={34}>STANDARD</Option>
-                    <Option value={35}>PROMO FARE</Option>
-                    <Option value={36}>CORP CONNECT FARE</Option>
-                    <Option value={37}>REGULAR FARE</Option>
-                    <Option value={38}>ECO VALUE</Option>
-                    <Option value={39}>ECONOMY COMFORT</Option>
-                    <Option value={40}>ECOFLEX|ECONOMY FLEX</Option>
-                    <Option value={41}>VALUE</Option>
-                    <Option value={42}>YS|ECONOMY FLEX</Option>
-                    <Option value={43}>YR|ECONOMY SPECIAL</Option>
-                    <Option value={44}>YP|ECONOMY SAVER</Option>
-                    <Option value={45}>YF|ECONOMY FLEX PLUS</Option>
-                    <Option value={46}>LITE</Option>
-                    <Option value={47}>ECONOMY LIGHT</Option>
-                    <Option value={48}>YF|ECONOMY FLEX</Option>
-                    <Option value={49}>SALE</Option>
-                    <Option value={50}>PUBLISHED</Option>
-                    <Option value={51}>FAMILY</Option>
-                    <Option value={52}>FLEXI_PLUS</Option>
-                    <Option value={53}>PREMIUM_FLEX</Option>
-                     <Option value={54}>GOMORE</Option>   
-                     <Option value={55}>CORPORATE_FLEX</Option>
-                     <Option value={56}>SPECIAL_RETURN</Option>
-                     <Option value={57}>OFFER_FARE_WITHOUT_PNR</Option>
-                     <Option value={58}>OFFER_FARE_WITH_PNR</Option>
-                     <Option value={59}>SUPER_6E</Option>
-                     <Option value={60}>AZAL CLASSIC</Option>
-<Option value={61}>AZAL PLUS</Option>
-<Option value={62}>ECONOMY FLEX</Option>
-<Option value={63}>ECO CLASSIC</Option>
-<Option value={64}>ECO FLEX</Option>
-<Option value={65}>ECO SAVER</Option>
-<Option value={66}>ECO FLEXPLUS</Option>
-<Option value={67}>BASIC ECO</Option>
-<Option value={68}>FLEX ECO</Option>
-<Option value={69}>ECONOMY SAVER</Option>
-<Option value={70}>ECONOMY BASE</Option>
-<Option value={71}>ECONOMY GREEN</Option>
-<Option value={72}>ECONOMY BASIC</Option>
-<Option value={73}>ECONOMY VALUE</Option>
-<Option value={74}>ECONOMY DELUXE</Option>
-<Option value={75}>ECONOMY STANDARD</Option>
-<Option value={76}>ECONOMY FLEXI</Option>
-<Option value={77}>RESTRICTED</Option>
-<Option value={78}>FLEXIBLE</Option>
-<Option value={79}>ECONOMY ESSENTIAL</Option>
-                     <Option value={81}>UPFRONT</Option>
-                     <Option value={82}>SPICE SAVER</Option>
-                     <Option value={83}>SAVER (REGULAR)</Option>
-                     <Option value={84}>SPICE MAX</Option>
-                     <Option value={85}>CORPORATE FLEX</Option>
-                     <Option value={86}>PROMO</Option>
-                     <Option value={87}>CLASSIC</Option>
-                     <Option value={88}>STRETCH</Option>
-                     <Option value={89}>STRETCHPLUS</Option>
-                  </Select>
-                  </Form.Item>
-                </div>
-                <div className="col-md-3 mb-2">
-                  <label className="form-label-title">Airline Code</label>
-                  <Form.Item name="airlineCode">
-                    <Select
-                      showSearch
-                      placeholder="Select Operator"
-                      allowClear
-                      filterOption={(input, option) =>
-                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                      }
-                      options={operatorList.map((item) => ({
-                        key: item.id,
-                        value: item.airlineCode,
-                        label: `${item.airlineName} - ${item.airlineCode}`,
-                      }))}
-                    />
-                  </Form.Item>
-                </div>
-                <div className="col-md-3 mb-2">
-                  <label className="form-label-title">Transaction Type</label>
-                  <Form.Item name="transactionType">
-                    <Select placeholder="Select Transaction Type">
-                      <Option value={0}>None</Option>
-                      <Option value={1}>Booking</Option>
-                      <Option value={2}>Cancellation</Option>
-                      <Option value={3}>Meal</Option>
-                      <Option value={4}>Baggage</Option>
-                      <Option value={5}>Seat</Option>
+                    <Select placeholder="Please select">
+                      <Option value={0}>DOMESTIC HOTEL</Option>
+                      <Option value={1}>INTERNATIONAL HOTEL</Option>
                     </Select>
                   </Form.Item>
                 </div>
-                <div className="col-md-3 mb-2">
-                  <label className="form-label-title">Fare Category Type</label>
-                  <Form.Item name="fareCategoryType">
-                    <Select placeholder="Select Fare Category Type">
-                      <Option value={0}>None</Option>
-                      <Option value={1}>Basic</Option>
-                      <Option value={2}>Tax</Option>
+                <div className="col-md-6 mb-2">
+                  <label className="form-label-title">Star Rating</label>
+                  <Form.Item name="starRating">
+                    <Select placeholder="Please select">
+                      <Option value={0}>All</Option>
+                      <Option value={1}>One Star</Option>
+                      <Option value={2}>Two Star</Option>
+                      <Option value={3}>Three Star</Option>
+                      <Option value={4}>Four Star</Option>
+                      <Option value={5}>Five Star</Option>
                     </Select>
                   </Form.Item>
                 </div>
-                <div className="col-md-3 mb-2">
+                <div className="col-md-6 mb-2">
                   <label className="form-label-title">Markup Type</label>
                   <Form.Item name="markupType">
-                   <Select placeholder="Please select">
-                    <Option value={0}>Fixed</Option>
-                    <Option value={1}>Percentage</Option>
-                  </Select>
+                    <Select placeholder="Please select">
+                      <Option value={0}>Fixed</Option>
+                      <Option value={1}>Percentage</Option>
+                    </Select>
                   </Form.Item>
                 </div>
-                <div className="col-md-3 mb-2">
+                <div className="col-md-6 mb-2">
                   <label className="form-label-title">Markup Value</label>
                   <Form.Item name="markupValue">
                     <InputNumber placeholder="0" style={{ width: '100%' }} />
                   </Form.Item>
                 </div>
-                <div className="col-md-3 mb-2">
+                <div className="col-md-6 mb-2">
                   <label className="form-label-title">Commission Type</label>
                   <Form.Item name="commissionType">
- <Select placeholder="Please select">
-                    <Option value={0}>Fixed</Option>
-                    <Option value={1}>Percentage</Option>
-                  </Select>
+                    <Select placeholder="Please select">
+                      <Option value={0}>Fixed</Option>
+                      <Option value={1}>Percentage</Option>
+                    </Select>
                   </Form.Item>
                 </div>
-                <div className="col-md-3 mb-2">
+                <div className="col-md-6 mb-2">
                   <label className="form-label-title">Commission Value</label>
                   <Form.Item name="commissionValue">
                     <InputNumber placeholder="0" style={{ width: '100%' }} />
-                  </Form.Item>
-                </div>
-                <div className="col-md-3 mb-2">
-                  <label className="form-label-title">Cabin Type</label>
-                  <Form.Item name="cabinType">
-                    <Select placeholder="Select Cabin Type">
-                    <Option value="A">All</Option>
-                    <Option value="PE">Premium Economy</Option>
-                    <Option value="B">Business</Option>
-                    <Option value="F">First Class</Option>
-                    <Option value="E">Economy</Option>
-                  </Select>
-                  </Form.Item>
-                </div>
-                <div className="col-md-6 mb-2">
-                  <label className="form-label-title">Origin</label>
-                  <AirportAutoComplete
-                    formItemProps={{ name: "origin" }}
-                    selectProps={{
-                      value: originVal,
-                      placeholder: "City or Airport",
-                      style: { width: '100%' },
-                      onChange: (val) => { setOriginVal(val); form.setFieldsValue({ origin: val }); }
-                    }}
-                  />
-                </div>
-                <div className="col-md-6 mb-2">
-                  <label className="form-label-title">Destination</label>
-                  <AirportAutoComplete
-                    formItemProps={{ name: "destination" }}
-                    selectProps={{
-                      value: destinationVal,
-                      placeholder: "City or Airport",
-                      style: { width: '100%' },
-                      onChange: (val) => { setDestinationVal(val); form.setFieldsValue({ destination: val }); }
-                    }}
-                  />
-                </div>
-                <div className="col-md-3 mb-2">
-                  <label className="form-label-title">From Travel Date</label>
-                  <Form.Item name="fromTravelDate">
-                    <DatePicker style={{ width: '100%' }} />
-                  </Form.Item>
-                </div>
-                <div className="col-md-3 mb-2">
-                  <label className="form-label-title">To Travel Date</label>
-                  <Form.Item name="toTravelDate">
-                    <DatePicker style={{ width: '100%' }} />
                   </Form.Item>
                 </div>
               </div>
@@ -549,3 +325,4 @@ const CommissionMarkup = () => {
 };
 
 export default CommissionMarkup;
+

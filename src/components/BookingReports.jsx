@@ -58,7 +58,7 @@ const BookingReports = () => {
                 page: page
             };
 
-            const response = await ApiClient.post('Booking/GetBookingReports', payload);
+            const response = await ApiClient.post('HotelBooking/GetBookingReports', payload);
             if (response && (response.success || response.statusCode === 200)) {
                 const results = response.data?.results || (Array.isArray(response.data) ? response.data : []);
                 setBookings(results);
@@ -92,7 +92,7 @@ const BookingReports = () => {
 
     const handleViewTicket = (bookingRef) => {
         if (bookingRef) {
-            navigate(`/admin/flight/ticket?ref=${bookingRef}`);
+            navigate(`/admin/hotel/ticket?ref=${bookingRef}`);
         }
     };
 
@@ -153,8 +153,9 @@ const BookingReports = () => {
         },
         {
             title: 'Amount',
-            key: 'amount',
-            render: (_, record) => record.totalAmount != null ? `${record.currency || ''} ${Number(record.totalAmount).toFixed(2)}` : 'N/A'
+            key: 'price',
+            dataIndex: 'price',
+            render: (_, record) => record.price != null ? `${record.currency || ''} ${Number(record.price).toFixed(2)}` : 'N/A'
         },
         {
             title: 'Status',
@@ -163,8 +164,8 @@ const BookingReports = () => {
         },
         {
             title: 'Booked On',
-            dataIndex: 'bookedOn',
-            key: 'bookedOn',
+            dataIndex: 'bookingDate',
+            key: 'bookingDate',
             render: (text) => formatDate(text)
         },
         {
@@ -254,7 +255,7 @@ const BookingReports = () => {
                                 {searchType === 'Custom' && (
                                     <Col xs={24} sm={12} md={6}>
                                         <Form.Item name="dateRange" label="Date Range">
-                                            <RangePicker 
+                                            <RangePicker
                                                 style={{ width: '100%' }}
                                                 disabledDate={(current) => current && current > dayjs().endOf('day')}
                                             />
@@ -301,11 +302,11 @@ const BookingReports = () => {
                         </Form>
 
                         <div className="table-responsive table-desi">
-                            <Table 
-                                columns={columns} 
-                                dataSource={bookings} 
-                                size="small" 
-                                scroll={{ x: 'max-content' }} 
+                            <Table
+                                columns={columns}
+                                dataSource={bookings}
+                                size="small"
+                                scroll={{ x: 'max-content' }}
                                 rowKey={(record) => record.bookingId || record.bookingRef}
                                 pagination={false}
                                 loading={loading}

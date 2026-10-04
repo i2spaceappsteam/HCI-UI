@@ -143,11 +143,11 @@ const Currency = () => {
 
                     <div className="card-body">
                         <div className="table-responsive table-desi">
-                            <Table 
-                                columns={columns} 
-                                dataSource={currencies} 
-                                size="small" 
-                                scroll={{ x: 'max-content' }} 
+                            <Table
+                                columns={columns}
+                                dataSource={currencies}
+                                size="small"
+                                scroll={{ x: 'max-content' }}
                                 rowKey="id"
                                 pagination={{ pageSize: 10 }}
                             />
@@ -229,7 +229,7 @@ const Currency = () => {
                             </Form.Item>
 
                             <Form.Item
-                                name="currencyName"
+                                name="currencyCode"
                                 label="Currency Code"
                                 rules={[{ required: true, message: "Currency Code is required" }]}
                             >

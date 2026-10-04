@@ -1,0 +1,53 @@
+.filter-skeleton-layout-container {
+    background-color: #fff;
+    height: auto;
+    padding: 24px;
+    .filter-blocks {
+        margin-bottom: 20px;
+    }
+    .ant-divider-horizontal {
+         margin: 5px 0;
+    }
+    .filter-header {
+        .clear-all-text {
+            .ant-skeleton-title {
+                margin-left: auto;
+            }
+        }
+    }
+    .filter-types-header {
+        .filter-type-text {
+            .ant-skeleton-title {
+                width: 85% !important;
+            }
+        }
+        .clear-text {
+            .ant-skeleton-title {
+                width: 50% !important;
+            }
+        }
+        .collpase-icon {
+            .ant-skeleton-title {
+                margin-left: auto;
+            }
+        }
+    }
+    .filter-type-content {
+        .ant-skeleton-title {
+            width: 70% !important;
+        }
+        .ant-skeleton-paragraph {
+            li {
+                width: 70% !important;
+                &:nth-child(1) {
+                    width: 60% !important;
+                }
+            }
+        }
+        .filter-slider {
+            .ant-skeleton-title {
+                width: 100% !important;
+            }
+        }
+    }
+  }

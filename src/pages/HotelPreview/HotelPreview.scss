@@ -1,0 +1,227 @@
+.hotel-preview-container {
+  .form-body {
+    background-color: #ffffff;
+
+    .form-body-container {
+      max-width: 94%;
+      padding: 15px;
+      margin: auto;
+
+      .hotel-card-wrapper {
+        border-radius: 8px;
+        box-shadow: 0 2px 14px #c9c9c9;
+        // margin: 15px 0;
+        //padding: 16px;
+
+        .ant-card-body {
+          padding: 0;
+        }
+      }
+    }
+
+    .book-pay-card {
+      padding: 16px 24px;
+      box-shadow: 0 2px 2px 0 #dcdee3;
+      border: none;
+
+      @media (max-width: 767px) {
+        padding: 16px;
+      }
+
+      .book-pay-tc {
+        display: flex;
+
+        span {
+          color: red;
+        }
+
+        p {
+          margin-bottom: 0;
+        }
+      }
+
+      .book-pay-offers {
+        display: flex;
+
+        p {
+          font-size: 15px;
+
+          a {
+            &:hover {
+              color: #bd0c21;
+            }
+          }
+        }
+      }
+
+      .book-pay-btn {
+        button {
+          // background-color: #bd0c21;
+          background: #f5802c;
+          color: #fff;
+          border: none;
+          font-size: 17px;
+          font-weight: 600;
+          padding: 8px 17px;
+          height: 100%;
+
+          @media (max-width: 767px) {
+            font-size: 16px;
+            padding: 10px 15px;
+          }
+        }
+
+        .book-and-content {
+          padding-top: 20px;
+
+          p {
+            font-size: 15px;
+            color: #969dac;
+          }
+        }
+      }
+    }
+  }
+}
+
+.fare-card-hot {
+  border-radius: 8px;
+  box-shadow: 1px 1px 5px grey;
+}
+
+.hotel-price-wrapper {
+  .hdng {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    //border-bottom: 2px solid grey;
+  }
+}
+
+.rm-pax-det {
+  // border: 1px solid #35459c;
+  // border-radius: 4px;
+  // padding: 4px;
+
+  .rm-info {
+    color: #000000;
+    // background: linear-gradient(to right, #bd0c21, #35459c);
+    padding: 1px 18px 1px 4px;
+    max-width: fit-content;
+    border-bottom-right-radius: 30px;
+    border-top-left-radius: 3px;
+    //margin-top: -4px;
+    //margin-left: -4px;
+  }
+
+  // .passenger-info {
+  //   thead {
+  //     tr {
+  //       background: #e9f0ff;
+  //     }
+  //   }
+
+  //   th {
+  //     color: #35459c;
+  //   }
+  // }
+  //new
+
+
+  /* General Table Styling */
+  .passenger-info {
+    margin: 20px 0;
+    // font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .passenger-info .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    /* Enable horizontal scrolling on small screens */
+    margin: 0 auto;
+  }
+
+  .passenger-info .table {
+    width: 100%;
+    border-collapse: collapse;
+    /* Remove gaps between table cells */
+    border: 1px solid #ddd;
+  }
+
+  .passenger-info .table th,
+  .passenger-info .table td {
+    text-align: left;
+    padding: 8px;
+    border: 1px solid #ddd;
+    color: #35459c;
+  }
+
+  .passenger-info .table th {
+    // background-color: #f4f4f4;
+    background: #e9f0ff;
+    /* Light gray background for table headers */
+    font-weight: bold;
+  }
+
+  .passenger-info .table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+    /* Alternate row coloring for readability */
+  }
+
+  /* Responsive Design: Adjust for Small Screens */
+  @media (max-width: 768px) {
+
+    .passenger-info .table th,
+    .passenger-info .table td {
+      font-size: 12px;
+      padding: 6px;
+    }
+  }
+
+  /* Responsive Design: Adjust for Extra Small Screens */
+  @media (max-width: 480px) {
+
+    .passenger-info .table th,
+    .passenger-info .table td {
+      display: block;
+      /* Stack table cells vertically */
+      width: 100%;
+      text-align: right;
+      /* Align text to the right for better readability */
+      position: relative;
+      padding-left: 50%;
+      /* Leave space for labels */
+      box-sizing: border-box;
+    }
+
+    .passenger-info .table th::before,
+    .passenger-info .table td::before {
+      content: attr(data-label);
+      /* Use data-label attribute for column headers */
+      position: absolute;
+      left: 0;
+      width: 50%;
+      /* Align labels on the left */
+      padding-left: 10px;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .passenger-info .table th {
+      display: none;
+      /* Hide table headers on small screens */
+    }
+  }
+
+}
+
+.hotel-detail-header-wrapper {
+  padding: 10px;
+  display: flex;
+  align-items: "center";
+  justify-content: space-between;
+  background: #f9f9f9;
+}
