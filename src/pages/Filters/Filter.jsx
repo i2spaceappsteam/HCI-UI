@@ -378,7 +378,7 @@ const Filter = ({ count, data, setListOfHotels, isHotelSearchLoad, Loading }) =>
 
       <div>
         <Card>
-          <div className="flight-filters slider-icon-1" style={{ padding: 14, background: 'white', borderRadius: 10 }}>
+          <div className="flight-filters slider-icon-1" style={{ /* padding: 14, */ background: 'white', borderRadius: 10 }}>
             <div className="flight-result-indicator">
               {isHotelSearchLoad ? (
                 <Skeleton paragraph={{ rows: 0 }} active />
@@ -410,7 +410,7 @@ const Filter = ({ count, data, setListOfHotels, isHotelSearchLoad, Loading }) =>
                         <div className="flex-wrapper">
                           <Input.Group className="hotel-name-search-input" >
                             <Select
-                              style={{ border: "1px solid transparent", width: "100%", height: "36px", marginTop: "0%" }}
+                              style={{ border: "1px solid grey", width: "100%", height: "36px", marginTop: "0%" }}
                               showSearch
                               className="search-select-box"
                               placeholder={`Search By ${searchBy === "hotel" ? "Name" : "Location"
@@ -582,7 +582,7 @@ const Filter = ({ count, data, setListOfHotels, isHotelSearchLoad, Loading }) =>
 
                 {
                   filters?.hotelFacilities?.length > 0 && (
-                  <div className="stops-filter star-filters">
+                    <div className="stops-filter star-filters">
                       <Collapse
                         defaultActiveKey={["1"]}
                         expandIconPosition={"right"}
