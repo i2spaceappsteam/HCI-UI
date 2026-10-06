@@ -48,7 +48,7 @@ const LedgerStatement = () => {
 
     const handleViewTicket = (referenceNumber) => {
         if (referenceNumber) {
-            navigate(`/admin/flight/ticket?ref=${referenceNumber}`);
+            navigate(`/admin/hotel/ticket?ref=${referenceNumber}`);
         }
     };
 
@@ -212,8 +212,8 @@ const LedgerStatement = () => {
                         {searchType === 'Custom' && (
                             <Col span={6}>
                                 <Form.Item name="dateRange" label="Date Range">
-                                    <RangePicker 
-                                        style={{ width: '100%' }} 
+                                    <RangePicker
+                                        style={{ width: '100%' }}
                                         disabledDate={(current) => current && current > dayjs().endOf('day')}
                                     />
                                 </Form.Item>

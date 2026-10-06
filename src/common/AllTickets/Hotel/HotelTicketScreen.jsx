@@ -105,13 +105,45 @@ const HotelTicketScreen = ({ mode }) => {
       mealPlan: r.mealPlan || "Room Only",
     }));
 
-    const totalBasePrice = rooms.length > 0
-      ? rooms.reduce((sum, r) => sum + (Number(r.roomPrice) || 0), 0)
-      : (Number(booking.price) || 0);
-
-    const totalTax = rooms.length > 0
-      ? rooms.reduce((sum, r) => sum + (Number(r.taxAmount) || 0), 0)
+    const roomBaseSum = rooms.length > 0
+      ? rooms.reduce((sum, r) => sum + (Number(r.roomPrice || r.roomPublishPrice || r.price) || 0), 0)
       : 0;
+
+    const totalBasePrice = Number(
+      rootData.priceDetails?.totalBasePrice ??
+      rootData.totalBasePrice ??
+      booking.totalBasePrice ??
+      booking.basePrice ??
+      (roomBaseSum > 0 ? roomBaseSum : (booking.price || 0))
+    );
+
+    const roomTaxSum = rooms.length > 0
+      ? rooms.reduce((sum, r) => sum + (Number(r.taxAmount || r.tax) || 0), 0)
+      : 0;
+
+    const bookingTotalTax = Number(
+      rootData.priceDetails?.totalTax ??
+      rootData.totalTax ??
+      rootData.tax ??
+      booking.totalTax ??
+      booking.taxAmount ??
+      booking.tax ??
+      roomTaxSum ??
+      0
+    );
+
+    const bookingTotal = Number(
+      rootData.grandTotal ??
+      rootData.totalAmount ??
+      booking.totalAmount ??
+      booking.grandTotal ??
+      booking.price ??
+      0
+    );
+
+    const resolvedTax = bookingTotalTax > 0
+      ? bookingTotalTax
+      : (bookingTotal > totalBasePrice && totalBasePrice > 0 ? bookingTotal - totalBasePrice : 0);
 
     const mainPolicy = policies?.[0]?.cancellationPolicy || booking.cancellationPolicy || "";
     const mainHotelPolicy = policies?.[0]?.hotelPolicy || booking.hotelPolicy || "";
@@ -158,8 +190,10 @@ const HotelTicketScreen = ({ mode }) => {
       Currency: booking.currency || rootData.Currency || "INR",
       priceDetails: rootData.priceDetails || {
         totalBasePrice: totalBasePrice,
-        totalTax: totalTax,
+        totalTax: resolvedTax,
       },
+      totalTax: resolvedTax,
+      totalBasePrice: totalBasePrice,
       Rooms: formattedRooms.length > 0 ? formattedRooms : (rootData.Rooms || []),
       guests: formattedGuests.length > 0 ? formattedGuests : (rootData.guests || []),
       Inclusions: rootData.Inclusions || [

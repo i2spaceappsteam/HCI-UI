@@ -28,11 +28,11 @@ import {
 import queryString from "query-string";
 import { useSelector } from "react-redux";
 import { selectActiveCurrency } from "../../../store/slices/currencySlice";
-import "./HotelsList.scss";
+import "./NewHotelsList.scss";
 
 const ImBaseUrl = import.meta.env.VITE_Image_URL;
 
-const HotelsList = ({
+const NewHotelsList = ({
   keyId,
   availableHotel,
   hotelTraceId,
@@ -330,4 +330,4 @@ const HotelsList = ({
   );
 };
 
-export default HotelsList;
+export default NewHotelsList;

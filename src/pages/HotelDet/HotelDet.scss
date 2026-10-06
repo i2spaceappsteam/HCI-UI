@@ -716,7 +716,7 @@
            //    font-weight: 700;
            //  }
            .font-wht-nrml {
-             font-family: "Nunito",sans-serif;
+             font-family: 'Jost', sans-serif;
              line-height: 26px;
            }
 
@@ -976,7 +976,7 @@
 
  .rm-nam-tp {
    font-size: 14px;
-   background: #f5802c;;
+   background: #017bcf;
    padding: 2px 8px;
    border-top-right-radius: 6px;
    border-bottom-right-radius: 6px;
@@ -1202,8 +1202,9 @@
  .cp-book-this .ant-btn:hover,
  .ant-btn:focus,
  .ant-btn:active {
-  background-image: #f5802c !important;
-   background: #f5802c !important;
+  background-image: #017bcf !important;
+   background: #017bcf !important;
+   color: white !important;
  }
 
  .cp-other-rooms {
@@ -1646,12 +1647,12 @@
    // border: 1px solid red;
    border-radius: 8px;
    //background: linear-gradient(to right, #0370a9, #08acda);
-   background: #f5802c;;
+   background: #017bcf;
    color: white;
    padding: 0px 16px;
 
    &:hover {
-     // background: #f5802c;!important;
+     // background: #017bcf;!important;
      background: linear-gradient(to right, #0370a9, #08acda) !important;
      color: white;
    }
@@ -1688,7 +1689,7 @@
  }
 
  .span-currency {
-   font-family: "Nunito";
+   font-family: 'Jost', sans-serif;
 
    @media (max-width: 767px) {
      width: 100%;
@@ -1735,6 +1736,6 @@
 
  }
  .font-wht-nrml {
-  font-family: "Nunito";
+  font-family: 'Jost', sans-serif;
   line-height: 26px;
 }

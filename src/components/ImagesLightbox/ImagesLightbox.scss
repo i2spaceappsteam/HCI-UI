@@ -1,37 +1,259 @@
-.carousel-wrapper {
-  .carousel.carousel-slider {
-    height: 340px !important;
-  }
-}
+/* ============================================================
+   MODERN LIGHTBOX GALLERY DESIGN SYSTEM
+   ============================================================ */
 
-.charterFlight-wrapper {
-  .carousel.carousel-slider {
-    height: 400px !important;
+.modern-lightbox-gallery {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+
+  /* Main Showcase Display */
+  .main-image-display {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    background-color: #0f172a;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 12px 12px 0 0;
+
+    @media (max-width: 768px) {
+      height: 260px;
+    }
+
+    .active-showcase-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    &:hover .active-showcase-img {
+      transform: scale(1.02);
+    }
+
+    /* Floating Navigation Arrows */
+    .gallery-nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      color: #00164d;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      transition: all 0.2s ease;
+      z-index: 10;
+      opacity: 0.85;
+
+      &:hover {
+        opacity: 1;
+        background: #ffffff;
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      &.prev {
+        left: 16px;
+      }
+
+      &.next {
+        right: 16px;
+      }
+    }
+
+    /* Badges Overlay */
+    .gallery-badges-overlay {
+      position: absolute;
+      bottom: 14px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 5;
+      pointer-events: none;
+
+      .photo-counter-badge {
+        background: rgba(0, 0, 0, 0.65);
+        color: #ffffff;
+        font-size: 12.5px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 9999px;
+        backdrop-filter: blur(4px);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .fullscreen-btn {
+        pointer-events: auto;
+        background: rgba(0, 0, 0, 0.65);
+        color: #ffffff;
+        font-size: 12.5px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 9999px;
+        backdrop-filter: blur(4px);
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s ease;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.85);
+        }
+      }
+    }
   }
-  .selected {
-    border: 0 !important;
-  }
-  .carousel {
-    .thumbs-wrapper.axis-vertical {
-      padding: 10px;
+
+  /* Thumbnails Strip */
+  .gallery-thumbnails-strip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: #ffffff;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    border-radius: 0 0 12px 12px;
+
+    /* Sleek custom scrollbar */
+    &::-webkit-scrollbar {
+      height: 5px;
+    }
+    &::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+      &:hover {
+        background: #94a3b8;
+      }
+    }
+
+    .thumbnail-item {
+      width: 86px;
+      height: 58px;
+      min-width: 86px;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      opacity: 0.65;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      &:hover {
+        opacity: 0.95;
+        transform: translateY(-2px);
+      }
+
+      &.active {
+        opacity: 1;
+        border-color: #00164d;
+        box-shadow: 0 2px 8px rgba(0, 22, 77, 0.3);
+        transform: translateY(-2px);
+      }
     }
   }
 }
-.carousel-images {
-  max-height: 400px;
-  object-fit: cover;
-  width: 100%;
-}
-.carousel-ima {
-  max-height: 376px;
-  object-fit: cover;
-  width: 100%;
-}
-@media screen and (max-width: 768px) {
-  .main-chater-wrapper .carousel.carousel-slider {
-    height: 280px !important;
+
+/* Fullscreen Lightbox Modal */
+.gallery-fullscreen-modal {
+  .ant-modal-content {
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
-  .main-chater-wrapper img {
-    height: 280px !important;
+
+  .ant-modal-close {
+    color: #ffffff !important;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  .modal-fullscreen-viewer {
+    position: relative;
+    text-align: center;
+
+    .fullscreen-modal-img {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-nav-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 14px;
+
+      .modal-arrow {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        color: #00164d;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #ffffff;
+          transform: scale(1.1);
+        }
+      }
+
+      .modal-counter {
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 4px 14px;
+        border-radius: 9999px;
+      }
+    }
   }
 }

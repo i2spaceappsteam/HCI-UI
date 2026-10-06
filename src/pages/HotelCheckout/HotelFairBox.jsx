@@ -18,12 +18,13 @@ import "./HotelFairBox.scss";
 import GlobalStatesContext from "../../Providers/GlobalStatesContext";
 import { useSelector } from "react-redux";
 import { selectIsAgent, selectUser } from "../../store/slices/authSlice";
-import { QuestionCircleOutlined } from "@ant-design/icons";
-import moment from "moment";
-
-import ApiClient from "../../Helpers/ApiClient";
-
-import { CloseOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  QuestionCircleOutlined,
+  CloseOutlined,
+  EditOutlined,
+  FileTextOutlined,
+  SafetyCertificateFilled,
+} from "@ant-design/icons";
 
 export const getPromoDiscount = (promoData, total) => {
   let promoAmount = 0;
@@ -367,214 +368,166 @@ const HotelFairBox = ({ hotelDetailsObj, hotelSearchData, isPromoVisible, locati
   };
   return (
     <>
-      <div style={{ background: "white", boxShadow: "0 2px 14px #c9c9c9" }}>
-        <div style={{ background: "#f9f9f9", padding: "10px", marginBottom: 0 }}>
-          <p className="hdng">Fare Details</p>
+      <div className="luxury-fare-box">
+        <div className="fare-box-header">
+          <div className="header-title-flex">
+            <FileTextOutlined className="fare-icon" />
+            <span className="fare-title-text">Fare Breakdown</span>
+          </div>
+          <span className="fare-currency-badge">INR</span>
         </div>
-        <div className="sticky-card-container" style={{ padding: 10 }}>
 
-
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '6px 0', flexWrap: 'nowrap' }}>
-            <div>
-              <p style={{ fontSize: 16, fontWeight: 700, fontFamily: "Nunito", margin: 0 }}>Room Price</p>
-            </div>
-            <div>
-              <p style={{ whiteSpace: "nowrap", fontSize: 16, fontWeight: 700, fontFamily: "Nunito", margin: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
-                ₹ {Number(hotelDetailsObj?.combineRoom[0]?.priceDetails?.totalBasePrice || 0).toFixed(2)}
-                <Popover
-                  overlayClassName="pricepopup"
-                  placement="left"
-                  content={roomFare()}
-                  title="Room Price"
-                >
-                  <QuestionCircleOutlined style={{ fontSize: "11px", color: "#35459c", cursor: 'pointer' }} />
-                </Popover>
-              </p>
+        <div className="fare-box-content">
+          <div className="fare-item-row">
+            <span className="item-label">Room Price</span>
+            <div className="item-val-wrap">
+              <span className="item-price">₹ {Number(hotelDetailsObj?.combineRoom[0]?.priceDetails?.totalBasePrice || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <Popover
+                overlayClassName="pricepopup"
+                placement="left"
+                content={roomFare()}
+                title="Room Price Breakdown"
+              >
+                <QuestionCircleOutlined className="info-pop-icon" />
+              </Popover>
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '6px 0', flexWrap: 'nowrap' }}>
-            <div>
-              <p style={{ fontSize: 16, fontWeight: 700, fontFamily: "Nunito", margin: 0 }}>Taxes &amp; Fee's</p>
-            </div>
-            <div>
-              <p style={{ whiteSpace: "nowrap", fontSize: 16, fontWeight: 700, fontFamily: "Nunito", margin: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
-                ₹ {(Number(hotelDetailsObj?.combineRoom[0]?.priceDetails?.totalTax || 0) + Number(agentTax)).toFixed(2)}
-                <Popover
-                  overlayClassName="pricepopup"
-                  placement="left"
-                  content={
-                    <>
-                      {hotelDetailsObj?.combineRoom[0]?.priceDetails?.totalTax > 0 && (
-                        <div className="pax-count-acc-body">
-                          <div className="pax-type">
-                            <p>Tax</p>
-                          </div>
-                          <div className="service-price">
-                            <p style={{ whiteSpace: "nowrap" }}>
-                              {Number(hotelDetailsObj?.combineRoom[0]?.priceDetails?.totalTax || 0).toFixed(2)}
-                            </p>
-                          </div>
+
+          <div className="fare-item-row">
+            <span className="item-label">Taxes &amp; Fees</span>
+            <div className="item-val-wrap">
+              <span className="item-price">₹ {(Number(hotelDetailsObj?.combineRoom[0]?.priceDetails?.totalTax || 0) + Number(agentTax)).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <Popover
+                overlayClassName="pricepopup"
+                placement="left"
+                content={
+                  <>
+                    {hotelDetailsObj?.combineRoom[0]?.priceDetails?.totalTax > 0 && (
+                      <div className="pax-count-acc-body">
+                        <div className="pax-type"><p>Tax</p></div>
+                        <div className="service-price">
+                          <p style={{ whiteSpace: "nowrap" }}>
+                            {Number(hotelDetailsObj?.combineRoom[0]?.priceDetails?.totalTax || 0).toFixed(2)}
+                          </p>
                         </div>
-                      )}
-                      {hotelDetailsObj?.combineRoom[0]?.priceDetails?.tax > 0 && (
-                        <div className="pax-count-acc-body">
-                          <div className="pax-type">
-                            <p>Tax</p>
-                          </div>
-                          <div className="service-price">
-                            <p style={{ whiteSpace: "nowrap" }}>
-                              {Number(hotelDetailsObj?.combineRoom[0]?.priceDetails?.tax || 0).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      {hotelDetailsObj?.combineRoom[0]?.priceDetails?.otherCharges > 0 && (
-                        <div className="pax-count-acc-body">
-                          <div className="pax-type">
-                            <p>Other Tax</p>
-                          </div>
-                          <div className="service-price">
-                            <p style={{ whiteSpace: "nowrap" }}>
-                              {Number(hotelDetailsObj?.combineRoom[0]?.priceDetails?.otherCharges || 0).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      {agentTax > 0 && (
-                        <div className="pax-count-acc-body">
-                          <div className="pax-type">
-                            <p>Agent Tax</p>
-                          </div>
-                          <div className="service-price">
-                            <p style={{ whiteSpace: "nowrap", color: '#0075c3' }}>
-                              {Number(agentTax || 0).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  }
-                  title="Taxes and Fees"
-                >
-                  <QuestionCircleOutlined style={{ fontSize: "11px", color: "#35459c", cursor: 'pointer' }} />
-                </Popover>
-              </p>
-            </div>
-          </div>
-          {roomDetails.extraGuestCharges > 0 ?
-            <Row className="grand_tCard_row">
-              <Col>
-                <p>Extra Guest Charge</p>
-              </Col>
-              <Col className="d-flex">
-                <p>
-
-                  {Number(roomDetails.extraGuestCharges || 0).toFixed(2)}
-                </p>
-              </Col>
-            </Row> : null}
-          {roomDetails.totalHotelDiscount > 0 ?
-            <Row justify={"space-between"} className="grand_tCard_row">
-              <Col>
-                <p style={{ fontSize: 16, fontWeight: 700, fontFamily: "Nunito" }}>Hotel Discount </p>
-              </Col>
-              <Col className="d-flex">
-                <p style={{ whiteSpace: "nowrap", ontSize: 16, fontWeight: 700, fontFamily: "Nunito" }} >
-
-                  {Number(roomDetails.totalHotelDiscount || 0).toFixed(2)}
-                </p>
-              </Col>
-            </Row>
-            : null}
-
-          {promoData.status && promoDiscount > 0 ? (
-            <Row justify={"space-between"} className="grand_tCard_row">
-              <Col>
-                <p style={{ fontSize: 16, fontWeight: 700, fontFamily: "Nunito" }}>Discount</p>
-              </Col>
-              <Col className="d-flex">
-                <p style={{ whiteSpace: "nowrap", fontSize: 16, fontWeight: 700, fontFamily: "Nunito" }}>
-
-                  {Number(promoDiscount || 0).toFixed(2)}
-                </p>
-              </Col>
-            </Row>
-          ) : null}
-
-
-          {convamount > 0 ?
-            <Row justify={"space-between"} className="grand_tCard_row">
-              <Col>
-                <p style={{ fontSize: 16, fontWeight: 700, fontFamily: "Nunito" }}>Service Fee</p>
-              </Col>
-              <Col className="d-flex">
-                <p style={{ whiteSpace: "nowrap", fontSize: 16, fontWeight: 700, fontFamily: "Nunito" }}>
-
-                  {Number(convamount || 0).toFixed(2)}
-                </p>
-              </Col>
-            </Row> : null}
-
-          <div className="pax-total-price" style={{ margin: "2px 4px" }}>
-            <div className="tot-far">
-              <div className="pax-type">
-                <p className="t-fare">
-                  <strong style={{ fontSize: 20, fontWeight: 700, fontFamily: "Nunito" }}>Total:</strong>
-                  <span className="all-taxes">Including all taxes and fees</span>
-                </p>
-              </div>
-              <div className="total">
-
-                <p className="amount" >{"₹"}{" "} {(totalAmount)}</p>
-              </div>
-            </div>
-
-            {/* {agent && totalCommission > 0 ? (
-              <div className="pax-total-price1">
-                <div className="pax-type">
-                  <p className="pax-comm">Commission Earned:</p>
-                </div>
-                <div className="total">
-                  <p className="pax-comm"> {activeCurrency === "INR" ? "₹" : activeCurrency} </p>
-                  <p className="amount ml-1 pax-comm">
-                    {" "}
-                    {currencyValue(totalCommission)}
-                  </p>
-                </div>
-              </div>
-            ) : null} */}
-            {agent && (
-              <Collapse
-                size="small"
-                defaultActiveKey={[]} // This makes it expanded by default
-                style={{ margin: '16px 0' }}
-                items={[
-                  {
-                    key: '1',
-                    label: 'Fare Details',
-                    children: (
-                      <div>
-                        <Row justify="space-between" style={{ marginBottom: '8px' }}>
-                          <Col>Commission</Col>
-                          <Col> {totalCommission}</Col>
-                        </Row>
-                        {/* <Row justify="space-between" style={{ marginBottom: '8px' }}>
-                          <Col>MarkupAgent</Col>
-                          <Col>{activeCurrency} {currencyValue(muAgent)}</Col>
-                        </Row> */}
-                        <Row justify="space-between">
-                          <Col>Net Fare</Col>
-                          <Col> {Netfare}</Col>
-                        </Row>
                       </div>
-                    ),
-                  },
-                ]}
-              />
-
-            )}
+                    )}
+                    {hotelDetailsObj?.combineRoom[0]?.priceDetails?.tax > 0 && (
+                      <div className="pax-count-acc-body">
+                        <div className="pax-type"><p>Tax</p></div>
+                        <div className="service-price">
+                          <p style={{ whiteSpace: "nowrap" }}>
+                            {Number(hotelDetailsObj?.combineRoom[0]?.priceDetails?.tax || 0).toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {hotelDetailsObj?.combineRoom[0]?.priceDetails?.otherCharges > 0 && (
+                      <div className="pax-count-acc-body">
+                        <div className="pax-type"><p>Other Tax</p></div>
+                        <div className="service-price">
+                          <p style={{ whiteSpace: "nowrap" }}>
+                            {Number(hotelDetailsObj?.combineRoom[0]?.priceDetails?.otherCharges || 0).toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {agentTax > 0 && (
+                      <div className="pax-count-acc-body">
+                        <div className="pax-type"><p>Agent Tax</p></div>
+                        <div className="service-price">
+                          <p style={{ whiteSpace: "nowrap", color: '#0075c3' }}>
+                            {Number(agentTax || 0).toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                }
+                title="Taxes and Fees"
+              >
+                <QuestionCircleOutlined className="info-pop-icon" />
+              </Popover>
+              {isEditable && (
+                <button type="button" className="edit-tax-btn" onClick={handleTaxClick} title="Edit Tax">
+                  <EditOutlined />
+                </button>
+              )}
+            </div>
           </div>
+
+          {roomDetails.extraGuestCharges > 0 && (
+            <div className="fare-item-row">
+              <span className="item-label">Extra Guest Charge</span>
+              <span className="item-price">₹ {Number(roomDetails.extraGuestCharges || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+          )}
+
+          {roomDetails.totalHotelDiscount > 0 && (
+            <div className="fare-item-row discount">
+              <span className="item-label">Hotel Discount</span>
+              <span className="item-price discount">- ₹ {Number(roomDetails.totalHotelDiscount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+          )}
+
+          {promoData.status && promoDiscount > 0 && (
+            <div className="fare-item-row discount">
+              <span className="item-label">Promo Discount</span>
+              <span className="item-price discount">- ₹ {Number(promoDiscount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+          )}
+
+          {convamount > 0 && (
+            <div className="fare-item-row">
+              <span className="item-label">Service Fee</span>
+              <span className="item-price">₹ {Number(convamount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+          )}
+
+          <div className="fare-total-banner">
+            <div className="total-left">
+              <span className="total-title">Total Amount</span>
+              <span className="total-tax-note">Includes all taxes &amp; fees</span>
+            </div>
+            <div className="total-right">
+              <span className="total-currency">₹</span>
+              <span className="total-amount-number">
+                {Number(totalAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            </div>
+          </div>
+
+          <div className="fare-trust-footer">
+            <SafetyCertificateFilled className="shield-icon" />
+            <span>100% Safe &amp; Secure Booking</span>
+          </div>
+
+          {agent && (
+            <Collapse
+              size="small"
+              defaultActiveKey={[]}
+              className="agent-collapse-box"
+              style={{ marginTop: 12 }}
+              items={[
+                {
+                  key: '1',
+                  label: 'Agent Fare Details',
+                  children: (
+                    <div className="agent-breakdown-details">
+                      <div className="agent-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                        <span>Commission:</span>
+                        <strong>₹ {Number(totalCommission || 0).toFixed(2)}</strong>
+                      </div>
+                      <div className="agent-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span>Net Fare:</span>
+                        <strong>₹ {Number(Netfare || 0).toFixed(2)}</strong>
+                      </div>
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          )}
 
           <Modal
             title="Edit Tax Amount"
@@ -634,7 +587,7 @@ const HotelFairBox = ({ hotelDetailsObj, hotelSearchData, isPromoVisible, locati
                       </Col>
                     </Row>
                   </Form> : <div className="promo-input" style={{ padding: 10 }}>
-                    <p>Please <span style={{ color: "#023d96", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "Nunito" }} onClick={() => showModal1("USER")}>Sign-In</span> to Avail Offers</p>
+                    <p>Please <span style={{ color: "#023d96", cursor: "pointer", fontSize: 16, fontWeight: 700, fontFamily: "jost" }} onClick={() => showModal1("USER")}>Sign-In</span> to Avail Offers</p>
                   </div>
                 }
 
@@ -685,7 +638,7 @@ const HotelFairBox = ({ hotelDetailsObj, hotelSearchData, isPromoVisible, locati
                   ) : (
                     <div className="promo-cp-coupons" style={{ padding: 10 }}>
                       <div className="promo-percentage-cp pl-0 pt-0">
-                        <p style={{ fontSize: 14, fontWeight: 700, fontFamily: "Nunito" }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, fontFamily: "jost" }}>
                           No Promo Code Available
                         </p>
                       </div>

@@ -1,74 +1,71 @@
-//**** After Changing structure for room resp? ****//
-
 import React, { useState, useRef, useEffect, useMemo } from "react";
-
-import { Button, Card, Col, Skeleton, Rate, Row, message, Modal, Radio, Select, } from "antd";
+import { Button, Card, Col, Skeleton, Rate, Row, message, Modal, Radio, Select, Tag, Tooltip } from "antd";
 import { useNavigate } from "react-router";
-import "./HotelDet.scss";
-
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-import parse from 'html-react-parser';
+import parse from "html-react-parser";
 import moment from "moment";
-import { Tooltip } from 'antd';
 import { useSelector } from "react-redux";
 import Slider from "react-slick";
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import ImagesLightbox from "../../components/ImagesLightbox/ImagesLightbox";
 import Apiclient1 from "../../Helpers/Apiclient1";
 import ApiClient from "../../Helpers/ApiClient";
-
 import queryString from "query-string";
 import HotelCardImage from "./HotelCardImage";
-import { EnvironmentOutlined, StarTwoTone } from "@ant-design/icons";
-
+import {
+    EnvironmentOutlined,
+    StarFilled,
+    StarTwoTone,
+    ArrowLeftOutlined,
+    CheckOutlined,
+    CalendarOutlined,
+    UserOutlined,
+    AppstoreOutlined,
+    InfoCircleOutlined,
+    CheckCircleFilled,
+    SafetyCertificateOutlined,
+    CoffeeOutlined,
+    CompassOutlined,
+    FileTextOutlined
+} from "@ant-design/icons";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import "./NewHotelDet.scss";
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import ScrollToTopButton from "../../common/ScrollToTop";
 
-import { Checkbox } from "antd";
-
-
-const { Group } = Checkbox;
 const { Option } = Select;
 const ImBUrl = import.meta.env.VITE_Image_URL;
-const HotelDet = () => {
-    let history = useNavigate();
 
+const HotelDet = () => {
+    const history = useNavigate();
     const user = useSelector((state) => state.auth.user);
 
     const [filteredRooms, setFilteredRooms] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [hotelDetailsRespObj, setHotelDetailsRespObj] = useState({});
     const [selectedMealPlan, setSelectedMealPlan] = useState([]);
-    const [isRoomModal, setIsRoomModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [roomsDetails, setRoomsDetails] = useState({ roomList: [], type: "" });
-    const [isShowModal, setIsShowModal] = useState(false);
-    const [roomImagesModal, setRoomImagesModal] = useState({});
-    const [selectedRooms, setSelectedRooms] = useState({});
     const [showcancellationModal, setShowCancellationModal] = useState(false);
     const [roomsData, setRoomsData] = useState(null);
     const [inclusiondata, setinclusiondata] = useState([]);
     const [cancellationInfo, setCancellationInfo] = useState([]);
     const [isinclusionvisible, setisinclusionvisible] = useState(false);
-    const [activeTab, setActiveTab] = useState('rooms');
+    const [activeTab, setActiveTab] = useState("rooms");
     const [defaultProps, setDefaultProps] = useState({
         center: {
             address: "",
             lat: 17.42159,
             lng: 78.33752,
         },
-        zoom: 12,
+        zoom: 13,
         mapVisible: true,
     });
-    const handleTabClick = (tab) => {
-        setActiveTab(tab);
-    };
+
+    const roomsSectionRef = useRef(null);
+
     useEffect(() => {
         fetchHotelDetails();
     }, []);
@@ -81,7 +78,7 @@ const HotelDet = () => {
             checkInDate: p.checkInDate || "",
             checkOutDate: p.checkOutDate || "",
             hotelCityCode: p.hotelCityCode || "",
-            roomGuests: p.roomGuests || "",       // still JSON string; parsed inside fetchHotelRooms
+            roomGuests: p.roomGuests || "",
             nationality: p.nationality || "IN",
             supplierParamter: p.supplierParamter || "",
             currency: "INR",
@@ -102,18 +99,13 @@ const HotelDet = () => {
         const processStaticHotel = (matchedStatic) => {
             if (!matchedStatic) return;
 
-            // GetHotelDetails returns addresses as an ARRAY e.g. [{address:"", cityName:""}]
-            // and facilities under the key 'facilities' (not 'hotelFacility')
             const mapping = matchedStatic.mappingHotelDetails?.[0] || {};
-
-            // Images: direct array on static response
             const staticImages =
                 (matchedStatic.images?.length > 0 ? matchedStatic.images : null) ||
                 (matchedStatic.imageList?.length > 0 ? matchedStatic.imageList : null) ||
                 (mapping.images?.length > 0 ? mapping.images : null) ||
                 [];
 
-            // Facilities: key is 'facilities' in GetHotelDetails (not 'hotelFacility')
             const staticFacilities =
                 (matchedStatic.facilities?.length > 0 ? matchedStatic.facilities : null) ||
                 (matchedStatic.hotelFacility?.length > 0 ? matchedStatic.hotelFacility : null) ||
@@ -121,7 +113,6 @@ const HotelDet = () => {
                 (mapping.hotelFacility?.length > 0 ? mapping.hotelFacility : null) ||
                 [];
 
-            // Description
             const staticDesc =
                 matchedStatic.description ||
                 matchedStatic.hotelDescription ||
@@ -129,57 +120,34 @@ const HotelDet = () => {
                 mapping.hotelContent ||
                 "";
 
-            // Address: GetHotelDetails returns addresses as ARRAY [{address, cityName}]
             const addrArr = matchedStatic.addresses;
             const staticAddress =
                 (Array.isArray(addrArr) && addrArr.length > 0)
                     ? (addrArr[0].address || addrArr[0].Address || "")
                     : (addrArr?.address || matchedStatic.address || matchedStatic.hotelAddress || mapping.addresses?.[0]?.address || mapping.addresses?.address || "");
 
-            // Lat/Lng
             const staticLat = matchedStatic.latitude || matchedStatic.lat || matchedStatic.Latitude || mapping.latitude;
             const staticLng = matchedStatic.longitude || matchedStatic.lng || matchedStatic.Longitude || mapping.longitude;
-
             const staticRating = matchedStatic.starRating || matchedStatic.StarRating || matchedStatic.rating || mapping.starRating;
             const staticName = matchedStatic.hotelName || matchedStatic.HotelName || matchedStatic.propertyName || matchedStatic.PropertyName;
 
-            console.log("[processStaticHotel] images:", staticImages.length, "| address:", staticAddress, "| lat:", staticLat, "| lng:", staticLng);
-
             setHotelDetailsRespObj((prev) => {
                 const updated = { ...prev };
-
-                // Always prefer static images — HotelRooms does NOT return images
-                if (staticImages.length > 0) {
-                    updated.images = staticImages;
-                }
-                // Facilities
+                if (staticImages.length > 0) updated.images = staticImages;
                 if (staticFacilities.length > 0 && (!updated.hotelFacility || updated.hotelFacility.length === 0)) {
                     updated.hotelFacility = staticFacilities;
                 }
-                // Description
-                if (staticDesc && !updated.description) {
-                    updated.description = staticDesc;
-                }
-                // Address: normalize to {address: string} for consistent rendering
+                if (staticDesc && !updated.description) updated.description = staticDesc;
                 if (staticAddress && (!updated.addresses || !updated.addresses.address)) {
                     updated.addresses = { address: staticAddress };
                 }
-                // Hotel name
-                if (staticName && !updated.hotelName) {
-                    updated.hotelName = staticName;
-                }
-                // Star rating
-                if (staticRating && !updated.starRating) {
-                    updated.starRating = staticRating;
-                }
-                // Lat/Lng: always prefer static — HotelRooms does NOT return these
+                if (staticName && !updated.hotelName) updated.hotelName = staticName;
+                if (staticRating && !updated.starRating) updated.starRating = staticRating;
                 if (staticLat) updated.latitude = staticLat;
                 if (staticLng) updated.longitude = staticLng;
-
                 return updated;
             });
 
-            // Update map if we have valid coordinates
             if (staticLat && staticLng) {
                 setDefaultProps((prev) => ({
                     ...prev,
@@ -195,137 +163,101 @@ const HotelDet = () => {
 
         Apiclient1.post("StaticData/GetHotelDetails", staticReqObj)
             .then((staticRes) => {
-                console.log("StaticData/GetHotelDetails response:", staticRes);
-                const rawStaticHotels =
-                    staticRes?.hotelDetails ||
-                    staticRes?.hotels ||
-                    staticRes?.data?.hotelDetails ||
-                    staticRes?.data?.hotels ||
-                    staticRes?.data ||
-                    (Array.isArray(staticRes) ? staticRes : []);
-
-                let matchedStatic = null;
-                if (Array.isArray(rawStaticHotels) && rawStaticHotels.length > 0) {
-                    matchedStatic = rawStaticHotels.find(h =>
-                        String(h.hotelId || h.HotelId || h.hotelCode || h.HotelCode || "") === String(params.hotelCode)
-                    ) || rawStaticHotels[0];
-                } else if (rawStaticHotels && typeof rawStaticHotels === "object" && !Array.isArray(rawStaticHotels)) {
-                    matchedStatic = rawStaticHotels;
-                }
-
-                if (matchedStatic) {
-                    processStaticHotel(matchedStatic);
-                } else {
-                    fetchV2StaticDetails(params, processStaticHotel);
-                }
+                const rawStaticHotels = staticRes?.hotelDetails || staticRes?.data?.hotelDetails || [];
+                const matchedStatic = Array.isArray(rawStaticHotels)
+                    ? rawStaticHotels.find((h) => String(h.hotelCode || h.hotelId) === String(params.hotelCode)) || rawStaticHotels[0]
+                    : rawStaticHotels;
+                if (matchedStatic) processStaticHotel(matchedStatic);
             })
-            .catch((err) => {
-                console.warn("StaticData/GetHotelDetails error, trying fallback:", err);
-                fetchV2StaticDetails(params, processStaticHotel);
-            });
-    };
-
-    const fetchV2StaticDetails = (params, processStaticHotel) => {
-        ApiClient.post("hotels-v2/hotelstaticdetails", {
-            traceId: params.traceId || "string",
-            cityId: params.hotelCityCode || "",
-            hotelId: params.hotelCode || "",
-        })
-            .then((res) => {
-                if (res?.data?.hotelDetails?.length > 0) {
-                    const matchedStatic = res.data.hotelDetails.find(h =>
-                        String(h.hotelId || h.mappingHotelDetails?.[0]?.hotelId) === String(params.hotelCode)
-                    ) || res.data.hotelDetails[0];
-                    processStaticHotel(matchedStatic);
-                }
-            })
-            .catch((err) => {
-                console.error("V2 static details error:", err);
-            });
+            .catch(() => { });
     };
 
     const fetchHotelRooms = (params) => {
-        setLoading(true);
-
-        // Parse roomGuests from URL (JSON stringified by HotelsList)
-        let roomGuests = [];
+        let parsedGuests = [];
         try {
-            roomGuests = params.roomGuests ? JSON.parse(params.roomGuests) : [];
-        } catch { roomGuests = []; }
+            if (params.roomGuests) {
+                parsedGuests = typeof params.roomGuests === "string" ? JSON.parse(params.roomGuests) : params.roomGuests;
+            }
+        } catch {
+            parsedGuests = [];
+        }
 
-        const requestBody = {
-            traceId: params.traceId || "",
-            checkInDate: params.checkInDate || "",
-            checkOutDate: params.checkOutDate || "",
-            currency: params.currency || "INR",
-            hotelCode: params.hotelCode || "",
-            hotelCityCode: params.hotelCityCode || "",
-            roomGuests: roomGuests,
+        const reqObj = {
+            hotelCode: params.hotelCode,
+            checkInDate: params.checkInDate,
+            checkOutDate: params.checkOutDate,
+            hotelCityCode: params.hotelCityCode,
+            roomGuests: parsedGuests,
             nationality: params.nationality || "IN",
-            supplierParamter: params.supplierParamter || "",
+            supplierParamter: params.supplierParamter,
+            currency: "INR",
         };
 
-        console.log("HotelRooms request body:", requestBody);
-
-        Apiclient1.post("Hotel/HotelRooms", requestBody)
+        Apiclient1.post("Hotel/HotelRooms", reqObj)
             .then((res) => {
-                console.log("HotelRooms response:", res);
-                const data = res;
+                const roomsData = res?.data?.hotelRooms || res?.data || res || {};
+                const rawList = roomsData?.rooms || roomsData?.roomList || res?.data?.rooms || res?.rooms || [];
 
-                const hasErrors = data?.errors?.length > 0 && data.errors.some(e => e.errorCode);
-                if (!hasErrors) {
-                    setHotelDetailsRespObj((prev) => {
-                        // ⚠️ DO NOT spread `...data` here — HotelRooms returns images:[] / undefined
-                        // which would overwrite the 24 images already loaded from GetHotelDetails.
-                        // Only pick specific fields that HotelRooms actually provides.
+                if (Array.isArray(rawList) && rawList.length > 0) {
+                    const normalizedList = rawList.map((room, idx) => {
+                        let ratePlans = room.ratePlans || [];
+                        if (ratePlans.length === 0 && (room.price || room.totalPrice || room.avgPerRoomPerNightPrice)) {
+                            ratePlans = [{
+                                ratePlanId: room.ratePlanId || room.rateId || `rp_${idx}`,
+                                ratePlanName: room.ratePlanName || room.roomName || room.name,
+                                mealPlan: room.mealPlan || room.boardName || "Room Only",
+                                price: room.price || { total: room.avgPerRoomPerNightPrice || room.totalPrice || 0 },
+                                prefPrice: room.prefPrice || { total: room.avgPerRoomPerNightPrice || room.totalPrice || 0 },
+                                refundable: room.refundable ?? false,
+                                lastCancellationDate: room.lastCancellationDate || null,
+                                cancellationPolicy: room.cancellationPolicy || [],
+                                inclusions: room.inclusions || [],
+                                amenities: room.amenities || [],
+                                supplierParamter: room.supplierParamter || roomsData.supplierParamter || "",
+                            }];
+                        }
                         return {
-                            ...prev,
-                            // Basic hotel info — prefer static (prev) if already set
-                            hotelName: prev?.hotelName || data?.hotelName || data?.HotelName || "",
-                            starRating: prev?.starRating || data?.starRating || data?.StarRating || data?.rating || "",
-                            description: data?.description || prev?.description || "",
-                            // Rooms-specific fields from HotelRooms response
-                            traceId: data?.traceId || prev?.traceId || "",
-                            hotelCode: data?.hotelCode || prev?.hotelCode || "",
-                            roomsId: data?.roomsId || data?.roomsID || prev?.roomsId || "",
-                            fixedFormat: data?.fixedFormat || prev?.fixedFormat || "",
-                            supplier: data?.supplier || prev?.supplier || "",
-                            // STATIC DATA — NEVER overwrite with rooms response (rooms returns empty/undefined)
-                            images: prev?.images?.length > 0 ? prev.images : (data?.images?.length > 0 ? data.images : []),
-                            hotelFacility: prev?.hotelFacility?.length > 0 ? prev.hotelFacility : (data?.hotelFacility || []),
-                            addresses: prev?.addresses?.address
-                                ? prev.addresses
-                                : (data?.addresses?.address
-                                    ? data.addresses
-                                    : (Array.isArray(data?.addresses) && data.addresses[0]?.address
-                                        ? { address: data.addresses[0].address }
-                                        : (data?.hotelAddress ? { address: data.hotelAddress } : { address: "" }))),
-                            latitude: prev?.latitude || data?.latitude || "",
-                            longitude: prev?.longitude || data?.longitude || "",
+                            ...room,
+                            roomId: String(room.roomId ?? room.roomCode ?? idx),
+                            roomName: room.roomName || room.name || "Standard Room",
+                            roomDesc: room.roomDesc || room.description || "",
+                            ratePlans: ratePlans.map((rp) => {
+                                const rpPrice = Number(rp?.price?.total || rp?.prefPrice?.total || rp?.avgPerRoomPerNightPrice || rp?.roomPublishPrice || rp?.totalPrice || 0);
+                                const isRef = rp.refundable ?? (rp.cancellationPolicy?.length > 0 ? (rp.cancellationPolicy[0]?.penaltyAmount === "0" || rp.cancellationPolicy[0]?.penaltyAmount === 0 || Number(rp.cancellationPolicy[0]?.penaltyAmount) === 0) : false);
+                                return {
+                                    ...rp,
+                                    price: rp.price?.total ? rp.price : { total: rpPrice },
+                                    prefPrice: rp.prefPrice?.total ? rp.prefPrice : { total: rpPrice },
+                                    refundable: isRef,
+                                    supplierParamter: rp.supplierParamter || room.supplierParamter || roomsData.supplierParamter || "",
+                                    roomsId: roomsData.roomsId || rp.roomsId || "",
+                                };
+                            }),
                         };
                     });
 
-                    // Only update map if static hasn't already set it and rooms has coords
-                    if (data?.latitude && data?.longitude) {
-                        setDefaultProps((prev) => ({
-                            ...prev,
-                            center: {
-                                address: prev.center.address || data?.addresses?.address || "",
-                                lat: prev.center.lat !== 17.42159 ? prev.center.lat : parseFloat(data.latitude),
-                                lng: prev.center.lng !== 78.33752 ? prev.center.lng : parseFloat(data.longitude),
-                            },
-                            mapVisible: true,
-                        }));
-                    }
+                    setRoomsDetails({ ...roomsData, roomList: normalizedList });
+                    setFilteredRooms(normalizedList);
 
-                    const rooms = data?.rooms || [];
-                    setRoomsDetails({
-                        roomList: rooms,
-                        type: data?.fixedFormat || "",
+                    setHotelDetailsRespObj((prev) => {
+                        const updated = { ...prev };
+                        if (roomsData.hotelName && !updated.hotelName) updated.hotelName = roomsData.hotelName;
+                        if (roomsData.starRating && !updated.starRating) updated.starRating = roomsData.starRating;
+                        if (roomsData.address && (!updated.addresses || !updated.addresses.address)) {
+                            updated.addresses = { address: roomsData.address };
+                        }
+                        if (roomsData.hotelFacility?.length > 0 && (!updated.hotelFacility || updated.hotelFacility.length === 0)) {
+                            updated.hotelFacility = roomsData.hotelFacility;
+                        }
+                        if (roomsData.roomsId) updated.roomsId = roomsData.roomsId;
+                        if (roomsData.traceId) updated.traceId = roomsData.traceId;
+                        if (roomsData.supplierParamter) updated.supplierParamter = roomsData.supplierParamter;
+                        if (roomsData.reservationPolicy) updated.reservationPolicy = roomsData.reservationPolicy;
+                        return updated;
                     });
                 } else {
-                    console.warn("HotelRooms API errors:", data?.errors);
-                    setRoomsDetails({ roomList: [], type: "" });
+                    setRoomsDetails({ ...roomsData, roomList: [] });
+                    setFilteredRooms([]);
                 }
                 setLoading(false);
             })
@@ -335,24 +267,8 @@ const HotelDet = () => {
             });
     };
 
-    const handleSelectedRooms = (hotelRoom, key) => {
-        let copyData = { ...selectedRooms };
-        copyData[key] = hotelRoom;
-        setSelectedRooms(copyData);
-    };
-
-    const handleCheckout = () => {
-        let array = Object.keys(selectedRooms).map((key) => selectedRooms[key]);
-        if (roomsDetails.roomList.length === array.length) {
-            navigateToCheckout(array);
-        } else {
-            message.error("Please select Rooms", 3);
-        }
-    };
-
     const navigateToCheckout = (roomsArray) => {
         const hotelDetSearchParams = queryString.parse(window.location.search);
-
         let roomsList = [];
         if (Array.isArray(roomsArray)) {
             roomsList = roomsArray;
@@ -363,7 +279,6 @@ const HotelDet = () => {
         }
 
         if (roomsList.length > 0) {
-            // Build ratePlans array matching new HotelPrice API contract
             let ratePlans = roomsList.map((data) => ({
                 roomsId: data.roomsId || data.roomsID || hotelDetailsRespObj?.roomsId || "",
                 ratePlanId: data.ratePlanId || data.rateID || data.rateId || "",
@@ -378,11 +293,7 @@ const HotelDet = () => {
                 hotelDetSearchParams?.roomsID ||
                 "";
 
-            const traceIdVal =
-                hotelDetSearchParams?.traceId ||
-                hotelDetailsRespObj?.traceId ||
-                "";
-
+            const traceIdVal = hotelDetSearchParams?.traceId || hotelDetailsRespObj?.traceId || "";
             const supplierParamterVal =
                 roomsList[0]?.supplierParamter ||
                 hotelDetSearchParams?.supplierParamter ||
@@ -409,124 +320,34 @@ const HotelDet = () => {
             };
 
             const query = queryString.stringify(queryObj);
-            console.log("Navigating to checkout with query:", query);
-            history(`/hotels/checkout?${query}`);
+            history("/hotels/checkout?" + query);
         } else {
-            message.error("Please select Rooms", 3);
+            message.error("Please select a valid Room & Rate Plan", 3);
         }
     };
 
-    const backToList = () => {
-        history("/hotels/listing");
-    };
-
-    let myRef1 = useRef(null);
-    let myRef2 = useRef(null);
-    let myRef3 = useRef(null);
-    let myRef4 = useRef(null);
-    let myRef5 = useRef(null);
-
-    const scrollToRef = (ref) => {
-
-        try {
-            ref.current.scrollIntoView({
-                behavior: "smooth",
-            });
-        } catch (error) { }
-    };
-
-
-
-    const onHandleModal = (roomObj) => {
-        setRoomImagesModal(roomObj);
-        setIsShowModal(true);
-    };
-
-    const getRoomDec = (roomDesc, ratePlans) => {
-        return (
-            <div className="tooltipWrapper">
-                <p>
-                    <b> {roomDesc} </b>
-                </p>
-                <p>Policies:</p>
-                {ratePlans.cancellationPolicy[0]?.policies.map((pol, i) => (
-                    <div key={pol + i}>
-                        {/* {ReactHtmlParser(pol)} */}
-                        {pol}
-                    </div>
-                ))}
-            </div>
-        );
-    };
-    const Marker = ({ text }) => (
-        <div className="markerWrapper">
-            <EnvironmentOutlined />
-        </div>
-    );
-    const guestCount = (roomGuests) => {
-        return roomGuests?.reduce(
-            (acc, cur) => acc + (cur.noOfChilds + cur.noOfAdults),
-            0
-        );
-    };
-
-    const breakfastOptions = [
-        "Breakfast",
-        "Full Breakfast",
-        "Breakfast for 2",
-        "Breakfast buffet",
-        "Free breakfast",
-        "Room with Breakfast",
-        "BREAKFAST",
-        "BBBreakfast",
-        "BREAKFAST",
-        "Breakfast included",
-        "Bed and Breakfast",
-        "BED AND BREAKFAST",
-        "Bed and Breakfast: The price includes accommodation and breakfast",
-        "Breakfast Tourism fee Service charge VAT Municipality fee is included in the rates",
-    ];
-
-    const breakfastDescriptions = [
-        "Breakfast",
-        "breakfast",
-        "bed and breakfast",
-        "Hot Buffet Breakfast",
-        "BUFFET BREAKFAST",
-        "Full Breakfast",
-        "breakfast,complimentary wifi",
-        "Bed & Breakfast",
-        "BUFFET BREAKFAST",
-        "BUFFET BREAKFAST",
-        "Bed and Breakfast",
-        "full breakfast,free self parking,free wifi",
-        "Food/beverage credit, Breakfast buffet",
-        "Bed and breakfast",
-        "full breakfast",
-        "Free Breakfast",
-        "Free breakfast",
-        "Breakfast buffet",
-        "free breakfast,free valet",
-        "BED AND BREAKFAST",
-        "Hot Buffet Breakfast"
-    ];
-
-
-
-    const halfDescriptions = ['HalfBoard', 'Half Board', "HALF BOARD", "Half board", "half board", "Half-board", "Half Board (Dinner)"]
-    const FullDescriptions = ['FullBoard', "Full Board", "Full board", "Full-board", "FULL BOARD", "full board",]
     const handleMealPlanSelection = (values) => {
-        setSelectedOptions(values)
+        setSelectedOptions(values);
         setSelectedMealPlan(values);
     };
 
-    // Helper: does any ratePlan in this room match the mealPlan keyword?
     const roomHasMeal = (room, keywords) =>
         room?.ratePlans?.some(rp =>
             keywords.some(kw => (rp.mealPlan || "").toLowerCase().includes(kw.toLowerCase()))
         );
     const roomIsRefundable = (room) =>
         room?.ratePlans?.some(rp => rp.refundable === true);
+
+    const getCancellationDateDisplay = (ratePlan) => {
+        if (ratePlan?.lastCancellationDate && !ratePlan.lastCancellationDate.startsWith("0001") && moment(ratePlan.lastCancellationDate).isValid()) {
+            return `Before ${moment(ratePlan.lastCancellationDate).format("DD MMM, YYYY")}`;
+        }
+        const penaltyRule = ratePlan?.cancellationPolicy?.find(p => Number(p.penaltyAmount) > 0);
+        if (penaltyRule?.fromDate) {
+            return `Before ${penaltyRule.fromDate.split(" ")[0]}`;
+        }
+        return null;
+    };
 
     useEffect(() => {
         const list = roomsDetails?.roomList || [];
@@ -557,19 +378,14 @@ const HotelDet = () => {
         }));
     }, [selectedMealPlan, roomsDetails.roomList]);
 
-
-
-
     const MapComponent = ({ center, zoom }) => {
         useEffect(() => {
-
-            const map = L.map('map').setView([center.lat, center.lng], zoom);
-
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors',
+            const mapContainer = document.getElementById("map");
+            if (!mapContainer) return;
+            const map = L.map("map").setView([center.lat, center.lng], zoom);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: "&copy; OpenStreetMap contributors",
             }).addTo(map);
-
 
             const customIcon = L.icon({
                 iconUrl: markerIcon,
@@ -580,796 +396,659 @@ const HotelDet = () => {
                 shadowSize: [41, 41],
             });
 
-            L.marker([center.lat, center.lng], { icon: customIcon }).addTo(map)
-                .bindPopup('Your Hotel')
+            L.marker([center.lat, center.lng], { icon: customIcon })
+                .addTo(map)
+                .bindPopup(hotelDetailsRespObj?.hotelName || "Hotel Location")
                 .openPopup();
-
 
             return () => {
                 map.remove();
             };
         }, [center, zoom]);
 
-        return <div id="map" style={{ height: '500px', width: '100%' }}></div>;
+        return <div id="map" style={{ height: "420px", width: "100%", borderRadius: "12px" }}></div>;
     };
-
-
-
 
     const handelCancellationPolicy = (roomInfo) => {
         setRoomsData(roomInfo);
-
-
         let cancellationdata = roomInfo?.cancellationPolicy ?? null;
-
         setCancellationInfo(cancellationdata);
         setShowCancellationModal(true);
     };
+
     const handleinclusiondata = (val) => {
         setinclusiondata(val);
         setisinclusionvisible(true);
     };
-    const RoomsInclusion = (i, idx) => {
-        return (
-            <>
 
-                <p style={{ margin: '0px 0px 0px' }}>
-                    <span className="fa fa-check" style={{ color: 'green' }}></span> {i}
-                </p>
-
-
-            </>
-        );
-    };
-    const StarRating = ({ rating }) => {
-        const numStars = parseFloat(rating);
-        const starsArray = Array.from({ length: numStars }, (_, index) => index);
-
-        return (
-            <div className="str-top-ht" style={{ fontSize: "16px", marginLeft: 5 }}>
-                {starsArray?.map((_, index) => (
-                    <span
-                        key={index}
-                        role="img"
-                        aria-label="star"
-                        style={{
-                            textShadow: "3px 2px 6px grey",
-
-                        }}
-                    >
-                        <StarTwoTone />
-
-                    </span>
-                ))}
-            </div>
-        );
-    };
-    const handleCancel = () => {
-        setShowCancellationModal(false);
-    };
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 3000,
-    };
     const viewMap = () => {
         const { latitude, longitude } = hotelDetailsRespObj;
-        // console.log(latitude,longitude,"maappfinder");
-        const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
-        window.open(googleMapsUrl, "_blank");
+        if (latitude && longitude) {
+            const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+            window.open(googleMapsUrl, "_blank");
+        } else {
+            setActiveTab("location");
+        }
     };
-    // New response has no 'request' object - read dates/guests from URL params (set at search time)
+
+    const handleBackToResults = () => {
+        if (window.history.length > 1) {
+            history(-1);
+        } else {
+            const p = queryString.parse(window.location.search);
+            const query = queryString.stringify({
+                cityId: p.hotelCityCode || "",
+                checkIn: p.checkInDate || "",
+                checkOut: p.checkOutDate || "",
+                roomGuests: p.roomGuests || "",
+                nationality: p.nationality || "IN",
+            });
+            history(`/hotels/results?${query}`);
+        }
+    };
+
+    const scrollToRooms = () => {
+        setActiveTab("rooms");
+        if (roomsSectionRef.current) {
+            roomsSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    };
+
+    // Date & Guest calculations
     const hotelDetUrlParams = queryString.parse(window.location.search);
     const checkInVal = hotelDetUrlParams?.checkInDate || hotelDetUrlParams?.checkIn;
     const checkOutVal = hotelDetUrlParams?.checkOutDate || hotelDetUrlParams?.checkOut;
-    const checkInDateFormatted = checkInVal
-        ? moment(checkInVal).format("DD MMM, YYYY")
-        : (hotelDetailsRespObj?.request?.checkInDate
-            ? moment(hotelDetailsRespObj.request.checkInDate).format("DD MMM, YYYY")
-            : "");
-    const checkOutDateFormatted = checkOutVal
-        ? moment(checkOutVal).format("DD MMM, YYYY")
-        : (hotelDetailsRespObj?.request?.checkOutDate
-            ? moment(hotelDetailsRespObj.request.checkOutDate).format("DD MMM, YYYY")
-            : "");
-    const RoomsFormatted = guestCount(hotelDetailsRespObj?.request?.roomGuests)
-        ? guestCount(hotelDetailsRespObj?.request?.roomGuests)
-        : (hotelDetUrlParams?.guests || "");
-    const RoomsCount = hotelDetailsRespObj?.request?.roomGuests?.length
-        ? hotelDetailsRespObj?.request?.roomGuests?.length
-        : (hotelDetUrlParams?.rooms ? Number(hotelDetUrlParams.rooms) : 0);
-    // First room first ratePlan for summary display
+    const checkInMoment = checkInVal ? moment(checkInVal) : (hotelDetailsRespObj?.request?.checkInDate ? moment(hotelDetailsRespObj.request.checkInDate) : null);
+    const checkOutMoment = checkOutVal ? moment(checkOutVal) : (hotelDetailsRespObj?.request?.checkOutDate ? moment(hotelDetailsRespObj.request.checkOutDate) : null);
+    const nightsCount = (checkInMoment && checkOutMoment) ? Math.max(1, checkOutMoment.diff(checkInMoment, "days")) : 1;
+
+    const checkInDateFormatted = checkInMoment ? checkInMoment.format("DD MMM, YYYY") : "Select Date";
+    const checkOutDateFormatted = checkOutMoment ? checkOutMoment.format("DD MMM, YYYY") : "Select Date";
+
+    let urlRoomGuests = [];
+    try {
+        urlRoomGuests = hotelDetUrlParams?.roomGuests ? JSON.parse(hotelDetUrlParams.roomGuests) : [];
+    } catch {
+        urlRoomGuests = [];
+    }
+
+    const totalAdults = urlRoomGuests.reduce((acc, cur) => acc + (cur.noOfAdults || 0), 0) || 1;
+    const totalChilds = urlRoomGuests.reduce((acc, cur) => acc + (cur.noOfChilds || cur.noOfChildren || 0), 0);
+    const totalRooms = urlRoomGuests.length || 1;
+
     const firstRoom = filteredRooms?.[0];
     const firstRatePlan = firstRoom?.ratePlans?.[0];
     const hotelNameDisplay = hotelDetailsRespObj?.hotelName || hotelDetailsRespObj?.HotelName || hotelDetUrlParams?.hotelName || "";
     const starRatingDisplay = hotelDetailsRespObj?.starRating || hotelDetailsRespObj?.StarRating || hotelDetailsRespObj?.rating || hotelDetUrlParams?.starRating || "";
     const addressDisplay = hotelDetailsRespObj?.addresses?.address || hotelDetailsRespObj?.address || hotelDetailsRespObj?.hotelAddress || hotelDetUrlParams?.address || "";
 
+    const startingPrice = useMemo(() => {
+        let min = Infinity;
+        roomsDetails?.roomList?.forEach(r => {
+            r?.ratePlans?.forEach(rp => {
+                const p = Number(rp?.price?.total || rp?.prefPrice?.total || rp?.avgPerRoomPerNightPrice || rp?.roomPublishPrice || 0);
+                if (p > 0 && p < min) min = p;
+            });
+        });
+        const firstP = Number(firstRatePlan?.price?.total || firstRatePlan?.avgPerRoomPerNightPrice || 0);
+        return min !== Infinity ? min : firstP;
+    }, [roomsDetails.roomList, firstRatePlan]);
+
+    const roomSliderSettings = {
+        dots: true,
+        infinite: true,
+        speed: 400,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        arrows: true,
+    };
+
     return (
-        <div style={{ background: "#f5f5f5" }}>
-
-            <div className="hotel-det-new" style={{ paddingTop: "100px", margin: "0 2%" }}>
-                <div className="hotel-detail-container">
-                    {loading ? (
-                        <div className="hotel-header">
-                            <Skeleton active={true} paragraph={{ rows: 1 }} />
-                            <Col md={6} xs={0} className="show-moreskeleton-btn">
-                                <Skeleton.Button active={true} size={"large"} />
-                            </Col>
-
-                        </div>
-                    ) : (
-                        (Object.keys(hotelDetailsRespObj).length > 0 || hotelNameDisplay) && (
-                            <div className="hotel-header">
-                                <div>
-                                    <h1 className="hotel-name">{hotelNameDisplay}
-                                        {starRatingDisplay && (
-                                            <span className="rating-share-save">
-                                                <StarRating rating={starRatingDisplay} />
-                                            </span>
-                                        )}
-                                    </h1>
-                                    <p className="hotel-location">{addressDisplay}</p>
-
-                                </div>
-                                <div className="show-rooms-btn">
-                                    <Button onClick={() => scrollToRef(myRef1)}>
-                                        Show rooms
-                                        <i
-                                            className="fa fa-chevron-down"
-                                            aria-hidden="true"
-                                        ></i>
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
-                </div>
-                <div className="hotel-Det-v-top">
-
-                    <div className="hotel-carousel1">
-                        {hotelDetailsRespObj?.images?.length > 0 ?
-
-                            <ImagesLightbox
-                                hotelImages={hotelDetailsRespObj.images}
-                            />
-                            : loading ?
-
-                                <Skeleton.Image
-                                    active
-                                    style={{
-                                        width: '865px',
-                                        height: '376px',
-                                        borderRadius: '8px'
-                                    }}
-                                />
-                                :
-                                <ImagesLightbox
-                                    hotelImages={[ImBUrl + "images/hotels/no_photo.png"]}
-                                />
-                        }
+        <div className="hotel-details-page-v2">
+            {/* Top Navigation & Breadcrumb */}
+            <div className="hotel-top-nav-bar">
+                <div className="container-custom">
+                    <button className="back-btn-pill" onClick={handleBackToResults}>
+                        <ArrowLeftOutlined />
+                        <span>Back to Search Results</span>
+                    </button>
+                    <div className="hotel-search-badge-summary">
+                        <span><CalendarOutlined /> {checkInDateFormatted} - {checkOutDateFormatted}</span>
+                        <span className="divider">•</span>
+                        <span><UserOutlined /> {totalRooms} Room{totalRooms > 1 ? "s" : ""}, {totalAdults + totalChilds} Guest{totalAdults + totalChilds > 1 ? "s" : ""}</span>
                     </div>
+                </div>
+            </div>
 
-                    <div className="booking-section">
-
-                        <div className="map" onClick={viewMap}>
-                            <img src={ImBUrl + "images/map-image.svg"} alt="Map" />
-                            <span className="view-map-Cli" style={{ cursor: "pointer", color: "#007bff" }}>
-                                View On Map
-                            </span>
-                        </div>
-                        <div className="rate-details">
-
-                            <div className="room-rate-Det-box">
-                                <h3>{firstRoom?.roomName || firstRoom?.roomDesc}
-                                    <div>
-                                        {firstRatePlan?.refundable
-                                            ? <span style={{ color: "green", fontSize: "12px" }}>Refundable</span>
-                                            : <span style={{ color: "red", fontSize: "12px" }}>Non-Refundable</span>}
-                                    </div>
-                                </h3>
-                                <p className="show-pr">
-                                    <strong>{""}{Number(firstRatePlan?.price?.total || firstRatePlan?.prefPrice?.total || 0).toFixed(0)}</strong>
+            <div className="container-custom hotel-main-content">
+                {/* Hero Header Card */}
+                <div className="hotel-hero-header-card">
+                    {loading ? (
+                        <Skeleton active paragraph={{ rows: 2 }} />
+                    ) : (
+                        <div className="hero-header-flex">
+                            <div className="hero-title-area">
+                                <div className="stars-and-badge">
+                                    {Number(starRatingDisplay) > 0 && (
+                                        <div className="luxury-star-badge">
+                                            {[...Array(Math.min(5, Math.floor(Number(starRatingDisplay))))].map((_, i) => (
+                                                <StarFilled key={i} className="star-gold" />
+                                            ))}
+                                            <span className="star-text">{starRatingDisplay} Star Hotel</span>
+                                        </div>
+                                    )}
+                                    <span className="verified-badge">
+                                        <SafetyCertificateOutlined /> Verified Property
+                                    </span>
+                                </div>
+                                <h1 className="main-hotel-name">{hotelNameDisplay || "Luxury Hotel & Suites"}</h1>
+                                <p className="hotel-main-address">
+                                    <EnvironmentOutlined className="pin-icon" />
+                                    <span>{addressDisplay || "Prime Location City Center"}</span>
+                                    <button type="button" className="view-map-link-btn" onClick={viewMap}>
+                                        View on Map
+                                    </button>
                                 </p>
                             </div>
-                        </div>
-                        <div className="booking-for">
 
-                            <div className="form-gro">
-                                <label>Check-In Date:</label>
-                                <input
-                                    type="text"
-                                    value={checkInDateFormatted}
-                                    readOnly
-                                    style={{ cursor: "default", backgroundColor: "#1c3d70", color: "#fff", width: "125px", marginTop: "12px" }}
-                                />
-                            </div>
-
-                            <div className="form-gro">
-                                <label>Check-Out Date:</label>
-                                <input
-                                    type="text"
-                                    value={checkOutDateFormatted}
-                                    readOnly
-                                    style={{ cursor: "default", backgroundColor: "#1c3d70", color: "#fff", width: "125px", marginTop: "12px" }}
-                                />
-                            </div>
-                        </div>
-                        <div className="booking-form">
-                            <div className="form-gro">
-                                <label>Room & guests</label>
-                                <input
-                                    type="text"
-                                    value={RoomsCount + " Room , " + RoomsFormatted + " Guests "}
-                                    readOnly
-                                    style={{ cursor: "default", backgroundColor: "#075080", color: "#fff", width: "100%", marginTop: "18px" }}
-                                />
-                            </div>
-                            <Select
-                                mode="multiple"
-                                allowClear
-                                placeholder="Room filters"
-                                value={selectedOptions}
-                                onChange={handleMealPlanSelection}
-                                size="large"
-
-                            >
-                                <Option value="Breakfast" style={{ fontSize: 15 }}>Breakfast</Option>
-                                <Option value="Half Board" style={{ fontSize: 15 }}>Half Board</Option>
-                                <Option value="Full Board" style={{ fontSize: 15 }}>Full Board</Option>
-                                <Option value="Refundable" style={{ fontSize: 15 }}>Refundable</Option>
-                            </Select>
-                        </div>
-                    </div>
-                </div>
-            </div >
-            <section className="hotel-details-header-New">
-                <div className="details-header-container">
-
-                    <div className="Activ-btn-Det" style={{ marginTop: 10 }}>
-                        <button onClick={() => handleTabClick('rooms')} className={activeTab === 'rooms' ? 'activeDet' : 'no-btn'}>ROOMS</button>
-                        <button onClick={() => handleTabClick('about')} className={activeTab === 'about' ? 'activeDet' : 'no-btn'}>ABOUT</button>
-                        <button onClick={() => handleTabClick('facility')} className={activeTab === 'facility' ? 'activeDet' : 'no-btn'}>FACILITY</button>
-                        <button onClick={() => handleTabClick('location')} className={activeTab === 'location' ? 'activeDet' : 'no-btn'}>LOCATION</button>
-
-                    </div>
-
-                </div>
-
-                <div className="hotel-Newdet-block">
-                    {loading ? (
-                        <Skeleton active />
-                    ) : (
-                        <div className="hotel-rooms-listN">
-                            {activeTab === 'about' && (
-                                <div ref={myRef2}>
-                                    <h3>About Hotel</h3>
-                                    {hotelDetailsRespObj?.description
-                                        ? parse(hotelDetailsRespObj.description)
-                                        : (hotelDetailsRespObj?.reservationPolicy
-                                            ? <p>{hotelDetailsRespObj.reservationPolicy}</p>
-                                            : <p style={{ color: "#888" }}>No description available.</p>)
-                                    }
-                                </div>
-                            )}
-                            {activeTab === 'rooms' && (
-                                <section className="hotel-rooms-list" ref={myRef1}>
-                                    <div className="rooms-wrapper">
-
-                                        <div>
-                                            <h5 className="rooms-available-sta">Available Rooms</h5>
+                            <div className="hero-price-cta-box">
+                                {startingPrice > 0 && (
+                                    <div className="price-tag-block">
+                                        <span className="starts-from">Starting from</span>
+                                        <div className="price-val">
+                                            <span className="currency">₹</span>
+                                            <span className="amount">{Math.round(startingPrice).toLocaleString("en-IN")}</span>
+                                            <span className="per-night">/ night</span>
                                         </div>
+                                        <span className="tax-subtext">+ taxes & fees applicable</span>
+                                    </div>
+                                )}
+                                <Button type="primary" size="large" className="select-rooms-cta-btn" onClick={scrollToRooms}>
+                                    Select Room
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </div>
 
-                                        <div className="rooms-list">
-                                            {loading ? (
-                                                <div className="hotel-details-block">
-                                                    <div className="hotel-details-room-card-container">
-                                                        {/* ----Room Skeleton Card---- */}
-                                                        {[...Array(2)].map((_, i) => (
-                                                            <div key={"skeleton" + i} className="room-card">
-                                                                <Row gutter={16}>
-                                                                    <Col md={4}>
-                                                                        <div className="room-image-skel">
-                                                                            <Skeleton.Image />
-                                                                        </div>
-                                                                    </Col>
-                                                                    <Col md={16}>
-                                                                        <Skeleton active />
-                                                                    </Col>
-                                                                    <Col md={4}>
-                                                                        <div className="choose-btn-s">
-                                                                            <Skeleton paragraph={{ rows: 0 }} />
-                                                                            <Skeleton.Button active={true} size={"large"} />
-                                                                        </div>
-                                                                    </Col>
-                                                                </Row>
+                {/* Hero 2-Column: Left Gallery & Right Quick Booking Card */}
+                <div className="hotel-visual-section-grid">
+                    {/* Left Gallery */}
+                    <div className="hotel-gallery-wrapper">
+                        {hotelDetailsRespObj?.images?.length > 0 ? (
+                            <ImagesLightbox hotelImages={hotelDetailsRespObj.images} />
+                        ) : loading ? (
+                            <div className="gallery-skeleton-box">
+                                <Skeleton.Image active style={{ width: "100%", height: "420px", borderRadius: "12px" }} />
+                            </div>
+                        ) : (
+                            <ImagesLightbox hotelImages={[ImBUrl + "images/hotels/no_photo.png"]} />
+                        )}
+                    </div>
+
+                    {/* Right Trip Summary Card & Quick Filters */}
+                    <div className="hotel-summary-sidebar-card">
+                        <div className="sidebar-card-header">
+                            <h3>Reservation Overview</h3>
+                            <span className="nights-badge">{nightsCount} Night{nightsCount > 1 ? "s" : ""}</span>
+                        </div>
+
+                        <div className="stay-dates-pill-grid">
+                            <div className="date-block checkin">
+                                <span className="lbl">CHECK-IN</span>
+                                <strong>{checkInDateFormatted}</strong>
+                                <span className="time-lbl">From 2:00 PM</span>
+                            </div>
+                            <div className="date-block checkout">
+                                <span className="lbl">CHECK-OUT</span>
+                                <strong>{checkOutDateFormatted}</strong>
+                                <span className="time-lbl">Until 11:00 AM</span>
+                            </div>
+                        </div>
+
+                        <div className="occupancy-pill">
+                            <div className="occ-icon"><UserOutlined /></div>
+                            <div className="occ-info">
+                                <span className="occ-title">Rooms & Guests</span>
+                                <span className="occ-desc">{totalRooms} Room{totalRooms > 1 ? "s" : ""} • {totalAdults} Adult{totalAdults > 1 ? "s" : ""}{totalChilds > 0 ? ` • ${totalChilds} Child` : ""}</span>
+                            </div>
+                        </div>
+
+                        {/* Quick Live Filters */}
+                        <div className="quick-filter-section">
+                            <span className="qf-title">Quick Room Filters</span>
+                            <div className="filter-chips-wrap">
+                                {["Breakfast", "Half Board", "Full Board", "Refundable"].map((opt) => {
+                                    const isSelected = selectedMealPlan.includes(opt);
+                                    return (
+                                        <button
+                                            key={opt}
+                                            type="button"
+                                            className={`filter-chip ${isSelected ? "active" : ""}`}
+                                            onClick={() => {
+                                                if (isSelected) {
+                                                    handleMealPlanSelection(selectedMealPlan.filter((x) => x !== opt));
+                                                } else {
+                                                    handleMealPlanSelection([...selectedMealPlan, opt]);
+                                                }
+                                            }}
+                                        >
+                                            {isSelected && <CheckOutlined className="chk-icon" />}
+                                            {opt}
+                                        </button>
+                                    );
+                                })}
+                                {selectedMealPlan.length > 0 && (
+                                    <button
+                                        type="button"
+                                        className="filter-chip reset"
+                                        onClick={() => handleMealPlanSelection([])}
+                                    >
+                                        Clear All
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Location Preview Button */}
+                        <div className="map-preview-card" onClick={viewMap}>
+                            <img src={ImBUrl + "images/map-image.svg"} alt="Map Preview" />
+                            <div className="map-overlay">
+                                <CompassOutlined />
+                                <span>Explore Area on Map</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sticky Section Navigation Tabs */}
+                <div className="hotel-sticky-nav-tabs">
+                    <button
+                        className={`tab-item-btn ${activeTab === "rooms" ? "active" : ""}`}
+                        onClick={() => setActiveTab("rooms")}
+                    >
+                        <AppstoreOutlined />
+                        <span>Available Rooms ({filteredRooms?.length || 0})</span>
+                    </button>
+                    <button
+                        className={`tab-item-btn ${activeTab === "about" ? "active" : ""}`}
+                        onClick={() => setActiveTab("about")}
+                    >
+                        <InfoCircleOutlined />
+                        <span>About Hotel</span>
+                    </button>
+                    <button
+                        className={`tab-item-btn ${activeTab === "facility" ? "active" : ""}`}
+                        onClick={() => setActiveTab("facility")}
+                    >
+                        <CoffeeOutlined />
+                        <span>Amenities & Facilities</span>
+                    </button>
+                    <button
+                        className={`tab-item-btn ${activeTab === "location" ? "active" : ""}`}
+                        onClick={() => setActiveTab("location")}
+                    >
+                        <CompassOutlined />
+                        <span>Location & Map</span>
+                    </button>
+                    <button
+                        className={`tab-item-btn ${activeTab === "policies" ? "active" : ""}`}
+                        onClick={() => setActiveTab("policies")}
+                    >
+                        <FileTextOutlined />
+                        <span>Hotel Policies</span>
+                    </button>
+                </div>
+
+                {/* Tab Content Panels */}
+                <div className="hotel-tab-content-container" ref={roomsSectionRef}>
+                    {/* 1. ROOMS TAB */}
+                    {activeTab === "rooms" && (
+                        <div className="rooms-tab-pane">
+                            <div className="rooms-header-row">
+                                <div>
+                                    <h2 className="section-title">Available Room Options</h2>
+                                    <p className="section-subtitle">Select the room type and meal plan that best matches your trip</p>
+                                </div>
+                                {selectedMealPlan.length > 0 && (
+                                    <div className="active-filter-alert">
+                                        Showing rooms with: <strong>{selectedMealPlan.join(", ")}</strong>
+                                        <button onClick={() => handleMealPlanSelection([])}>Reset</button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {loading ? (
+                                <div className="rooms-loading-state">
+                                    {[...Array(3)].map((_, i) => (
+                                        <div key={i} className="room-card-modern-skeleton">
+                                            <Skeleton active avatar paragraph={{ rows: 3 }} />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : filteredRooms?.length > 0 ? (
+                                <div className="rooms-card-list">
+                                    {filteredRooms.map((hotelRoom, index) => (
+                                        <div className="room-card-modern" key={hotelRoom?.roomId || index}>
+                                            <div className="room-card-header">
+                                                <div className="room-title-area">
+                                                    <h3 className="room-name">{hotelRoom?.roomName || hotelRoom?.roomDesc}</h3>
+                                                    {hotelRoom?.roomDesc && hotelRoom.roomDesc !== hotelRoom.roomName && (
+                                                        <p className="room-short-desc">{hotelRoom.roomDesc}</p>
+                                                    )}
+                                                </div>
+                                                <div className="room-occupancy-badges">
+                                                    <span className="occ-badge">
+                                                        <UserOutlined /> Max Adults: {hotelRoom?.maxAdult || hotelRoom?.adultCount || hotelRoom?.maxOccupancy || totalAdults}
+                                                    </span>
+                                                    <span className="occ-badge">
+                                                        Children: {hotelRoom?.minChildren ?? hotelRoom?.childCount ?? totalChilds}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Room Images slider if available */}
+                                            {hotelRoom?.roomImageList?.length > 0 && (
+                                                <div className="room-slider-wrapper">
+                                                    <Slider {...roomSliderSettings}>
+                                                        {hotelRoom.roomImageList.map((img, imgIdx) => (
+                                                            <div key={imgIdx} className="room-slide-item">
+                                                                <img
+                                                                    src={img}
+                                                                    alt={hotelRoom.roomName}
+                                                                    onError={(e) => { e.target.src = ImBUrl + "images/htImgs/no-htl.jpg"; }}
+                                                                />
                                                             </div>
                                                         ))}
-
-                                                        {/* ----End Of Room Skeleton Card---- */}
-                                                    </div>
+                                                    </Slider>
                                                 </div>
-                                            ) :
-
-
-                                                filteredRooms?.length > 0 ? (
-                                                    filteredRooms?.map((hotelRoom, index) => (
-                                                        <Card style={{ padding: "6px 16px" }} className="room-card-wrapper mb-2" key={hotelRoom?.roomId || index}>
-                                                            {/* <ScrollToTopButton /> */}
-                                                            <h5 className="rm-nam-tp" style={{ margin: "0 0 8px 0" }}>
-                                                                {hotelRoom?.roomName || hotelRoom?.roomDesc}
-                                                            </h5>
-                                                            {hotelRoom?.roomDesc && hotelRoom.roomDesc !== hotelRoom.roomName && (
-                                                                <p style={{ fontSize: 13, color: "#666", margin: "0 0 8px 0" }}>{hotelRoom.roomDesc}</p>
-                                                            )}
-                                                            <p style={{ fontSize: 12, color: "#888", margin: "0 0 8px 0" }}>
-                                                                Max Adults: {hotelRoom?.maxAdult || hotelRoom?.adultCount} &nbsp;|&nbsp; Children: {hotelRoom?.minChildren || hotelRoom?.childCount}
-                                                            </p>
-                                                            {hotelRoom?.roomImageList?.length > 0 && (
-                                                                <div style={{ marginBottom: 12 }}>
-                                                                    <Slider {...settings}>
-                                                                        {hotelRoom.roomImageList.map((img, imgIdx) => (
-                                                                            <div key={imgIdx}>
-                                                                                <img src={img} alt={hotelRoom.roomName}
-                                                                                    style={{ width: "100%", maxHeight: 180, objectFit: "cover", borderRadius: 8 }}
-                                                                                    onError={(e) => { e.target.src = ImBUrl + "images/htImgs/no-htl.jpg"; }} />
-                                                                            </div>
-                                                                        ))}
-                                                                    </Slider>
-                                                                </div>
-                                                            )}
-                                                            {hotelRoom?.ratePlans?.map((ratePlan, rpIdx) => (
-                                                                <div key={rpIdx} className="hotel-room-details-main-card"
-                                                                    style={{ borderTop: "1px solid #f0f0f0", paddingTop: 8, marginTop: 8 }}>
-                                                                    <div className="hotel-room-details-main-content-card">
-                                                                        <div className="hotel-room-details-main-inclusions-card">
-                                                                            <div className="hotel-room-details-main-inclusions-card1">
-                                                                                <div className="hotel-room-details-main-inclusions-card2">
-                                                                                    {ratePlan?.ratePlanName && (
-                                                                                        <p style={{ fontWeight: 600, margin: "0 0 4px 0" }}>{ratePlan.ratePlanName}</p>
-                                                                                    )}
-                                                                                    {ratePlan?.mealPlan && (
-                                                                                        <p className="board-b">Meal Plan: {ratePlan.mealPlan}</p>
-                                                                                    )}
-                                                                                    {ratePlan?.inclusions?.length > 0 && (
-                                                                                        <div className="inc-r">
-                                                                                            {ratePlan.inclusions.slice(0, 3).map((i, idx) => RoomsInclusion(i, idx))}
-                                                                                            {ratePlan.inclusions.length > 3 && (
-                                                                                                <button style={{ color: "blue", border: "1px solid white", backgroundColor: "white" }}
-                                                                                                    onClick={() => handleinclusiondata(ratePlan.inclusions)}>More</button>
-                                                                                            )}
-                                                                                        </div>
-                                                                                    )}
-                                                                                    {ratePlan?.amenities?.length > 0 && (
-                                                                                        <div className="inc-r">
-                                                                                            {ratePlan.amenities.slice(0, 2).map((a, idx) => RoomsInclusion(a, idx))}
-                                                                                        </div>
-                                                                                    )}
-                                                                                </div>
-                                                                                <div className="hotel-room-details-main-inclusions-card-2">
-                                                                                    {ratePlan?.refundable ? (
-                                                                                        <>
-                                                                                            {ratePlan?.lastCancellationDate && (
-                                                                                                <h1 style={{ fontSize: "small" }}>
-                                                                                                    Free Cancellation Till {moment(ratePlan.lastCancellationDate).format("DD MMM YYYY")}
-                                                                                                </h1>
-                                                                                            )}
-                                                                                            <span style={{ color: "green", fontSize: "12px", padding: "4px 8px", borderRadius: "7px" }}>Refundable</span>
-                                                                                            <div className="cncl-chrgs-ht" style={{ color: "red", cursor: "pointer" }}
-                                                                                                onClick={() => handelCancellationPolicy({ ...ratePlan, roomName: hotelRoom.roomName })}>
-                                                                                                Cancellation Policy
-                                                                                            </div>
-                                                                                        </>
-                                                                                    ) : (
-                                                                                        <span style={{ color: "#bd0c21", fontSize: "12px" }}>Non-Refundable</span>
-                                                                                    )}
-                                                                                </div>
-                                                                            </div>
-                                                                            <div className="hotel-room-details-main-price-card-1">
-                                                                                <span className="span-currency">
-                                                                                    <span style={{ fontSize: "18px", color: "green" }}>
-                                                                                        {"₹"}
-                                                                                    </span>
-                                                                                    <span style={{ fontSize: "22px" }}>
-                                                                                        {Number(ratePlan?.price?.total || ratePlan?.prefPrice?.total || 0).toFixed(2)}
-                                                                                    </span>
-                                                                                    <span style={{ fontSize: "12px", color: "grey" }}> / night</span>
-                                                                                </span>
-                                                                                <div style={{ minWidth: "126px" }}>
-                                                                                    <Button
-                                                                                        onClick={() => navigateToCheckout([{
-                                                                                            roomId: hotelRoom.roomId,
-                                                                                            ratePlanId: ratePlan.ratePlanId,
-                                                                                            roomsId: hotelDetailsRespObj.roomsId,
-                                                                                            roomName: hotelRoom.roomName,
-                                                                                            price: ratePlan.price,
-                                                                                            refundable: ratePlan.refundable,
-                                                                                            cancellationPolicy: ratePlan.cancellationPolicy,
-                                                                                            lastCancellationDate: ratePlan.lastCancellationDate,
-                                                                                            supplierParamter: ratePlan.supplierParamter,
-                                                                                        }])}
-                                                                                        className="btn-choose-room-hotel-det chooseroom-details-hotel"
-                                                                                    >
-                                                                                        Choose Room
-                                                                                    </Button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-                                                        </Card>
-                                                    ))
-                                                ) :
-                                                    <Card className="no-rroms-cr" style={{ background: "#eaebee" }}>
-                                                        <div className="rm-norooms">
-
-                                                            <img className="no-rm-im" src={ImBUrl + "images/filterno.jpg"} alt="No Filter" />
-
-                                                            <div style={{ textAlign: "center", paddingTop: "4%" }}>
-                                                                <h4 style={{ color: "#bd0c21" }}>SORRY..!!</h4>
-                                                                <p>We couldn't find any properties matching the criteria for hotel Rooms.</p>
-                                                                <p>Please remove the filters applied and try again.</p>
-                                                            </div>
-                                                            <img className="no-rm" src={ImBUrl + "images/skyline.png"} alt="No Filter" />
-                                                        </div>
-                                                    </Card>
-
-                                            }
-                                        </div>
-                                    </div >
-                                </section >
-                            )}
-                            {activeTab === 'facility' && (
-                                <div className="description-block facilities-list">
-
-                                    <div className="description-content miscell-data">
-
-                                        <div className="facilities-block">
-                                            <p className="rooms-available-sta">Miscellaneous</p>
-                                            {loading ? (
-                                                <Skeleton active />
-                                            ) : (
-                                                <ul>
-                                                    <Row>
-                                                        {hotelDetailsRespObj?.hotelFacility?.length > 0 ? (
-                                                            hotelDetailsRespObj.hotelFacility.map(
-                                                                (facility, index) => (
-                                                                    <Col key={"facili" + index} md={8} sm={8} xs={12}>
-                                                                        <li>
-                                                                            <i
-                                                                                className="fa fa-check "
-                                                                                style={{ color: "#008cff" }}
-                                                                            ></i>{" "}
-                                                                            {facility}
-                                                                        </li>{" "}
-                                                                    </Col>
-                                                                )
-                                                            )
-                                                        ) : (
-                                                            <p>No data available</p>
-                                                        )}
-                                                    </Row>
-                                                </ul>
                                             )}
+
+                                            {/* Rate Plans List */}
+                                            <div className="rate-plans-table">
+                                                <div className="rate-table-head">
+                                                    <div className="col-plan">BENEFITS & MEAL PLAN</div>
+                                                    <div className="col-policy">CANCELLATION POLICY</div>
+                                                    <div className="col-price">PRICE PER NIGHT</div>
+                                                    <div className="col-action"></div>
+                                                </div>
+
+                                                {hotelRoom?.ratePlans?.map((ratePlan, rpIdx) => (
+                                                    <div key={rpIdx} className="rate-plan-row">
+                                                        {/* Inclusions / Meal Plan */}
+                                                        <div className="col-plan">
+                                                            {ratePlan?.ratePlanName && (
+                                                                <div className="rate-plan-tag-name">{ratePlan.ratePlanName}</div>
+                                                            )}
+                                                            {ratePlan?.mealPlan && (
+                                                                <div className="meal-plan-pill">
+                                                                    <CoffeeOutlined /> {ratePlan.mealPlan.replace(/_/g, " ")}
+                                                                </div>
+                                                            )}
+                                                            {ratePlan?.inclusions?.length > 0 && (
+                                                                <div className="inclusions-chips-list">
+                                                                    {ratePlan.inclusions.slice(0, 3).map((inc, iIdx) => (
+                                                                        <span key={iIdx} className="inc-chip">
+                                                                            <CheckCircleFilled className="chk-green" /> {inc}
+                                                                        </span>
+                                                                    ))}
+                                                                    {ratePlan.inclusions.length > 3 && (
+                                                                        <button
+                                                                            type="button"
+                                                                            className="more-inc-btn"
+                                                                            onClick={() => handleinclusiondata(ratePlan.inclusions)}
+                                                                        >
+                                                                            +{ratePlan.inclusions.length - 3} more
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Cancellation Policy */}
+                                                        <div className="col-policy">
+                                                            {ratePlan?.refundable ? (
+                                                                <div className="policy-refundable-wrap">
+                                                                    <span className="refundable-pill">
+                                                                        <CheckOutlined /> Free Cancellation
+                                                                    </span>
+                                                                    {getCancellationDateDisplay(ratePlan) && (
+                                                                        <span className="cancellation-date-text">
+                                                                            {getCancellationDateDisplay(ratePlan)}
+                                                                        </span>
+                                                                    )}
+                                                                    <button
+                                                                        type="button"
+                                                                        className="view-policy-btn"
+                                                                        onClick={() => handelCancellationPolicy({ ...ratePlan, roomName: hotelRoom.roomName })}
+                                                                    >
+                                                                        View Policy Rules
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="policy-nonref-wrap">
+                                                                    <span className="non-refundable-pill">Non-Refundable</span>
+                                                                    <span className="non-ref-note">This booking cannot be cancelled or modified for a refund.</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Price */}
+                                                        <div className="col-price">
+                                                            <div className="price-display-box">
+                                                                <span className="currency-symbol">₹</span>
+                                                                <span className="amount-num">
+                                                                    {Number(ratePlan?.price?.total || ratePlan?.prefPrice?.total || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                </span>
+                                                            </div>
+                                                            <span className="per-night-label">per night</span>
+                                                        </div>
+
+                                                        {/* CTA */}
+                                                        <div className="col-action">
+                                                            <Button
+                                                                type="primary"
+                                                                className="choose-room-primary-btn"
+                                                                onClick={() => navigateToCheckout([{
+                                                                    roomId: hotelRoom.roomId,
+                                                                    ratePlanId: ratePlan.ratePlanId,
+                                                                    roomsId: hotelDetailsRespObj.roomsId,
+                                                                    roomName: hotelRoom.roomName,
+                                                                    price: ratePlan.price,
+                                                                    refundable: ratePlan.refundable,
+                                                                    cancellationPolicy: ratePlan.cancellationPolicy,
+                                                                    lastCancellationDate: ratePlan.lastCancellationDate,
+                                                                    supplierParamter: ratePlan.supplierParamter,
+                                                                }])}
+                                                            >
+                                                                Book Room
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="no-rooms-fallback-card">
+                                    <div className="fallback-content">
+                                        <img src={ImBUrl + "images/filterno.jpg"} alt="No rooms" />
+                                        <h3>No Rooms Match Your Selected Filters</h3>
+                                        <p>Try clearing your meal plan or refundability filters to view all available room categories.</p>
+                                        <Button type="primary" onClick={() => handleMealPlanSelection([])}>
+                                            Clear All Filters
+                                        </Button>
                                     </div>
                                 </div>
                             )}
-                            {activeTab === 'location' && (
-                                <>
-                                    {defaultProps.mapVisible ? (
-                                        <section className="locationWrapper">
-
-                                            <h3 className="rooms-available-sta">Location</h3>
-                                            {loading ? (
-                                                <Skeleton active paragraph={{ rows: 0 }} />
-                                            ) : (
-                                                <p className="loc">
-                                                    <EnvironmentOutlined /> {defaultProps?.center?.address}
-                                                </p>
-                                            )}
-
-                                            <div className="mapWrapper">
-                                                <MapComponent
-                                                    center={{ lat: defaultProps.center.lat, lng: defaultProps.center.lng }}
-                                                    zoom={defaultProps.zoom}
-                                                />
-
-                                            </div>
-                                        </section>
-                                    ) : null
-                                    }
-                                </>
-                            )}
-
                         </div>
                     )}
 
-                </div>
-
-            </section>
-            <section className="hotel-Det-v-bottom">
-                <div className="description-block facilities-list" ref={myRef4}>
-
-                    <div className="description-content miscell-data">
-                        <h3>Check-In Instructions</h3>
-                        <div className="facilities-block">
-                            <Row>
-                                <Col md={24} sm={24} xs={24}>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        Extra-person charges may apply and vary depending on
-                                        property policy.
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        Government-issued photo identification and a credit card,
-                                        debit card, or cash deposit may be required at check-in
-                                        for incidental charges.
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        Special requests are subject to availability upon check-in
-                                        and may incur additional charges; special requests cannot
-                                        be guaranteed .
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        The primary guest must be at least 18 years of age to
-                                        check into this hotel(s) .
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        In some countries including India, as per Government
-                                        regulations, it is mandatory for all guests above 18 years
-                                        of age to carry a valid photo identity card & address
-                                        proof at the time of check-in. In case, check-in is denied
-                                        by the hotel due to lack of required documents, you cannot
-                                        claim for the refund & the booking will be considered as
-                                        NO SHOW. Please check with the hotel(s) directly .
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        Unless mentioned, the tariff does not include charges for
-                                        optional room services (such as telephone calls, room
-                                        service, mini bar, snacks, laundry extra bed etc.). In
-                                        case, such additional charges are levied by the hotel(s),
-                                        we shall not be held responsible for it .
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        Extra bed can be accommodated with a folding cot or a
-                                        mattress, subject to room size & availability .
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        The hotel(s) reserves the right to decline accommodation
-                                        to localities/same city residents.eTravos.com will not be
-                                        responsible for any check-in declined by the hotel(s) or
-                                        any refunds due to the above-mentioned reason .
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        eTravos.com will not be responsible for any service issues
-                                        at the hotel(s) .
-                                    </p>
-                                </Col>
-                            </Row>
+                    {/* 2. ABOUT TAB */}
+                    {activeTab === "about" && (
+                        <div className="generic-tab-pane">
+                            <h2 className="section-title">About {hotelNameDisplay || "the Property"}</h2>
+                            <div className="editorial-description-content">
+                                {hotelDetailsRespObj?.description ? (
+                                    parse(hotelDetailsRespObj.description)
+                                ) : hotelDetailsRespObj?.reservationPolicy ? (
+                                    <p>{hotelDetailsRespObj.reservationPolicy}</p>
+                                ) : (
+                                    <p className="no-info-text">No detailed description currently provided for this property.</p>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div className="description-block facilities-list" ref={myRef5}>
+                    )}
 
-                    <div className="description-content miscell-data">
-                        <h3>Special Instructions</h3>
-                        <div className="facilities-block">
-                            <Row>
-                                <Col md={24} sm={24} xs={24}>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        Early check -in/ Late checkout (Subject to availability,
-                                        Amount varies) to be Charges by the Property at time of
-                                        Service. .
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        To make arrangements for check-in please contact the
-                                        property at least 24 hours before arrival using the
-                                        information on the booking confirmation.
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        Guests must contact the property in advance for check-in
-                                        instructions. Front desk staff will greet guests on
-                                        arrival.
-                                    </p>
-                                </Col>
-                            </Row>
+                    {/* 3. FACILITY TAB */}
+                    {activeTab === "facility" && (
+                        <div className="generic-tab-pane">
+                            <h2 className="section-title">Hotel Facilities & Amenities</h2>
+                            <p className="section-subtitle">Services and features provided on premise for guests</p>
+                            {hotelDetailsRespObj?.hotelFacility?.length > 0 ? (
+                                <div className="facilities-pill-grid">
+                                    {hotelDetailsRespObj.hotelFacility.map((facility, index) => (
+                                        <div key={index} className="facility-grid-item">
+                                            <CheckCircleFilled className="fac-icon" />
+                                            <span>{facility}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="no-info-text">No facilities listed for this property.</p>
+                            )}
                         </div>
-                    </div>
-                </div>
-                <div className="description-block facilities-list" style={{ marginBottom: "15px" }}>
+                    )}
 
-                    <div className="description-content miscell-data">
-                        <h3>Disclaimer Notification</h3>
-                        <div className="facilities-block">
-                            <Row>
-                                <Col md={24} sm={24} xs={24}>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        Amenities are subject to availability and may be
-                                        chargeable as per the hotel policy.
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        We attempts to ensure that the information on this page is
-                                        complete and accurate; however this information along with
-                                        its links may contain typographical errors, and other
-                                        errors or inaccuracies. We assume no responsibility for
-                                        such errors or omissions, and reserve the right to correct
-                                        any errors, inaccuracies or omissions.
-                                    </p>
-                                    <p className="font-wht-nrml">
-                                        <i
-                                            className="fa fa-check"
-                                            style={{ color: "#008cff" }}
-                                        ></i>{" "}
-                                        All information provided on this page is meant to serve as
-                                        a general information source only and does not constitute
-                                        professional advice. This page may not cover all
-                                        information available on a particular issue. Before
-                                        relying on this page, we urge you to independently
-                                        validate or obtain professional advice relevant to your
-                                        particular circumstances .
-                                    </p>
-                                </Col>
-                            </Row>
+                    {/* 4. LOCATION TAB */}
+                    {activeTab === "location" && (
+                        <div className="generic-tab-pane">
+                            <h2 className="section-title">Location & Surroundings</h2>
+                            <p className="location-address-text">
+                                <EnvironmentOutlined /> {defaultProps?.center?.address || addressDisplay || "City Center"}
+                            </p>
+                            <div className="map-embed-wrapper">
+                                <MapComponent center={{ lat: defaultProps.center.lat, lng: defaultProps.center.lng }} zoom={defaultProps.zoom} />
+                            </div>
                         </div>
-                    </div>
+                    )}
+
+                    {/* 5. POLICIES TAB */}
+                    {activeTab === "policies" && (
+                        <div className="generic-tab-pane">
+                            <h2 className="section-title">Hotel Policies & Instructions</h2>
+                            <div className="policies-cards-grid">
+                                <div className="policy-info-card">
+                                    <h3>Check-In & Check-Out Guidelines</h3>
+                                    <ul className="policy-check-list">
+                                        <li><CheckOutlined /> Government-issued photo identification and credit card / cash deposit required at check-in.</li>
+                                        <li><CheckOutlined /> Primary guest must be at least 18 years of age.</li>
+                                        <li><CheckOutlined /> Early check-in / late check-out is subject to room availability upon arrival.</li>
+                                        <li><CheckOutlined /> In India, valid photo ID with address proof (Aadhar/Passport/Voter ID) is mandatory for all guests.</li>
+                                    </ul>
+                                </div>
+
+                                <div className="policy-info-card">
+                                    <h3>Special & Important Instructions</h3>
+                                    <ul className="policy-check-list">
+                                        <li><CheckOutlined /> Please notify the property at least 24 hours prior to arrival for late check-in arrangements.</li>
+                                        <li><CheckOutlined /> Special requests cannot be guaranteed and are subject to availability upon check-in.</li>
+                                        <li><CheckOutlined /> Optional services (telephone, minibar, room service, laundry) will incur additional on-site fees.</li>
+                                    </ul>
+                                </div>
+
+                                <div className="policy-info-card full-width">
+                                    <h3>Disclaimer & Booking Notification</h3>
+                                    <p className="policy-disclaimer-text">
+                                        Amenities and property features are provided directly by suppliers and are subject to availability.
+                                        We recommend confirming specific property requirements directly with the hotel prior to arrival.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            </section>
+            </div>
+
+            {/* Cancellation Policy Modal */}
             <Modal
-                title="Cancellation Policy"
+                wrapClassName="modalHeader amenitiesModal"
+                title="Cancellation Policy Details"
                 open={showcancellationModal}
-                onCancel={handleCancel}
+                onCancel={() => setShowCancellationModal(false)}
                 footer={null}
-                width={500}
+                width={560}
+                centered
             >
-                <div className="modal-body">
+                <div className="cancellation-modal-content">
                     {roomsData != null && (
                         <>
-                            <p className="heading-part-modal-cancellation">
-                                {roomsData.roomName?.split(",")[0]}
-                            </p>
-                            {cancellationInfo.length > 0
-                                ? cancellationInfo?.map((can, i) => {
+                            <div className="cancellation-room-header">
+                                <h4>{roomsData.roomName?.split(",")[0]}</h4>
+                                {roomsData.refundable ? (
+                                    <Tag color="success">Refundable Room</Tag>
+                                ) : (
+                                    <Tag color="error">Non-Refundable Room</Tag>
+                                )}
+                            </div>
 
-                                    return (
-
-                                        <div className={can?.penaltyAmount > 0 ? "modal-popup-cancellation" : "modal-popup-cancellation-1"}>
-                                            <div className="modal-popup-cancellation2">
-                                                {can?.penaltyAmount > 0 ?
-                                                    <i
-                                                        class="fa fa-calendar"
-                                                        style={{ color: "red", fontSize: "20px" }}
-                                                    ></i> : <i
-                                                        class="fa fa-calendar"
-                                                        style={{ color: "rgb(0, 191, 0)", fontSize: "20px" }}
-                                                    ></i>}
+                            {cancellationInfo?.length > 0 ? (
+                                <div className="cancellation-rules-list">
+                                    {cancellationInfo.map((can, i) => (
+                                        <div key={i} className={`cancellation-rule-card ${can?.penaltyAmount > 0 ? "penalty" : "free"}`}>
+                                            <div className="rule-date-box">
+                                                <CalendarOutlined className="cal-icon" />
+                                                <div className="rule-dates">
+                                                    <div><strong>From:</strong> {can?.fromDate?.split(" ")[0]}</div>
+                                                    <div><strong>To:</strong> {can?.toDate?.split(" ")[0]}</div>
+                                                </div>
                                             </div>
-                                            <div className="modal-popup-cancellation1">
-                                                <p style={{ margin: "0px 0px 0px" }}>
-                                                    <strong>From-</strong>{" "}
-                                                    {can?.fromDate?.split(" ")[0]}
-                                                </p>
-                                                <p style={{ margin: "0px 0px 0px" }}>
-                                                    <strong>To-</strong>{" "}
-                                                    {can?.toDate?.split(" ")[0]}
-                                                </p>
-
-
-                                            </div>
-                                            <div className="modal-popup-cancellation1">
-                                                <p style={{ margin: "0px 0px 0px" }}><strong>Cancellation Charges</strong></p>
-                                                {can.chargeType === "Amount" ?
-                                                    <p style={{ margin: "0px 0px 0px" }}><strong> {"â‚¹"}  {can?.penaltyAmount} </strong></p> : null}
-                                                {can.chargeType === "Fixed" ?
-                                                    <p style={{ margin: "0px 0px 0px" }}><strong> {"â‚¹"}  {can?.penaltyAmount} </strong></p> : null}
-                                                {can?.chargeType === "Nights" ?
-                                                    <p style={{ margin: "0px 0px 0px" }}><strong>{can?.penaltyAmount} {" Nights"}</strong></p> : null}
-                                                {can?.chargeType == "Percentage" ?
-                                                    <p style={{ margin: "0px 0px 0px" }}><strong>  {can.penaltyAmount} {can.chargeType == "Percentage" ? "%" : ""}</strong></p> : null}
-
-
-
-
+                                            <div className="rule-penalty-box">
+                                                <span className="penalty-label">Cancellation Charge:</span>
+                                                <strong className="penalty-val">
+                                                    {can?.chargeType === "Percentage"
+                                                        ? `${can.penaltyAmount}%`
+                                                        : can?.chargeType === "Nights"
+                                                            ? `${can.penaltyAmount} Night(s)`
+                                                            : `₹${can?.penaltyAmount || 0}`}
+                                                </strong>
                                             </div>
                                         </div>
-                                    );
-                                })
-                                : (
-                                    <p>No cancellation information available at the moment. </p>
-                                )}
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="no-cancellation-text">No detailed penalty breakdown provided by the supplier.</p>
+                            )}
                         </>
                     )}
                 </div>
             </Modal>
+
+            {/* Inclusions Modal */}
             <Modal
-                className="modal-css-direction-popup"
+                wrapClassName="modalHeader amenitiesModal"
+                title="Room Inclusions & Amenities"
                 open={isinclusionvisible}
                 onCancel={() => setisinclusionvisible(false)}
-                onOk={() => setisinclusionvisible(false)}
+                footer={null}
+                width={500}
+                centered
             >
-                {" "}
-                {inclusiondata?.length
-                    ? inclusiondata?.map((i, idx) =>
-                        idx > 0 ? (
-                            <>
-                                {idx === 1 ? (
-                                    <p className="mb-0 mr-1">
-                                        <strong>Inclusions :</strong>
-                                    </p>
-                                ) : null}
-
-                                <p className="mb-0 mr-1">
-                                    <i
-                                        className="fa fa-check color-blue"
-                                        aria-hidden="true"
-                                    ></i>{" "}
-                                    {i}
-                                </p>
-                            </>
-                        ) : (
-                            ""
-                        )
-                    )
-                    : ""}
+                <div className="inclusions-modal-body">
+                    {inclusiondata?.length > 0 ? (
+                        <div className="inclusions-grid-list">
+                            {inclusiondata.map((inc, idx) => (
+                                <div key={idx} className="inclusion-popup-item">
+                                    <CheckCircleFilled style={{ color: "#10b981", marginRight: 8 }} />
+                                    <span>{inc}</span>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p>No extra inclusions listed.</p>
+                    )}
+                </div>
             </Modal>
         </div>
     );

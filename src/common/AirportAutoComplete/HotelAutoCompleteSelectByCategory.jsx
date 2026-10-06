@@ -152,7 +152,7 @@ const HotelAutoCompleteSelectByCategory = (props) => {
             {details?.data.map((d, index) => {
               const HotelsLabel = (
                 <div>
-                  <p style={{ fontSize: "16px", color: "#111827", fontWeight: "700", margin: "0", fontFamily: "'Inter', 'Nunito', sans-serif" }}>
+                  <p style={{ fontSize: "16px", color: "#111827", fontWeight: "700", margin: "0", fontFamily: "'Inter', 'jost', sans-serif" }}>
                     {d.cityName.split(",")[0]}
                     <span style={{ fontSize: "12px", color: "#9B9B9B", display: "inline-block", marginLeft: "8px", fontWeight: "500" }}>
                       {d.cityName.split(",")[1]}
@@ -165,7 +165,7 @@ const HotelAutoCompleteSelectByCategory = (props) => {
                   <div className="d-flex align-items-center justify-content-between">
                     <i className="fa fa-hotel forplace-wor-dropdownflight" style={{ color: '#f5802c', marginRight: '10px' }}></i>
                     <div className="for-elepsis-work-dropdownhotels" style={{ flex: 1 }}>
-                      <p style={{ fontSize: "16px", color: "#111827", fontWeight: "700", margin: "0", fontFamily: "'Inter', 'Nunito', sans-serif" }}>
+                      <p style={{ fontSize: "16px", color: "#111827", fontWeight: "700", margin: "0", fontFamily: "'Inter', 'jost', sans-serif" }}>
                         {d.cityName.split(",")[0]}
                         <span style={{ fontSize: "12px", color: "#9CA3AF", display: "block", marginTop: "2px", fontWeight: "500" }}>
                           {d.cityName.split(",")[1]}
@@ -181,7 +181,7 @@ const HotelAutoCompleteSelectByCategory = (props) => {
           (props.value || props.selectProps?.value?.hotelss) && (
             <Option value={props.value || props.selectProps?.value?.hotelss} label={
               <div>
-                <p style={{ fontSize: "16px", color: "#111827", fontWeight: "700", margin: "0", fontFamily: "'Inter', 'Nunito', sans-serif" }}>
+                <p style={{ fontSize: "16px", color: "#111827", fontWeight: "700", margin: "0", fontFamily: "'Inter', 'jost', sans-serif" }}>
                   {queryString.parse(props.value || props.selectProps?.value?.hotelss)?.cityName?.split(',')[0] || "Hyderabad"}
                 </p>
               </div>

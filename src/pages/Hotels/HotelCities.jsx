@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, Card, Carousel, Spin } from "antd";
 import { EnvironmentOutlined, StarTwoTone } from "@ant-design/icons";
-import ApiClient from "../../helpers/ApiClient";
+import ApiClient from "../../Helpers/ApiClient";
 import Slider from "react-slick";
 import "./TripPlanner.scss";
 import queryString from "query-string";
@@ -66,7 +66,7 @@ const TripPlanner = () => {
             },
         ],
     };
-    
+
 
     const tomorrowDate = moment().add(5, "days").format("YYYY-MM-DD");
     const dayafter = moment().add(6, "days").format("YYYY-MM-DD");
@@ -148,7 +148,7 @@ const TripPlanner = () => {
                                                             textOverflow: "ellipsis",
                                                             fontSize: 20,
                                                             fontWeight: 700,
-                                                            fontFamily: "Nunito",
+                                                            fontFamily: "jost",
                                                             marginTop: "10px",
                                                             marginLeft: "10px",
                                                         }}

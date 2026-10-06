@@ -22,7 +22,7 @@ const ConsolidatedLedger = () => {
 
     const handleViewTicket = (referenceNumber) => {
         if (referenceNumber) {
-            navigate(`/admin/flight/ticket?ref=${referenceNumber}`);
+            navigate(`/admin/hotel/ticket?ref=${referenceNumber}`);
         }
     };
 
@@ -43,7 +43,7 @@ const ConsolidatedLedger = () => {
 
             const response = await ApiClient.post('Deposits/LedgerStatements', payload);
             console.log("Fetching with payload:", payload);
-            
+
             if (response && (response.success || response.statusCode === 200)) {
                 const results = response.data?.results || (Array.isArray(response.data) ? response.data : []);
                 setData(results);
@@ -79,9 +79,9 @@ const ConsolidatedLedger = () => {
 
     const columns = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
-        { 
-            title: 'Reference Number', 
-            dataIndex: 'referenceNumber', 
+        {
+            title: 'Reference Number',
+            dataIndex: 'referenceNumber',
             key: 'referenceNumber',
             render: (text) => text ? (
                 <a href="#!" onClick={(e) => { e.preventDefault(); handleViewTicket(text); }} style={{ color: '#1890ff', fontWeight: 500 }}>
@@ -129,7 +129,7 @@ const ConsolidatedLedger = () => {
                         {searchType === 'Custom' && (
                             <Col span={6}>
                                 <Form.Item name="dateRange" label="Date Range">
-                                    <RangePicker 
+                                    <RangePicker
                                         style={{ width: '100%' }}
                                         disabledDate={(current) => current && current > dayjs().endOf('day')}
                                     />
@@ -175,8 +175,8 @@ const ConsolidatedLedger = () => {
                             <Button type="primary" htmlType="submit">
                                 Search
                             </Button>
-                            <Button 
-                                style={{ marginLeft: '8px' }} 
+                            <Button
+                                style={{ marginLeft: '8px' }}
                                 onClick={() => {
                                     form.resetFields();
                                     fetchLedgerStatements({}, 1);

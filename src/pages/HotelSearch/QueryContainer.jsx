@@ -111,15 +111,15 @@ const QueryContainer = () => {
           {queryData.map((item, index) => (
             <Card
               key={index}
-             
-            
-             
-              
+
+
+
+
             >
-             
-              <div style={{padding:20,width:220,height:200}}>
-                <h1 style={{ color: "#003b95" ,fontFamily:"Nunito",fontSize:16,fontWeight:700}}>{item.title}</h1>
-                <p style={{ color: "#666",fontFamily:"Nunito",fontSize:14 }}>{item.description}</p>
+
+              <div style={{ padding: 20, width: 220, height: 200 }}>
+                <h1 style={{ color: "#003b95", fontFamily: "jost", fontSize: 16, fontWeight: 700 }}>{item.title}</h1>
+                <p style={{ color: "#666", fontFamily: "jost", fontSize: 14 }}>{item.description}</p>
               </div>
             </Card>
           ))}

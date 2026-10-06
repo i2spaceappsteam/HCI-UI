@@ -656,10 +656,8 @@ const HotelCheckout = ({ location }) => {
                         bordered={false}
                         className="guest-details-form hotel-card-wrapper"
                         key={roomIndex}
-                        style={{ background: "linear-gradient(283deg, #bbd9fc7a, transparent)" }}
                       >
-
-                        <div style={{ background: "#f9f9f9", padding: 10 }}>
+                        <div className="room-card-header-pill">
                           <p className="room-title">Room {1 + roomIndex}</p>
                         </div>
 
@@ -675,7 +673,7 @@ const HotelCheckout = ({ location }) => {
                             </p>
 
                             <Row gutter={[16, 16]} style={{ padding: 10 }}>
-                              <Col md={3} sm={12} xs={24}>
+                              <Col md={4} sm={12} xs={24}>
                                 {pax.guestType === "Adult" ? (
                                   <Form.Item
                                     name={`Title_${roomIndex}_${paxIndex}`}
@@ -795,7 +793,7 @@ const HotelCheckout = ({ location }) => {
                                 </Form.Item>
                               </Col>
                               {pax.guestType === "Child" ? (
-                                <Col md={5} sm={12} xs={24}>
+                                <Col md={4} sm={12} xs={24}>
                                   <Form.Item
                                     name={`childAge_${roomIndex}_${paxIndex}`}
                                     label="Child Age"
@@ -814,7 +812,7 @@ const HotelCheckout = ({ location }) => {
                                   </Form.Item>
                                 </Col>
                               ) : (
-                                <Col md={5} sm={12} xs={24}>
+                                <Col md={4} sm={12} xs={24}>
                                   <Form.Item
                                     name={`adultage_${roomIndex}_${paxIndex}`}
                                     label="Age"
@@ -1018,9 +1016,11 @@ const HotelCheckout = ({ location }) => {
 
                   </Form>
                 ) : null}
-                <Card className="guest-details-form hotel-card-wrapper" style={{ background: "linear-gradient(90deg,rgba(255, 255, 255, 0),#bbd9fc7a" }}>
-                  <div className="contact-header">
-
+                <Card bordered={false} className="guest-details-form hotel-card-wrapper">
+                  <div className="contact-card-header">
+                    <p className="bk-cntct">Contact Details</p>
+                  </div>
+                  <div>
                     <Form
                       layout="vertical"
                       name="contactForm"
@@ -1029,12 +1029,8 @@ const HotelCheckout = ({ location }) => {
                       initialValues={{
                         areaCode: "+91",
                       }}
-
                     >
                       <div className="guest-input-wrapper">
-                        <div style={{ background: "#f9f9f9", padding: 10, fontSize: 18, fontWeight: 700, fontFamily: "Nunito" }}>
-                          <p className="bk-cntct">Contact Details</p>
-                        </div>
                         <Row gutter={16} style={{ padding: 10 }}>
                           <Col md={8} sm={12} xs={24}>
                             <Form.Item

@@ -29,9 +29,9 @@
   }
 
   .tg-primary-btn {
-    background-color: #f5802c;
+    background-color: #017bcf;
     color: #FFE;
-    border-color: #f5802c;
+    border-color: #017bcf;
     height: 65px;
     border-radius: 38px;
     font-weight: 600;
@@ -416,7 +416,7 @@
       font-weight: 700 !important;
       color: #111827 !important;
       margin-top: 0;
-      font-family: 'Inter', 'Nunito', sans-serif !important;
+      font-family: 'Jost', sans-serif;
     }
 
     .ant-picker-input input::placeholder,
@@ -545,18 +545,18 @@
   width: 100% !important;
   font-size: 18px !important;
   font-weight: 700 !important;
-  background: linear-gradient(135deg, #f5802c, #ff9b52);
-  color: #fff;
+  background: linear-gradient(135deg, #017bcf, #017bcf);
+  color: #fff !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(245, 128, 44, 0.4);
+  // box-shadow: 0 4px 15px #017bcf;
   transition: all 0.3s ease;
   margin-top: 0px;
   
   &:hover {
-    background: linear-gradient(135deg, #e06c1c, #f5802c);
-    box-shadow: 0 6px 20px rgba(245, 128, 44, 0.6);
+    background: linear-gradient(135deg, #017bcf,#017bcf);
+    // box-shadow: 0 6px 20px #017bcf;
     transform: translateY(-2px);
-    color: #fff;
+    color: #fff !important;
   }
 }
 .my-hts{

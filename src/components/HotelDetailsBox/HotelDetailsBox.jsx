@@ -1,299 +1,266 @@
-
-
-
 import React from "react";
-import "../HotelDetailsBox/HotelDetailsBox.scss";
-
-import { Card, Col, Rate, Row } from "antd";
+import { Row, Col, Tag, Badge, Tooltip } from "antd";
 import moment from "moment";
 import queryString from "query-string";
 import { useNavigate } from "react-router";
+import {
+  StarFilled,
+  CalendarOutlined,
+  UserOutlined,
+  CheckCircleFilled,
+  EnvironmentOutlined,
+  SafetyCertificateOutlined,
+  ArrowLeftOutlined,
+  CoffeeOutlined,
+  InfoCircleOutlined,
+  CheckOutlined
+} from "@ant-design/icons";
+import "./HotelDetailsBox.scss";
 
-
-import { StarTwoTone } from "@ant-design/icons";
 const ImBaseUrl = import.meta.env.VITE_Image_URL;
-const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData }) => {
-  let history = useNavigate();
 
+const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
+  const history = useNavigate();
 
-  let noOfNights = () => {
-    if (Object.keys(hotelSearchData).length > 0) {
-      let checkin = new Date(hotelSearchData.checkInDate);
-      let checkout = new Date(hotelSearchData.checkOutDate);
-      let diffTime = checkout - checkin;
-      let diffDays = Math.ceil(diffTime / (1000 * 24 * 60 * 60));
-      return diffDays;
-    } else {
-      return 0;
+  const noOfNights = () => {
+    if (hotelSearchData?.checkInDate && hotelSearchData?.checkOutDate) {
+      const checkin = moment(hotelSearchData.checkInDate);
+      const checkout = moment(hotelSearchData.checkOutDate);
+      const diff = checkout.diff(checkin, "days");
+      return Math.max(1, diff);
     }
+    return 1;
   };
-
-  const getAdultChildCount = () => {
-    let adults = 0;
-    let childs = 0;
-
-    if (Object.keys(hotelSearchData).length > 0) {
-      if (hotelSearchData.roomGuests.length > 0) {
-        for (
-          let index = 0;
-          index < hotelSearchData.roomGuests.length;
-          index++
-        ) {
-          adults += Number(hotelSearchData.roomGuests[index].noOfAdults);
-          childs += Number(hotelSearchData.roomGuests[index].noOfChilds);
-        }
-      }
-    }
-    if (childs > 0) {
-      return `${adults} Adult &  ${childs} Children`;
-    } else return `${adults} Adult`;
-  };
-
 
   const gotoHotelDetail = (hotelCode) => {
-    let queryObj = {
-      hotelId: hotelCode,
-      traceId: Ids.traceId,
-      supplier: hotelSearchData.supplier,
+    if (window.history.length > 1) {
+      history(-1);
+    } else {
+      const queryObj = {
+        hotelId: hotelCode || hotelDetailsObj?.hotelCode,
+        traceId: Ids?.traceId || hotelDetailsObj?.traceId,
+        supplier: hotelSearchData?.supplier,
+      };
+      const query = queryString.stringify(queryObj);
+      history(`/hotels/detail?${query}`);
+    }
+  };
+
+  // Guest count summary
+  const guestSummary = () => {
+    let adults = 0;
+    let childs = 0;
+    let rooms = 0;
+
+    if (hotelSearchData?.roomGuests && Array.isArray(hotelSearchData.roomGuests)) {
+      rooms = hotelSearchData.roomGuests.length;
+      hotelSearchData.roomGuests.forEach((rg) => {
+        adults += Number(rg.noOfAdults || 0);
+        childs += Number(rg.noOfChilds || 0);
+      });
+    } else {
+      rooms = 1;
+      adults = 2;
+    }
+
+    return {
+      rooms: rooms || 1,
+      adults: adults || 1,
+      childs: childs || 0,
+      totalGuests: (adults || 1) + (childs || 0),
     };
-    const query = queryString.stringify(queryObj);
-    history(`/hotels/hotel-details?${query}`);
   };
-  const StarRating = ({ rating }) => {
-    const numStars = parseFloat(rating);
-    const starsArray = Array.from({ length: numStars }, (_, index) => index);
 
-    return (
-      <div className="str-top-ht" style={{ fontSize: "14px", marginLeft: -2, marginTop: -8 }}>
-        {starsArray?.map((_, index) => (
-          <span
-            key={index}
-            role="img"
-            aria-label="star"
-            style={{
-              textShadow: "3px 2px 6px grey",
-              marginRight: "1px"
-            }}
-          >
-            <StarTwoTone />
-            {/* ⭐ */}
-          </span>
-        ))}
-      </div>
-    );
-  };
+  const guests = guestSummary();
+  const nights = noOfNights();
+
+  // Images
+  const hotelImg =
+    hotelDetailsObj?.images?.[0] ||
+    hotelDetailsObj?.images?.[1] ||
+    (ImBaseUrl ? `${ImBaseUrl}images/htImgs/no_img.png` : "/images/hotels/no_photo.png");
+
+  // Room details
+  const roomData = hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0] || hotelDetailsObj?.combineRoom?.[0] || {};
+  const roomName = roomData?.ratePlanName || roomData?.roomName || "Standard Selected Room";
+  const mealPlan = roomData?.mealPlan || roomData?.boardName || "";
+
+  // Inclusions
+  const inclusions = hotelDetailsObj?.combineRoom?.[0]?.inclusions || roomData?.inclusions || [];
+
+  // Cancellation policies
+  const cancellationPolicies =
+    hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0]?.cancellationPolicy ||
+    roomData?.cancellationPolicy ||
+    [];
+
+  const isRefundable =
+    roomData?.refundable ??
+    (cancellationPolicies.length > 0 && !cancellationPolicies.some(p => p.penaltyAmount === 100 && p.chargeType === "Percentage"));
+
   return (
-    <>
+    <div className="modern-hotel-details-box">
+      {/* Header Bar */}
+      <div className="details-box-header">
+        <div className="header-title-group">
+          <div className="hotel-icon-badge">🏨</div>
+          <div>
+            <h3 className="box-title">Hotel & Reservation Summary</h3>
+            <span className="box-subtitle">Review your selected stay details before confirming</span>
+          </div>
+        </div>
 
-      <Row className="hot-detail">
-        <Col md={24}>
-          <div className="hotel-detail-header-wrapper">
-            <p className="booking-summary-div">Hotel Details</p>
+        {hotelDetailsObj?.hotelCode && Ids !== "hotel-review" && (
+          <button
+            type="button"
+            className="change-room-pill-btn"
+            onClick={() => gotoHotelDetail(hotelDetailsObj.hotelCode)}
+          >
+            <ArrowLeftOutlined />
+            <span>Change Room</span>
+          </button>
+        )}
+      </div>
 
-            {hotelDetailsObj?.hotelCode && Ids !== "hotel-review" && (
-              <p
-                className="pointer_cursor"
-                onClick={() => gotoHotelDetail(hotelDetailsObj.hotelCode)}
-              >
-                Change Room <span><img src={ImBaseUrl + "images/Icons/back.png"} width={"20px"} alt="" /></span>
+      {/* Main Content Layout */}
+      <div className="hotel-summary-card-body">
+        <div className="hotel-main-info-grid">
+          {/* Left: Hotel Featured Photo */}
+          <div className="hotel-img-frame">
+            <img
+              src={hotelImg}
+              alt={hotelDetailsObj?.hotelName || "Hotel"}
+              onError={(e) => {
+                e.target.src = ImBaseUrl ? `${ImBaseUrl}images/htImgs/no_img.png` : "/images/hotels/no_photo.png";
+              }}
+            />
+            <div className="hotel-photo-badge">
+              <SafetyCertificateOutlined /> Verified
+            </div>
+          </div>
+
+          {/* Right: Hotel Name, Stars & Room Details */}
+          <div className="hotel-meta-details">
+            <div className="meta-top-row">
+              {Number(hotelDetailsObj?.starRating) > 0 && (
+                <div className="star-rating-pill">
+                  {[...Array(Math.min(5, Math.floor(Number(hotelDetailsObj.starRating))))].map((_, i) => (
+                    <StarFilled key={i} className="star-icon" />
+                  ))}
+                  <span className="star-count">{hotelDetailsObj.starRating} Star Hotel</span>
+                </div>
+              )}
+            </div>
+
+            <h2 className="hotel-display-name">{hotelDetailsObj?.hotelName}</h2>
+            {hotelDetailsObj?.hotelAddress && (
+              <p className="hotel-location-row">
+                <EnvironmentOutlined /> {hotelDetailsObj.hotelAddress}
               </p>
             )}
+
+            {/* Selected Room Pill */}
+            <div className="selected-room-banner">
+              <span className="room-label">Selected Room:</span>
+              <strong className="room-title-val">{roomName?.split(",")?.[0]}</strong>
+              {mealPlan && (
+                <span className="meal-plan-tag">
+                  <CoffeeOutlined /> {mealPlan}
+                </span>
+              )}
+            </div>
           </div>
-        </Col>
+        </div>
 
-        <Col md={8} sm={24} xs={24}>
-          <div style={{ padding: 8 }}>
-            <div className="image-details one-img-hotel">
+        {/* Stay Dates Timeline & Guest Count */}
+        <div className="stay-timeline-container">
+          {/* Check-In */}
+          <div className="timeline-date-card checkin">
+            <span className="date-type-lbl">CHECK-IN</span>
+            <div className="date-main-val">
+              <span className="day-name">{moment(hotelSearchData.checkInDate).format("ddd")},</span>
+              <span className="date-num">{moment(hotelSearchData.checkInDate).format("DD MMM YYYY")}</span>
+            </div>
+            <span className="check-time-lbl">From 2:00 PM</span>
+          </div>
 
-              {hotelDetailsObj?.images?.length > 1 ? (
-                <img
-                  src={hotelDetailsObj?.images[1]}
-                  alt={hotelDetailsObj.hotelName}
-                />
-              ) : (hotelDetailsObj?.images?.length > 0 ? (
-                <img
-                  src={hotelDetailsObj?.images[0]}
-                  alt={hotelDetailsObj.hotelName}
-                />
+          {/* Duration Badge */}
+          <div className="timeline-duration-badge">
+            <div className="duration-pill">
+              <span>🌙 {nights} {nights > 1 ? "Nights" : "Night"}</span>
+            </div>
+            <div className="duration-line"></div>
+          </div>
+
+          {/* Check-Out */}
+          <div className="timeline-date-card checkout">
+            <span className="date-type-lbl">CHECK-OUT</span>
+            <div className="date-main-val">
+              <span className="day-name">{moment(hotelSearchData.checkOutDate).format("ddd")},</span>
+              <span className="date-num">{moment(hotelSearchData.checkOutDate).format("DD MMM YYYY")}</span>
+            </div>
+            <span className="check-time-lbl">Until 11:00 AM</span>
+          </div>
+
+          {/* Guests & Rooms */}
+          <div className="timeline-guests-card">
+            <span className="date-type-lbl">OCCUPANCY</span>
+            <div className="guests-main-val">
+              <UserOutlined className="guest-icon" />
+              <span>{guests.rooms} Room{guests.rooms > 1 ? "s" : ""}, {guests.adults} Adult{guests.adults > 1 ? "s" : ""}{guests.childs > 0 ? `, ${guests.childs} Child` : ""}</span>
+            </div>
+            <span className="check-time-lbl">{guests.totalGuests} Total Guest{guests.totalGuests > 1 ? "s" : ""}</span>
+          </div>
+        </div>
+
+        {/* Inclusions Chips List */}
+        {inclusions?.length > 0 && (
+          <div className="inclusions-strip-section">
+            <span className="strip-title">Included in Rate:</span>
+            <div className="inclusions-pills-wrap">
+              {inclusions.map((inc, idx) => (
+                <span key={idx} className="inclusion-pill">
+                  <CheckCircleFilled className="inc-chk-icon" />
+                  <span>{inc}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Cancellation Policy Alert Banner */}
+        {cancellationPolicies?.length > 0 && (
+          <div className={`cancellation-policy-banner ${isRefundable ? "refundable" : "non-refundable"}`}>
+            <div className="policy-banner-header">
+              <InfoCircleOutlined className="banner-icon" />
+              <strong>Cancellation Policy</strong>
+              {isRefundable ? (
+                <Tag color="success" style={{ marginLeft: 8 }}>Refundable</Tag>
               ) : (
-                <img src={ImBaseUrl + "images/htImgs/no_img.png"} alt="no-photo" />
-              ))
-              }
-
-
+                <Tag color="error" style={{ marginLeft: 8 }}>Non-Refundable</Tag>
+              )}
             </div>
-          </div>
-        </Col>
-
-        <Col md={16} sm={24} xs={24}>
-          <div className="rm-dt-bx" style={{ padding: 8 }}>
-            <div className="disp-table-cell-div">
-              <div className="hotel-plan-div">
-                <h4 className="hot-name">{hotelDetailsObj.hotelName}</h4>
-                {hotelDetailsObj.starRating && (
-                  <div className="hotel-star" style={{ alignContent: "center" }}>
-
-                    <StarRating rating={hotelDetailsObj.starRating} />
-                  </div>
-                )}
-              </div>
-              <div className="rm-st">
-                <div className="rrom-type">
-                  <span className="rom">Room</span> {" : "}
-                  <span className="room-name">
-
-                    {hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0]?.ratePlanName?.split(',')?.[0]}
-                  </span>
-                </div>
-                <div className="rrom-type">
-                  <span className="rom">Stay</span> {" : "}
-                  <span className="room-name">
-                    <i class="fa fa-moon-o" aria-hidden="true"></i>{" "}{noOfNights()} {noOfNights() > 1 ? "Nights" : "Night"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="booking-dates">
-                <div className="check-in">
-                  <div className="labelC">CHECK IN</div>
-                  <div className="date">
-                    <span className="day">{moment(hotelSearchData.checkInDate).format("ddd")}</span>
-                    <span className="date-number">{moment(hotelSearchData.checkInDate).format("DD")}</span>
-                    <span className="month-year">{moment(hotelSearchData.checkInDate).format("MMM YYYY")}</span>
-                  </div>
-                  <div className="time">12 PM</div>
-                </div>
-                <div className="nights">
-                  <span className="nights-badge"> <i class="fa fa-moon-o" aria-hidden="true"></i>{" "}{noOfNights()} {noOfNights() > 1 ? "Nights" : "Night"}</span>
-                </div>
-                <div className="check-out">
-                  <div className="labelC">CHECK OUT</div>
-                  <div className="date">
-                    <span className="day"> {moment(hotelSearchData.checkOutDate).format("ddd")}</span>
-                    <span className="date-number">{moment(hotelSearchData.checkOutDate).format("DD")}</span>
-                    <span className="month-year">{moment(hotelSearchData.checkOutDate).format("MMM YYYY")}</span>
-                  </div>
-                  <div className="time">10 AM</div>
-                </div>
-              </div>
-
-              <Col className="room-number-wrapper">
-                <div className="second-col-details-div">
-
-
-                  {Object.keys(hotelSearchData).length > 0 && hotelSearchData.roomGuests.length > 0 && (
-                    <div className="room-summ-bx">
-                      {(() => {
-                        const summary = hotelSearchData.roomGuests.reduce(
-                          (acc, room) => {
-                            acc.rooms += 1;
-                            acc.adults += room.noOfAdults;
-                            acc.children += room.noOfChilds;
-                            return acc;
-                          },
-                          { rooms: 0, adults: 0, children: 0 }
-                        );
-
-                        return (
-                          <div className="rmsury-details">
-                            <div className="rm-sum"><span>{summary.rooms} </span> Rooms</div> <div>|</div>
-                            <div className="rm-sum"><span>{summary.adults}</span> Adult's {summary.children > 0 ? <>{", "} <span>{summary.children}</span>Child's </> : null}   </div><div>|</div>
-                            <div className="rm-sum"><span>{noOfNights()} </span>{noOfNights() > 1 ? "Nights" : "Night"}</div>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  )}
-
-
-
-                </div>
-              </Col>
-
-            </div>
-          </div>
-        </Col>
-        <Col md={24} style={{ padding: 8 }}>
-
-          {hotelDetailsObj?.combineRoom?.[0]?.inclusions?.length > 0 ?
-            <Col className="inclusion-cp" style={{ display: 'contents' }}>
-
-              <p className="inc-txt">Inclusions:
-
-                {hotelDetailsObj?.combineRoom?.[0]?.inclusions?.map((i, idx) =>
-                  idx >= 0 ? (
-                    <>
-
-                      <ul >
-                        <li key={"ind" + idx} >
-                          <i class="fa fa-check-circle-o" aria-hidden="true"></i> {" "}
-                          {i.toUpperCase()}{hotelDetailsObj?.combineRoom?.[0]?.inclusions?.length < idx || idx > 0 ? " , " : ""}
-                        </li>
-
-                      </ul>
-                    </>
+            <div className="policy-text-list">
+              {cancellationPolicies.map((cancel, index) => (
+                <p key={index} className="policy-rule-desc">
+                  {cancel?.policies ? (
+                    cancel.policies
                   ) : (
-                    null
-                  )
-                )} </p>
-
-
-
-            </Col> : null}
-
-        </Col>
-
-
-      </Row>
-      <Row>
-        <Col md={24} sm={24} xs={24} className="cancel-cp-bottom" style={{ padding: 0, marginTop: -4 }}>
-          <>
-            {Object?.keys(hotelDetailsObj)?.length > 0 && (
-              <>
-                {hotelDetailsObj?.combineRoom?.length > 0 ? (
-                  <>
-                    {hotelDetailsObj?.combineRoom?.[0]?.combineRooms[0]?.cancellationPolicy?.map((cancel, index) => (
-                      <>
-
-                        {cancel?.chargeType === "Percentage" ?
-                          <div className="cancel-policy-cp">
-                            <label>
-                              <p className="cancl-txt">
-                                <strong>Cancellation Policy: </strong>
-                                {cancel?.policies ?? <span>
-                                  {"for "}{hotelDetailsObj?.combineRoom?.[0]?.combineRooms[0]?.roomName}{" - Total "} {" : "} {cancel?.penaltyAmount} {" % (percentage) of amount will be Charged, If Cancelled between "}{cancel?.fromDate}{" and "}{cancel?.toDat}{" until "} {" IST "}
-                                </span>
-                                }
-                              </p>
-                            </label>
-                          </div> :
-                          <div className="cancel-policy-cp">
-                            <label>
-                              <p className="cancl-txt">
-                                <strong>Cancellation Policy: </strong>
-                                <span>
-                                  {"for "}{hotelDetailsObj?.combineRoom?.[0]?.combineRooms[0]?.roomName}{" - of total "}{" : "}{cancel?.penaltyAmount}{"/- amount will be Charged, If Cancelled between "}{cancel?.fromDate}{" and "}{cancel?.toDate}{" until "} {" IST "}
-                                </span>
-                              </p>
-                            </label>
-                          </div>}
-                      </>))}
-
-
-                  </>
-                ) : (
-                  ""
-                )}
-              </>
-            )}
-
-
-          </>
-        </Col>
-      </Row>
-
-
-    </>
+                    <span>
+                      Cancellation between <strong>{cancel?.fromDate?.split(" ")[0]}</strong> and{" "}
+                      <strong>{cancel?.toDate?.split(" ")[0]}</strong> will incur a charge of{" "}
+                      <strong style={{ color: "#b91c1c" }}>
+                        {cancel?.chargeType === "Percentage" ? `${cancel.penaltyAmount}%` : `₹${cancel?.penaltyAmount || 0}`}
+                      </strong>.
+                    </span>
+                  )}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

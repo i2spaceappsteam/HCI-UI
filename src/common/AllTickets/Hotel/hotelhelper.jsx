@@ -1,4 +1,6 @@
-export function getHotelPrice(ticketData) {
+import React from "react";
+
+export function getHotelPrice(ticketData = {}) {
   let baseAmount = 0;
   let taxAmount = 0;
   let convienenceFee = 0;
@@ -13,74 +15,135 @@ export function getHotelPrice(ticketData) {
     postMarkup = Number(ticketData?.postMarkup);
   }
 
-  const checkin = new Date(ticketData.CheckInDate);
-  const checkout = new Date(ticketData.CheckOutDate);
+  const checkInDate = ticketData?.CheckInDate || ticketData?.booking?.checkInDate || ticketData?.checkInDate;
+  const checkOutDate = ticketData?.CheckOutDate || ticketData?.booking?.checkOutDate || ticketData?.checkOutDate;
+  const checkin = checkInDate ? new Date(checkInDate) : new Date();
+  const checkout = checkOutDate ? new Date(checkOutDate) : new Date();
   const diffTime = Math.abs(checkout - checkin);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const noOfNights = Number(diffDays);
-  const noOfRooms = Number(ticketData.NoOfRooms);
- 
-  if (ticketData.Rooms.length > 0) {
-    let totalBaseFare = ticketData.priceDetails.totalBasePrice
+  const noOfNights = Number(diffDays) || 1;
+  const noOfRooms = Number(ticketData?.NoOfRooms || ticketData?.booking?.noOfRooms || ticketData?.Rooms?.length || 1);
 
-    
-    baseAmount = Number(totalBaseFare);
-  
-     taxAmount = ticketData.priceDetails.totalTax
-   
-  
+  // Price details lookup across multiple nested properties
+  const priceDetails =
+    ticketData?.priceDetails ||
+    ticketData?.PriceDetails ||
+    ticketData?.booking?.priceDetails ||
+    ticketData?.booking?.PriceDetails ||
+    ticketData?.price ||
+    ticketData?.booking?.price ||
+    {};
+
+  const rawBase =
+    priceDetails?.totalBasePrice ??
+    priceDetails?.basePrice ??
+    priceDetails?.base ??
+    priceDetails?.BasePrice ??
+    ticketData?.totalBasePrice ??
+    ticketData?.basePrice ??
+    ticketData?.BasePrice ??
+    ticketData?.booking?.totalBasePrice ??
+    ticketData?.booking?.basePrice ??
+    0;
+
+  const rawTax =
+    priceDetails?.totalTax ??
+    priceDetails?.tax ??
+    priceDetails?.taxAmount ??
+    priceDetails?.Tax ??
+    ticketData?.totalTax ??
+    ticketData?.tax ??
+    ticketData?.Tax ??
+    ticketData?.taxAmount ??
+    ticketData?.booking?.totalTax ??
+    ticketData?.booking?.tax ??
+    0;
+
+  baseAmount = Number(rawBase || 0);
+  taxAmount = Number(rawTax || 0);
+
+  // Calculate from Rooms array if present and not set
+  const roomsList = ticketData?.Rooms || ticketData?.rooms || ticketData?.booking?.rooms || [];
+  if (Array.isArray(roomsList) && roomsList.length > 0) {
+    if (baseAmount === 0 || taxAmount === 0) {
+      let roomBaseSum = 0;
+      let roomTaxSum = 0;
+      roomsList.forEach((r) => {
+        const rPrice = r?.priceDetails || r?.PriceDetails || r?.price || {};
+        roomBaseSum += Number(rPrice?.base || rPrice?.basePrice || rPrice?.totalBasePrice || r?.basePrice || 0);
+        roomTaxSum += Number(rPrice?.tax || rPrice?.totalTax || rPrice?.otherCharges || r?.tax || 0);
+      });
+      if (baseAmount === 0 && roomBaseSum > 0) baseAmount = roomBaseSum;
+      if (taxAmount === 0 && roomTaxSum > 0) taxAmount = roomTaxSum;
+    }
 
     if (
       ticketData?.insuranceRequired === 1 &&
       ticketData?.insuranceData?.serviceType === 2
     ) {
-      let totalPax = ticketData.Rooms.reduce(
-        (acc, cur) => acc + Number(cur.adultCount) + Number(cur.childCount),
+      let totalPax = roomsList.reduce(
+        (acc, cur) => acc + Number(cur?.adultCount || 0) + Number(cur?.childCount || 0),
         0
       );
-     
-      insuranceTotal = totalPax * Number(ticketData?.insuranceData.amount);
+      insuranceTotal = totalPax * Number(ticketData?.insuranceData?.amount || 0);
     }
   }
 
-  
+  const rawGrandTotal =
+    ticketData?.grandTotal ??
+    ticketData?.GrandTotal ??
+    ticketData?.totalAmount ??
+    ticketData?.TotalAmount ??
+    ticketData?.booking?.totalAmount ??
+    ticketData?.booking?.grandTotal ??
+    priceDetails?.total ??
+    priceDetails?.totalAmount ??
+    0;
 
-  totalAmount = Number(taxAmount)+Number(baseAmount);
+  // Fallback: If taxAmount is 0 but rawGrandTotal > baseAmount
+  if (taxAmount === 0 && Number(rawGrandTotal) > baseAmount && baseAmount > 0) {
+    taxAmount = Number(rawGrandTotal) - baseAmount;
+  } else if (baseAmount === 0 && Number(rawGrandTotal) > 0) {
+    if (taxAmount > 0 && Number(rawGrandTotal) > taxAmount) {
+      baseAmount = Number(rawGrandTotal) - taxAmount;
+    } else {
+      baseAmount = Number(rawGrandTotal);
+    }
+  }
 
-  if (ticketData?.ConvienceData?.amount) {
-    if (ticketData.ConvienceData.type === 1) {
-      convienenceFee = Number(ticketData.ConvienceData.amount);
+  totalAmount = Number(taxAmount) + Number(baseAmount);
+
+  if (ticketData?.ConvienceData?.amount || ticketData?.convienceData?.amount) {
+    const convObj = ticketData?.ConvienceData || ticketData?.convienceData;
+    if (convObj.type === 1) {
+      convienenceFee = Number(convObj.amount || 0);
     } else {
       convienenceFee = Number(
-        (Number(totalAmount) / 100) *
-        Number(
-          ticketData.ConvienceData.amount
-            ? ticketData.ConvienceData.amount
-            : 0
-        )
+        (Number(totalAmount) / 100) * Number(convObj.amount || 0)
       );
     }
   }
 
-  // if (ticketData.PromoData && ticketData?.PromoData?.DiscountType) {
-  if (ticketData.PromoData) {
-    if (ticketData.PromoData.DiscountType == 1) {
-      discount = Number((totalAmount / 100) * ticketData?.PromoData?.Discount);
+  const promoObj = ticketData?.PromoData || ticketData?.promoData;
+  if (promoObj) {
+    if (promoObj.DiscountType == 1 || promoObj.discountType == 1) {
+      discount = Number((totalAmount / 100) * Number(promoObj.Discount || promoObj.discount || 0));
     } else {
-      discount = Number(ticketData.PromoData.Discount);
+      discount = Number(promoObj.Discount || promoObj.discount || 0);
     }
   }
-  RefundAmount = ticketData.RefundAmount ?? 0;
 
-  grandTotal = Number(
-    baseAmount +
-    taxAmount +
-    Number(convienenceFee) +
-    Number(insuranceTotal) -
-    Number(discount)
-  ).toFixed(2);
+  RefundAmount = ticketData?.RefundAmount ?? ticketData?.refundAmount ?? 0;
 
-
+  grandTotal = Number(rawGrandTotal) > 0
+    ? Number(rawGrandTotal).toFixed(2)
+    : Number(
+        baseAmount +
+        taxAmount +
+        Number(convienenceFee) +
+        Number(insuranceTotal) -
+        Number(discount)
+      ).toFixed(2);
 
   return {
     baseAmount: Number(baseAmount).toFixed(2),
@@ -94,97 +157,8 @@ export function getHotelPrice(ticketData) {
   };
 }
 
-export function getHotelPricce(invoiceData) {
-  let baseAmount = 0;
-  let taxAmount = 0;
-  let convienenceFee = 0;
-  let discount = 0;
-  let RefundAmount = 0;
-  let insuranceTotal = 0;
-  let totalAmount = 0;
-  let grandTotal = 0;
-
-  let postMarkup = 0;
-  if (invoiceData?.postMarkup) {
-    postMarkup = Number(invoiceData?.postMarkup);
-  }
-
-  const checkin = new Date(invoiceData.CheckInDate);
-  const checkout = new Date(invoiceData.CheckOutDate);
-  const diffTime = Math.abs(checkout - checkin);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const noOfNights = Number(diffDays);
-  const noOfRooms = Number(invoiceData.NoOfRooms);
-
-  if (invoiceData.Rooms.length > 0) {
-    let totalBaseFare = invoiceData.priceDetails.totalBasePrice
-
- 
-    baseAmount = Number(totalBaseFare);
-    
-    taxAmount = invoiceData.priceDetails.totalTax
-
-    if (
-      invoiceData?.insuranceRequired === 1 &&
-      invoiceData?.insuranceData?.serviceType === 2
-    ) {
-      let totalPax = invoiceData.Rooms.reduce(
-        (acc, cur) => acc + Number(cur.adultCount) + Number(cur.childCount),
-        0
-      );
-      
-      insuranceTotal = totalPax * Number(invoiceData?.insuranceData.amount);
-    }
-  }
-
-
-  totalAmount = Number(taxAmount) + Number(baseAmount)
-
-  if (invoiceData?.ConvienceData?.amount) {
-    if (invoiceData.ConvienceData.type === 1) {
-      convienenceFee = Number(invoiceData.ConvienceData.amount);
-    } else {
-      convienenceFee = Number(
-        (Number(totalAmount) / 100) *
-        Number(
-          invoiceData.ConvienceData.amount
-            ? invoiceData.ConvienceData.amount
-            : 0
-        )
-      );
-    }
-  }
-
-  // if (invoiceData.PromoData && invoiceData?.PromoData?.DiscountType) {
-  if (invoiceData.PromoData) {
-    if (invoiceData.PromoData.DiscountType == 1) {
-      discount = Number((totalAmount / 100) * invoiceData?.PromoData?.Discount);
-    } else {
-      discount = Number(invoiceData.PromoData.Discount);
-    }
-  }
-  RefundAmount = invoiceData.RefundAmount ?? 0;
-
-  grandTotal = Number(
-    baseAmount +
-    taxAmount +
-    Number(convienenceFee) +
-    Number(insuranceTotal) -
-    Number(discount)
-  ).toFixed(2);
-
-
-
-  return {
-    baseAmount: Number(baseAmount).toFixed(2),
-    taxAmount: Number(taxAmount).toFixed(2),
-    convienenceFee: Number(convienenceFee).toFixed(2),
-    discount: Number(discount).toFixed(2),
-    RefundAmount: Number(RefundAmount).toFixed(2),
-    grandTotal,
-    insuranceTotal: Number(insuranceTotal).toFixed(2),
-    noOfNights,
-  };
+export function getHotelPricce(invoiceData = {}) {
+  return getHotelPrice(invoiceData);
 }
 
 export const getStatus = (status) => {

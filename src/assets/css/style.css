@@ -14,7 +14,7 @@
 }
 
 .font-roboto {
-  font-family: Nunito, sans-serif, sans-serif
+  font-family: "jost", sans-serif;
 }
 
 .p-0 {
@@ -2556,7 +2556,7 @@ button:focus {
 body {
   font-size: 14px;
   overflow-x: hidden;
-  font-family: Nunito, sans-serif, sans-serif;
+  font-family: "jost", sans-serif;
   color: #2b2b2b
 }
 
@@ -8597,14 +8597,14 @@ table.dataTable.display tbody tr.odd>.sorting_1 {
 .icon-hover-bottom span,
 .icon-hover-bottom label,
 .icon-hover-bottom .btn {
-  font-family: Nunito, sans-serif, sans-serif
+  font-family: jost, sans-serif, sans-serif
 }
 
 .icon-hover-bottom .form-group input {
   display: inline-block;
   width: 300px;
   background-color: #fff;
-  font-family: Nunito, sans-serif, sans-serif
+  font-family: jost, sans-serif, sans-serif
 }
 
 .fa-fa-icon-show-div,
@@ -16719,7 +16719,7 @@ p.data-attributes svg {
 }
 
 .list-persons p {
-  font-family: Nunito, sans-serif, sans-serif
+  font-family: jost, sans-serif, sans-serif
 }
 
 .list-persons .profile-mail {
@@ -16965,7 +16965,7 @@ p.data-attributes svg {
 .negative-container .apexcharts-xaxis .apexcharts-xaxis-texts-g text {
   font-size: 13px;
   fill: rgba(43, 43, 43, 0.4);
-  font-family: Nunito, sans-serif, sans-serif !important
+  font-family: jost, sans-serif, sans-serif !important
 }
 
 .ecommerce-widgets {
@@ -17285,7 +17285,7 @@ p.data-attributes svg {
 .offer-box .offer-slider .selling-slide p {
   color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
-  font-family: Nunito, sans-serif, sans-serif;
+  font-family: jost, sans-serif, sans-serif;
   margin-bottom: 5px
 }
 
@@ -18405,7 +18405,7 @@ p.data-attributes svg {
 .news .news-update span,
 .appointment-sec .news-update span {
   color: rgba(43, 43, 43, 0.7);
-  font-family: Nunito, sans-serif, sans-serif;
+  font-family: jost, sans-serif, sans-serif;
   font-weight: 400
 }
 
@@ -38967,7 +38967,7 @@ body[class*="dark-"] .for-light {
   padding: 2px 4px;
   font-size: 11px;
   font-weight: 700;
-  font-family: Nunito, sans-serif, sans-serif
+  font-family: jost, sans-serif, sans-serif
 }
 
 .page-wrapper .page-header .header-wrapper .nav-right>ul>li span ul {
@@ -39379,7 +39379,7 @@ body[class*="dark-"] .for-light {
 .page-wrapper .page-body-wrapper .page-title .breadcrumb li {
   font-size: 13px;
   letter-spacing: 1px;
-  font-family: Nunito, sans-serif, sans-serif
+  font-family: jost, sans-serif, sans-serif
 }
 
 .page-wrapper .page-body-wrapper .page-title .breadcrumb .breadcrumb-item+.breadcrumb-item:before {
@@ -39614,7 +39614,7 @@ body[class*="dark-"] .for-light {
   color: rgba(43, 43, 43, 0.6);
   letter-spacing: 0.06em;
   font-weight: 500;
-  font-family: Nunito, sans-serif;
+  font-family: jost, sans-serif;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease
 }
@@ -40007,7 +40007,7 @@ body[class*="dark-"] .for-light {
 
 .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links li a span {
   letter-spacing: 0.7px;
-  font-family: Nunito, sans-serif;
+  font-family: jost, sans-serif;
   text-transform: capitalize;
   color: #2c323f
 }
@@ -40190,7 +40190,7 @@ body[class*="dark-"] .for-light {
   position: relative;
   letter-spacing: 0.06em;
   font-weight: 500;
-  font-family: Nunito, sans-serif;
+  font-family: jost, sans-serif;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
   white-space: nowrap;
@@ -40254,7 +40254,7 @@ body[class*="dark-"] .for-light {
   display: block;
   letter-spacing: 0.06em;
   font-weight: 500;
-  font-family: Nunito, sans-serif;
+  font-family: jost, sans-serif;
   cursor: pointer
 }
 
@@ -40276,7 +40276,7 @@ body[class*="dark-"] .for-light {
   display: block;
   letter-spacing: 0.06em;
   font-weight: 500;
-  font-family: Nunito, sans-serif
+  font-family: jost, sans-serif
 }
 
 .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content>li .mega-menu-container .mega-box .link-section .submenu-content.opensubmegamenu li a:after {
@@ -40561,7 +40561,7 @@ body[class*="dark-"] .for-light {
 
 .page-wrapper.compact-sidebar .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links li a span {
   letter-spacing: 0.7px;
-  font-family: Nunito, sans-serif;
+  font-family: jost, sans-serif;
   text-transform: capitalize;
   color: #2c323f;
   font-size: 13px

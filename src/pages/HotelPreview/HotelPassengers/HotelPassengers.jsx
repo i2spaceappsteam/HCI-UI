@@ -27,26 +27,26 @@ const PassengerDetails = (props) => {
                         ) && <th>Passport</th>}
                       </tr>
                     </thead>
-                    {paxInRoomObj.paxInfoList.map((paxObj) => (
-                      <tbody>
-                        <tr>
+                    <tbody>
+                      {paxInRoomObj.paxInfoList.map((paxObj, pIdx) => (
+                        <tr key={pIdx}>
                           <td>{paxObj.title} </td>
                           <td>
-                            {paxObj.firstName.toUpperCase()} {paxObj.lastName}
+                            {paxObj.firstName?.toUpperCase()} {paxObj.lastName}
                           </td>
                           <td>
                             {paxObj.guestType === "Adult" ? "Adult" : "Child"}
                           </td>
-                            <td>{paxObj.age} </td> 
-                            {paxInRoomObj.paxInfoList.some(
+                          <td>{paxObj.age} </td> 
+                          {paxInRoomObj.paxInfoList.some(
                             (pax) => pax.pan && pax.pan.trim() !== ""
                           ) && <td>{paxObj.pan}</td>}
                           {paxInRoomObj.paxInfoList.some(
                             (pax) => pax.passportNo && pax.passportNo.trim() !== ""
                           ) && <td>{paxObj.passportNo}</td>}
                         </tr>
-                      </tbody>
-                    ))}
+                      ))}
+                    </tbody>
                   </table>
                 </div>
               </div>
