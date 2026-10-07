@@ -75,8 +75,8 @@ const HotelDet = () => {
     const fetchHotelDetails = () => {
         const p = queryString.parse(window.location.search);
         const paramsObj = {
-            traceId: p.traceId,
-            hotelCode: p.hotelId,
+            traceId: p.traceId || "string",
+            hotelCode: p.hotelId || p.hotelCode || "",
             checkInDate: p.checkInDate || "",
             checkOutDate: p.checkOutDate || "",
             hotelCityCode: p.hotelCityCode || "",
@@ -185,6 +185,7 @@ const HotelDet = () => {
         }
 
         const reqObj = {
+            traceId: params.traceId || "string",
             hotelCode: params.hotelCode,
             checkInDate: params.checkInDate,
             checkOutDate: params.checkOutDate,
@@ -197,6 +198,10 @@ const HotelDet = () => {
 
         Apiclient1.post("Hotel/HotelRooms", reqObj)
             .then((res) => {
+                setHotelDetailsRespObj((prev) => ({
+                    ...prev,
+                    traceId: params.traceId || res?.traceId || res?.data?.traceId || prev.traceId,
+                }));
                 const roomsData = res?.data?.hotelRooms || res?.data || res || {};
                 const rawList = roomsData?.rooms || roomsData?.roomList || res?.data?.rooms || res?.rooms || [];
 
