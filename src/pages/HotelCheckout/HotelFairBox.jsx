@@ -448,11 +448,11 @@ const HotelFairBox = ({ hotelDetailsObj, hotelSearchData, isPromoVisible, locati
               >
                 <QuestionCircleOutlined className="info-pop-icon" />
               </Popover>
-              {isEditable && (
+              {/* {isEditable && (
                 <button type="button" className="edit-tax-btn" onClick={handleTaxClick} title="Edit Tax">
                   <EditOutlined />
                 </button>
-              )}
+              )} */}
             </div>
           </div>
 

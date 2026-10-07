@@ -28,6 +28,7 @@ import {
 import queryString from "query-string";
 import { useSelector } from "react-redux";
 import { selectActiveCurrency } from "../../../store/slices/currencySlice";
+import ImagesLightbox from "../../../components/ImagesLightbox/ImagesLightbox";
 import "./HotelsList.scss";
 
 const ImBaseUrl = import.meta.env.VITE_Image_URL;
@@ -60,6 +61,7 @@ const HotelsList = ({
   };
 
   const [isAmenitiesModal, setIsAmenitiesModal] = useState(false);
+  const [isImagesModal, setIsImagesModal] = useState(false);
   const [isShortlisted, setIsShortlisted] = useState(false);
 
   const hotelImages = availableHotel?.images?.length > 0
@@ -68,9 +70,9 @@ const HotelsList = ({
 
   const addressText = hotelCardProps?.addresses?.length > 0
     ? [
-        hotelCardProps.addresses[0]?.address,
-        hotelCardProps.addresses[0]?.cityName || hotelCardProps?.city,
-      ].filter(Boolean).join(", ")
+      hotelCardProps.addresses[0]?.address,
+      hotelCardProps.addresses[0]?.cityName || hotelCardProps?.city,
+    ].filter(Boolean).join(", ")
     : hotelCardProps?.city || hotelCardProps?.cityName || "City Center";
 
   const starRatingNum = Number(hotelCardProps?.starRating || 0);
@@ -118,16 +120,16 @@ const HotelsList = ({
     return "/hotels/detail?" + query;
   };
 
-  // Curated facilities
+  // Curated facilities (show up to 3 concise items)
   const facilities = hotelCardProps?.hotelFacility || [];
-  const topFacilities = facilities.slice(0, 4);
+  const topFacilities = facilities.slice(0, 3);
 
   return (
     <div key={keyId} className="modern-hotel-card-item">
       <div className="hotel-card-container">
         {/* 1. Left Gallery Column */}
         <div className="hotel-media-col">
-          <Link to={goToHotelDetails(hotelCardProps)} className="media-link-wrapper">
+          <Link className="media-link-wrapper">
             <Carousel autoplay autoplaySpeed={4000} dots={{ className: "carousel-custom-dots" }} effect="fade">
               {hotelImages.map((img, i) => (
                 <div key={i} className="carousel-slide-item">
@@ -142,41 +144,51 @@ const HotelsList = ({
                 </div>
               ))}
             </Carousel>
-            
-            {/* Top Badges */}
-            <div className="media-overlay-top">
-              {starRatingNum >= 4 ? (
-                <span className="premium-tag">
-                  <SafetyCertificateFilled /> Luxury Stay
-                </span>
-              ) : (
-                <span className="featured-tag">Verified Hotel</span>
-              )}
-
-              <button
-                type="button"
-                className={`wishlist-btn ${isShortlisted ? "active" : ""}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsShortlisted(!isShortlisted);
-                  if (handelShortedHotelsList) {
-                    handelShortedHotelsList(hotelCardProps);
-                  }
-                }}
-                title="Save Hotel"
-              >
-                {isShortlisted ? <HeartFilled /> : <HeartOutlined />}
-              </button>
-            </div>
-
-            {/* Bottom Photo Count */}
-            <div className="media-overlay-bottom">
-              <span className="photo-count-pill">
-                <PictureOutlined /> {hotelImages.length} Photos
-              </span>
-            </div>
           </Link>
+
+          {/* Top Badges */}
+          <div className="media-overlay-top">
+            {starRatingNum >= 4 ? (
+              <span className="premium-tag">
+                <SafetyCertificateFilled /> Luxury Stay
+              </span>
+            ) : (
+              null
+              // <span className="featured-tag">Verified Hotel</span>
+            )}
+
+            <button
+              type="button"
+              className={`wishlist-btn ${isShortlisted ? "active" : ""}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsShortlisted(!isShortlisted);
+                if (handelShortedHotelsList) {
+                  handelShortedHotelsList(hotelCardProps);
+                }
+              }}
+              title="Save Hotel"
+            >
+              {isShortlisted ? <HeartFilled /> : <HeartOutlined />}
+            </button>
+          </div>
+
+          {/* Bottom Photo Count */}
+          <div className="media-overlay-bottom">
+            <button
+              type="button"
+              className="photo-count-pill"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsImagesModal(true);
+              }}
+              title="Click to view all photos"
+            >
+              <PictureOutlined /> {hotelImages.length} Photos
+            </button>
+          </div>
         </div>
 
         {/* 2. Middle Content Column */}
@@ -186,7 +198,7 @@ const HotelsList = ({
               <Link to={goToHotelDetails(hotelCardProps)} className="hotel-title-link">
                 <h3 className="hotel-card-title">{hotelCardProps?.hotelName || "Premium Hotel & Suites"}</h3>
               </Link>
-              
+
               {starRatingNum > 0 && (
                 <div className="hotel-star-badge">
                   {[...Array(Math.min(5, Math.floor(starRatingNum)))].map((_, i) => (
@@ -206,18 +218,18 @@ const HotelsList = ({
           {/* Key Amenities Chips */}
           <div className="hotel-amenities-strip">
             {topFacilities.map((fac, idx) => (
-              <span key={idx} className="amenity-chip">
+              <span key={idx} className="amenity-chip" title={fac}>
                 <CheckCircleFilled className="check-icon" /> {fac}
               </span>
             ))}
-            
-            {facilities.length > 4 && (
+
+            {facilities.length > 3 && (
               <button
                 type="button"
                 className="more-amenities-link"
                 onClick={() => setIsAmenitiesModal(true)}
               >
-                +{facilities.length - 4} more
+                +{facilities.length - 3} more
               </button>
             )}
           </div>
@@ -278,17 +290,17 @@ const HotelsList = ({
             ) : (
               <div className="standard-price-block">
                 <span className="price-starts-from">Price starts at</span>
-                {originalFakePrice > publishPrice && (
+                {/* {originalFakePrice > publishPrice && (
                   <span className="original-strikethrough">
                     {currencySymbol} {currencyValue(originalFakePrice)}
                   </span>
-                )}
+                )} */}
                 <div className="main-price-val">
                   <span className="symbol">{currencySymbol}</span>
                   <span className="amount">{currencyValue(publishPrice)}</span>
                   <span className="night-lbl">/ night</span>
                 </div>
-                <span className="taxes-note">+ taxes & charges included</span>
+                <span className="taxes-note">+ taxes & charges exclusive</span>
               </div>
             )}
           </div>
@@ -297,7 +309,7 @@ const HotelsList = ({
           <div className="action-button-wrapper">
             <Link to={goToHotelDetails(hotelCardProps)} className="cta-link">
               <Button type="primary" size="large" className="choose-room-cta-btn">
-                <span>View Rates</span>
+                <span>View Rooms</span>
                 <RightOutlined className="arrow-icon" />
               </Button>
             </Link>
@@ -325,6 +337,34 @@ const HotelsList = ({
             </div>
           ))}
         </div>
+      </Modal>
+
+      {/* Hotel Images Gallery Modal */}
+      <Modal
+        wrapClassName="modalHeader hotelGalleryModal"
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <span style={{ fontWeight: 700, fontSize: "16px", color: "#00164d" }}>
+              {hotelCardProps?.hotelName || "Hotel Gallery"}
+            </span>
+            {starRatingNum > 0 && (
+              <span style={{ display: "inline-flex", gap: "2px", color: "#f59e0b", fontSize: "13px" }}>
+                {[...Array(Math.min(5, Math.floor(starRatingNum)))].map((_, i) => (
+                  <StarFilled key={i} />
+                ))}
+              </span>
+            )}
+          </div>
+        }
+        open={isImagesModal}
+        onCancel={() => setIsImagesModal(false)}
+        footer={null}
+        width={860}
+        centered
+        destroyOnClose
+        styles={{ body: { padding: "12px 16px 20px" } }}
+      >
+        <ImagesLightbox hotelImages={hotelImages} />
       </Modal>
     </div>
   );

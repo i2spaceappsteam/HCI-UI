@@ -12,6 +12,8 @@
     box-sizing: border-box;
   }
 
+  width: 100%;
+
   .hotel-card-container {
     background: #ffffff;
     border-radius: 14px;
@@ -21,8 +23,9 @@
     grid-template-columns: 240px 1fr 220px;
     height: 195px;
     max-height: 195px;
+    width: 100%;
     overflow: hidden;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
     position: relative;
 
     &:hover {
@@ -136,13 +139,13 @@
       /* Top Media Badges */
       .media-overlay-top {
         position: absolute;
-        top: 12px;
-        left: 12px;
-        right: 12px;
+        top: 10px;
+        left: 10px;
+        right: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        z-index: 5;
+        z-index: 2;
         pointer-events: none;
 
         .premium-tag {
@@ -200,22 +203,35 @@
       /* Bottom Photo Count */
       .media-overlay-bottom {
         position: absolute;
-        bottom: 12px;
-        left: 12px;
-        z-index: 5;
-        pointer-events: none;
+        bottom: 10px;
+        left: 10px;
+        z-index: 2;
+        pointer-events: auto;
 
         .photo-count-pill {
-          background: rgba(0, 0, 0, 0.65);
+          pointer-events: auto;
+          background: rgba(0, 0, 0, 0.7);
           backdrop-filter: blur(4px);
           color: #ffffff;
           font-size: 11px;
           font-weight: 600;
-          padding: 3px 8px;
+          padding: 4px 10px;
           border-radius: 6px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
           display: inline-flex;
           align-items: center;
-          gap: 4px;
+          gap: 5px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          outline: none;
+
+          &:hover {
+            background: #0284c7;
+            border-color: #38bdf8;
+            color: #ffffff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+          }
         }
       }
     }
@@ -307,7 +323,9 @@
         display: flex;
         align-items: center;
         flex-wrap: wrap;
-        gap: 5px;
+        gap: 4px 6px;
+        max-height: 52px;
+        overflow: hidden;
 
         .amenity-chip {
           background: #f8fafc;
@@ -320,10 +338,15 @@
           display: inline-flex;
           align-items: center;
           gap: 4px;
+          max-width: 220px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
 
           .check-icon {
             color: #0284c7;
             font-size: 10px;
+            flex-shrink: 0;
           }
         }
 
@@ -336,6 +359,7 @@
           cursor: pointer;
           padding: 0 3px;
           text-decoration: underline;
+          white-space: nowrap;
 
           &:hover {
             color: #0369a1;
@@ -347,10 +371,12 @@
       .hotel-perks-row {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         flex-wrap: wrap;
         padding-top: 6px;
         border-top: 1px solid #f1f5f9;
+        margin-top: auto;
+        flex-shrink: 0;
 
         .perk-highlight {
           font-size: 11.5px;
@@ -358,6 +384,7 @@
           display: inline-flex;
           align-items: center;
           gap: 4px;
+          white-space: nowrap;
 
           &.green {
             color: #16a34a;

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { Row, Col, Tag, Badge, Tooltip } from "antd";
 import moment from "moment";
 import queryString from "query-string";
 import { useNavigate } from "react-router";
+import { useSelector } from "react-redux";
 import {
   StarFilled,
   CalendarOutlined,
@@ -21,6 +22,40 @@ const ImBaseUrl = import.meta.env.VITE_Image_URL;
 
 const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
   const history = useNavigate();
+  const [selectedImage, setSelectedImage] = useState(null);
+  const selectedHotelInfo = useSelector((state) => state.hotel.selectedHotelInfo);
+
+  // Collect all available images from Redux store & props (hotel photos + room photos)
+  const allImages = useMemo(() => {
+    const list = [];
+    const addImg = (src) => {
+      if (typeof src === "string" && src.trim() && !list.includes(src.trim())) {
+        list.push(src.trim());
+      } else if (src && typeof src === "object" && src.url && !list.includes(src.url)) {
+        list.push(src.url);
+      }
+    };
+
+    if (Array.isArray(hotelDetailsObj?.images)) {
+      hotelDetailsObj.images.forEach(addImg);
+    }
+    if (Array.isArray(hotelDetailsObj?.imageList)) {
+      hotelDetailsObj.imageList.forEach(addImg);
+    }
+    if (Array.isArray(hotelDetailsObj?.roomImages)) {
+      hotelDetailsObj.roomImages.forEach(addImg);
+    }
+    if (Array.isArray(selectedHotelInfo?.images)) {
+      selectedHotelInfo.images.forEach(addImg);
+    }
+    if (Array.isArray(selectedHotelInfo?.roomImages)) {
+      selectedHotelInfo.roomImages.forEach(addImg);
+    }
+    return list;
+  }, [hotelDetailsObj, selectedHotelInfo]);
+
+  const defaultImg = ImBaseUrl ? `${ImBaseUrl}images/htImgs/no_img.png` : "/images/hotels/no_photo.png";
+  const activeImg = selectedImage || (allImages.length > 0 ? allImages[0] : defaultImg);
 
   const noOfNights = () => {
     if (hotelSearchData?.checkInDate && hotelSearchData?.checkOutDate) {
@@ -74,12 +109,6 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
   const guests = guestSummary();
   const nights = noOfNights();
 
-  // Images
-  const hotelImg =
-    hotelDetailsObj?.images?.[0] ||
-    hotelDetailsObj?.images?.[1] ||
-    (ImBaseUrl ? `${ImBaseUrl}images/htImgs/no_img.png` : "/images/hotels/no_photo.png");
-
   // Room details
   const roomData = hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0] || hotelDetailsObj?.combineRoom?.[0] || {};
   const roomName = roomData?.ratePlanName || roomData?.roomName || "Standard Selected Room";
@@ -94,9 +123,63 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
     roomData?.cancellationPolicy ||
     [];
 
+  const formatCancellationPenalty = (rule) => {
+    if (!rule) return "0";
+    if (rule.policies && typeof rule.policies === "string") return rule.policies;
+
+    const penalty = rule.penaltyAmount ?? rule.amount ?? rule.penalty ?? 0;
+    const penaltyStr = String(penalty).trim();
+    const penaltyNum = Number(penaltyStr.replace(/[^0-9.-]/g, ""));
+    const chargeType = String(rule.chargeType || "").trim().toLowerCase();
+
+    // 1. Check percentage
+    if (
+      chargeType.includes("percent") ||
+      chargeType.includes("pct") ||
+      chargeType === "%" ||
+      rule.chargeType === 1 ||
+      rule.chargeType === "1" ||
+      penaltyStr.includes("%")
+    ) {
+      return `${penaltyStr.replace("%", "")}%`;
+    }
+
+    // 2. Check nights
+    if (
+      chargeType.includes("night") ||
+      rule.chargeType === 3 ||
+      rule.chargeType === "3"
+    ) {
+      return `${penaltyNum} Night${penaltyNum > 1 ? "s" : ""}`;
+    }
+
+    // 3. Check fixed amount / currency
+    if (
+      chargeType.includes("amount") ||
+      chargeType.includes("fixed") ||
+      chargeType.includes("inr") ||
+      chargeType.includes("rs") ||
+      rule.chargeType === 2 ||
+      rule.chargeType === "2"
+    ) {
+      return `₹${penaltyNum.toLocaleString("en-IN")}`;
+    }
+
+    // 4. Heuristic fallback: if penalty <= 100 without explicit currency
+    if (penaltyNum > 0 && penaltyNum <= 100 && !rule.currency && !rule.currencyCode) {
+      return `${penaltyNum}%`;
+    }
+
+    return `₹${penaltyNum.toLocaleString("en-IN")}`;
+  };
+
   const isRefundable =
     roomData?.refundable ??
-    (cancellationPolicies.length > 0 && !cancellationPolicies.some(p => p.penaltyAmount === 100 && p.chargeType === "Percentage"));
+    (cancellationPolicies.length > 0 && !cancellationPolicies.some(p => {
+      const pNum = Number(p.penaltyAmount || 0);
+      const ct = String(p.chargeType || "").toLowerCase();
+      return (pNum === 100 && (ct.includes("percent") || ct === "" || ct === "%"));
+    }));
 
   return (
     <div className="modern-hotel-details-box">
@@ -125,18 +208,43 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
       {/* Main Content Layout */}
       <div className="hotel-summary-card-body">
         <div className="hotel-main-info-grid">
-          {/* Left: Hotel Featured Photo */}
-          <div className="hotel-img-frame">
-            <img
-              src={hotelImg}
-              alt={hotelDetailsObj?.hotelName || "Hotel"}
-              onError={(e) => {
-                e.target.src = ImBaseUrl ? `${ImBaseUrl}images/htImgs/no_img.png` : "/images/hotels/no_photo.png";
-              }}
-            />
-            <div className="hotel-photo-badge">
-              <SafetyCertificateOutlined /> Verified
+          {/* Left: Hotel Featured Photo & Thumbnails */}
+          <div className="hotel-img-column">
+            <div className="hotel-img-frame">
+              <img
+                src={activeImg}
+                alt={hotelDetailsObj?.hotelName || "Hotel"}
+                onError={(e) => {
+                  e.target.src = defaultImg;
+                }}
+              />
+              <div className="hotel-photo-badge">
+                <SafetyCertificateOutlined /> Verified
+              </div>
             </div>
+
+            {/* Thumbnail Strip if multiple photos exist */}
+            {allImages.length > 1 && (
+              <div className="hotel-thumbnails-row">
+                {allImages.slice(0, 4).map((thumb, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`thumb-btn ${activeImg === thumb ? "active" : ""}`}
+                    onClick={() => setSelectedImage(thumb)}
+                    title={`Photo ${idx + 1}`}
+                  >
+                    <img
+                      src={thumb}
+                      alt={`Photo ${idx + 1}`}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right: Hotel Name, Stars & Room Details */}
@@ -250,7 +358,7 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
                       Cancellation between <strong>{cancel?.fromDate?.split(" ")[0]}</strong> and{" "}
                       <strong>{cancel?.toDate?.split(" ")[0]}</strong> will incur a charge of{" "}
                       <strong style={{ color: "#b91c1c" }}>
-                        {cancel?.chargeType === "Percentage" ? `${cancel.penaltyAmount}%` : `₹${cancel?.penaltyAmount || 0}`}
+                        {formatCancellationPenalty(cancel)}
                       </strong>.
                     </span>
                   )}

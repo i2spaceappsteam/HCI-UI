@@ -3,7 +3,8 @@ import { Button, Card, Col, Skeleton, Rate, Row, message, Modal, Radio, Select, 
 import { useNavigate } from "react-router";
 import parse from "html-react-parser";
 import moment from "moment";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setSelectedHotelInfo } from "../../store/slices/hotelSlice";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -40,6 +41,7 @@ const ImBUrl = import.meta.env.VITE_Image_URL;
 
 const HotelDet = () => {
     const history = useNavigate();
+    const dispatch = useDispatch();
     const user = useSelector((state) => state.auth.user);
 
     const [filteredRooms, setFilteredRooms] = useState([]);
@@ -306,6 +308,28 @@ const HotelDet = () => {
                 hotelDetailsRespObj?.hotelCode ||
                 "";
 
+            const hotelAddr =
+                (Array.isArray(hotelDetailsRespObj?.addresses) && hotelDetailsRespObj.addresses[0]?.address) ||
+                hotelDetailsRespObj?.addresses?.address ||
+                hotelDetailsRespObj?.address ||
+                hotelDetailsRespObj?.hotelAddress ||
+                "";
+
+            // Persist hotel and room images and info in Redux store
+            const selectedHotelInfoToStore = {
+                ...hotelDetailsRespObj,
+                hotelCode: hotelCodeVal,
+                hotelName: hotelDetailsRespObj?.hotelName || "",
+                starRating: hotelDetailsRespObj?.starRating || 0,
+                hotelAddress: hotelAddr,
+                address: hotelAddr,
+                images: hotelDetailsRespObj?.images || [],
+                selectedRooms: roomsList,
+                roomImages: roomsList[0]?.roomImages || hotelDetailsRespObj?.images || [],
+            };
+
+            dispatch(setSelectedHotelInfo(selectedHotelInfoToStore));
+
             let queryObj = {
                 traceId: traceIdVal,
                 hotelCode: hotelCodeVal,
@@ -409,10 +433,86 @@ const HotelDet = () => {
         return <div id="map" style={{ height: "420px", width: "100%", borderRadius: "12px" }}></div>;
     };
 
+    const formatCancellationPenalty = (rule) => {
+        if (!rule) return "Free";
+        if (rule.policies && typeof rule.policies === "string") return rule.policies;
+
+        const penalty = rule.penaltyAmount ?? rule.amount ?? rule.penalty ?? 0;
+        const penaltyStr = String(penalty).trim();
+        const penaltyNum = Number(penaltyStr.replace(/[^0-9.-]/g, ""));
+        const chargeType = String(rule.chargeType || "").trim().toLowerCase();
+
+        // 1. Check percentage
+        if (
+            chargeType.includes("percent") ||
+            chargeType.includes("pct") ||
+            chargeType === "%" ||
+            rule.chargeType === 1 ||
+            rule.chargeType === "1" ||
+            penaltyStr.includes("%")
+        ) {
+            return `${penaltyStr.replace("%", "")}%`;
+        }
+
+        // 2. Check nights
+        if (
+            chargeType.includes("night") ||
+            rule.chargeType === 3 ||
+            rule.chargeType === "3"
+        ) {
+            return `${penaltyNum} Night${penaltyNum > 1 ? "s" : ""}`;
+        }
+
+        // 3. Check fixed amount / currency
+        if (
+            chargeType.includes("amount") ||
+            chargeType.includes("fixed") ||
+            chargeType.includes("inr") ||
+            chargeType.includes("rs") ||
+            rule.chargeType === 2 ||
+            rule.chargeType === "2"
+        ) {
+            return `₹${penaltyNum.toLocaleString("en-IN")}`;
+        }
+
+        // 4. Default / Heuristic:
+        if (penaltyNum === 0) {
+            return "Free (₹0)";
+        }
+        // If penalty <= 100 without explicit currency, it is a percentage penalty
+        if (penaltyNum > 0 && penaltyNum <= 100 && !rule.currency && !rule.currencyCode) {
+            return `${penaltyNum}%`;
+        }
+
+        return `₹${penaltyNum.toLocaleString("en-IN")}`;
+    };
+
+    const formatRuleDate = (dateStr) => {
+        if (!dateStr || dateStr.startsWith("0001") || dateStr.startsWith("1900")) return null;
+        const m = moment(dateStr);
+        return m.isValid() ? m.format("DD MMM YYYY") : dateStr.split(" ")[0];
+    };
+
     const handelCancellationPolicy = (roomInfo) => {
         setRoomsData(roomInfo);
-        let cancellationdata = roomInfo?.cancellationPolicy ?? null;
-        setCancellationInfo(cancellationdata);
+        let rawPolicy = roomInfo?.cancellationPolicy ?? null;
+        let policyList = [];
+
+        if (Array.isArray(rawPolicy)) {
+            policyList = rawPolicy;
+        } else if (rawPolicy && typeof rawPolicy === "object") {
+            if (Array.isArray(rawPolicy.policies)) {
+                policyList = rawPolicy.policies.map(p => typeof p === "string" ? { policies: p } : p);
+            } else if (Array.isArray(rawPolicy.cancellationPolicy)) {
+                policyList = rawPolicy.cancellationPolicy;
+            } else {
+                policyList = [rawPolicy];
+            }
+        } else if (typeof rawPolicy === "string" && rawPolicy.trim()) {
+            policyList = [{ policies: rawPolicy }];
+        }
+
+        setCancellationInfo(policyList);
         setShowCancellationModal(true);
     };
 
@@ -854,11 +954,14 @@ const HotelDet = () => {
                                                                     ratePlanId: ratePlan.ratePlanId,
                                                                     roomsId: hotelDetailsRespObj.roomsId,
                                                                     roomName: hotelRoom.roomName,
+                                                                    roomImages: hotelRoom?.roomImageList || [],
                                                                     price: ratePlan.price,
                                                                     refundable: ratePlan.refundable,
                                                                     cancellationPolicy: ratePlan.cancellationPolicy,
                                                                     lastCancellationDate: ratePlan.lastCancellationDate,
                                                                     supplierParamter: ratePlan.supplierParamter,
+                                                                    mealPlan: ratePlan.ratePlanName || ratePlan.mealPlan || "",
+                                                                    inclusions: ratePlan.inclusions || [],
                                                                 }])}
                                                             >
                                                                 Book Room
@@ -995,27 +1098,46 @@ const HotelDet = () => {
 
                             {cancellationInfo?.length > 0 ? (
                                 <div className="cancellation-rules-list">
-                                    {cancellationInfo.map((can, i) => (
-                                        <div key={i} className={`cancellation-rule-card ${can?.penaltyAmount > 0 ? "penalty" : "free"}`}>
-                                            <div className="rule-date-box">
-                                                <CalendarOutlined className="cal-icon" />
-                                                <div className="rule-dates">
-                                                    <div><strong>From:</strong> {can?.fromDate?.split(" ")[0]}</div>
-                                                    <div><strong>To:</strong> {can?.toDate?.split(" ")[0]}</div>
-                                                </div>
+                                    {cancellationInfo.map((can, i) => {
+                                        const penaltyNum = Number(can?.penaltyAmount ?? can?.amount ?? can?.penalty ?? 0);
+                                        const isPenalty = penaltyNum > 0 || (can?.chargeType && !String(can.chargeType).toLowerCase().includes("free"));
+                                        const formattedPenalty = formatCancellationPenalty(can);
+                                        const fromDateDisp = formatRuleDate(can?.fromDate);
+                                        const toDateDisp = formatRuleDate(can?.toDate);
+
+                                        return (
+                                            <div key={i} className={`cancellation-rule-card ${isPenalty ? "penalty" : "free"}`}>
+                                                {can?.policies && typeof can.policies === "string" ? (
+                                                    <div className="rule-text-full" style={{ padding: "4px 0", color: "#334155", fontSize: "13.5px" }}>
+                                                        {can.policies}
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="rule-date-box">
+                                                            <CalendarOutlined className="cal-icon" />
+                                                            <div className="rule-dates">
+                                                                {fromDateDisp && (
+                                                                    <div><strong>From:</strong> {fromDateDisp}</div>
+                                                                )}
+                                                                {toDateDisp && (
+                                                                    <div><strong>To:</strong> {toDateDisp}</div>
+                                                                )}
+                                                                {!fromDateDisp && !toDateDisp && (
+                                                                    <div>Standard Policy Timeline</div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="rule-penalty-box">
+                                                            <span className="penalty-label">Cancellation Charge:</span>
+                                                            <strong className="penalty-val">
+                                                                {formattedPenalty}
+                                                            </strong>
+                                                        </div>
+                                                    </>
+                                                )}
                                             </div>
-                                            <div className="rule-penalty-box">
-                                                <span className="penalty-label">Cancellation Charge:</span>
-                                                <strong className="penalty-val">
-                                                    {can?.chargeType === "Percentage"
-                                                        ? `${can.penaltyAmount}%`
-                                                        : can?.chargeType === "Nights"
-                                                            ? `${can.penaltyAmount} Night(s)`
-                                                            : `₹${can?.penaltyAmount || 0}`}
-                                                </strong>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             ) : (
                                 <p className="no-cancellation-text">No detailed penalty breakdown provided by the supplier.</p>

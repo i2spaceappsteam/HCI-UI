@@ -1,10 +1,20 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const getSessionData = (key, fallback = {}) => {
+  try {
+    const item = sessionStorage.getItem(key);
+    return item ? JSON.parse(item) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+};
+
 const initialState = {
   searchhotelobj: {},
   shortedHotelModalVisible: false,
   shortedHotelCount: 0,
-  hotelCheckOutData: {},
+  hotelCheckOutData: getSessionData('HOTEL_CHECKOUT_DATA', {}),
+  selectedHotelInfo: getSessionData('SELECTED_HOTEL_INFO', {}),
   sessiontimeout: false,
   status: 'idle',
 };
@@ -31,7 +41,16 @@ const hotelSlice = createSlice({
       state.shortedHotelCount = action.payload;
     },
     setHotelCheckOutData(state, action) {
-      state.hotelCheckOutData = action.payload;
+      state.hotelCheckOutData = action.payload || {};
+      try {
+        sessionStorage.setItem('HOTEL_CHECKOUT_DATA', JSON.stringify(action.payload || {}));
+      } catch (e) {}
+    },
+    setSelectedHotelInfo(state, action) {
+      state.selectedHotelInfo = action.payload || {};
+      try {
+        sessionStorage.setItem('SELECTED_HOTEL_INFO', JSON.stringify(action.payload || {}));
+      } catch (e) {}
     },
     setSessionTimeout(state, action) {
       state.sessiontimeout = action.payload;
@@ -52,6 +71,7 @@ export const {
   setShortedHotelModalVisible,
   setShortedHotelListCount,
   setHotelCheckOutData,
+  setSelectedHotelInfo,
   setSessionTimeout,
   setStatus,
 } = hotelSlice.actions;

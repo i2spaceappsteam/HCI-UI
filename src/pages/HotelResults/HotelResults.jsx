@@ -388,9 +388,6 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
                       />
                     </Suspense>
                   </div>
-                  <div>
-                    <ScrollToTopButton />
-                  </div>
                   <div className="hotels-box">
                     <div  >
                       {isHotelSearchLoad ? (
@@ -455,6 +452,7 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
 
                   </div>
                 </div>
+                <ScrollToTopButton />
               </div>
             </section>
           ) : (

@@ -9,7 +9,8 @@ import GoogleMapReact from "google-map-react";
 import parse from 'html-react-parser';
 import moment from "moment";
 import { Tooltip } from 'antd';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setSelectedHotelInfo } from "../../store/slices/hotelSlice";
 
 import ImagesLightbox from "../../../components/ImagesLightbox/ImagesLightbox";
 import ApiClient from "../../helpers/ApiClient";
@@ -35,6 +36,7 @@ const { Group } = Checkbox;
 const ImBUrl = import.meta.env.VITE_Image_URL;
 const HotelDet = () => {
   let history = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
  
   const [filteredRooms, setFilteredRooms] = useState([]);
@@ -137,7 +139,19 @@ const HotelDet = () => {
   };
 
   const navigateToCheckout = (roomsArray) => {
-    //console.log("acheckkk", roomsArray)
+    // Dispatch hotel info to Redux store
+    if (hotelDetailsRespObj) {
+      dispatch(setSelectedHotelInfo({
+        ...hotelDetailsRespObj,
+        hotelName: hotelDetailsRespObj?.hotelName || "",
+        starRating: hotelDetailsRespObj?.starRating || 0,
+        hotelAddress: hotelDetailsRespObj?.hotelAddress || hotelDetailsRespObj?.address || "",
+        address: hotelDetailsRespObj?.hotelAddress || hotelDetailsRespObj?.address || "",
+        images: hotelDetailsRespObj?.images || [],
+        selectedRooms: roomsArray,
+      }));
+    }
+
     if (roomsArray.length > 0) {
       const hotelDetSearchParams = queryString.parse(window.location.search);
 

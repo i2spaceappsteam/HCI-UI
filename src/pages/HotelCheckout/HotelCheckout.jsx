@@ -47,6 +47,7 @@ const HotelCheckout = ({ location }) => {
   const dispatch = useDispatch();
   const sessiontimeout = useSelector(state => state.hotel.sessiontimeout);
   const status = useSelector(state => state.hotel.status);
+  const selectedHotelInfo = useSelector(state => state.hotel.selectedHotelInfo);
   const setHotelCheckOutData = (data) => dispatch(setHotelCheckOutDataAction(data));
   const getsessiontimeoutHandler = () => dispatch(getsessiontimeout());
   const user = useSelector((state) => state.auth.user);
@@ -305,11 +306,32 @@ const HotelCheckout = ({ location }) => {
             supplierParamVal ||
             "";
 
+          const hotelImages =
+            (hotels.imageList && hotels.imageList.length > 0 ? hotels.imageList : null) ||
+            (hotels.images && hotels.images.length > 0 ? hotels.images : null) ||
+            (selectedHotelInfo?.images && selectedHotelInfo.images.length > 0 ? selectedHotelInfo.images : null) ||
+            [];
+
+          const roomImages =
+            (selectedHotelInfo?.roomImages && selectedHotelInfo.roomImages.length > 0 ? selectedHotelInfo.roomImages : null) ||
+            hotelImages;
+
+          const resolvedAddress =
+            hotels.hotelAddress ||
+            hotels.address ||
+            selectedHotelInfo?.hotelAddress ||
+            selectedHotelInfo?.address ||
+            "";
+
           setHotelPriceData({
             ...hotels,
-            address: hotels.hotelAddress || hotels.address || "",
-            images: hotels.imageList || hotels.images || [],
-            country: hotels.countryCode || hotels.countryName || "IN",
+            hotelName: hotels.hotelName || selectedHotelInfo?.hotelName || "",
+            starRating: hotels.starRating || selectedHotelInfo?.starRating || 0,
+            address: resolvedAddress,
+            hotelAddress: resolvedAddress,
+            images: hotelImages,
+            roomImages: roomImages,
+            country: hotels.countryCode || hotels.countryName || selectedHotelInfo?.country || "IN",
             combineRoom,
             purchaseType: purchaseType || "instant",
             traceId: traceIdVal,

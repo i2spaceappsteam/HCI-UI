@@ -41,7 +41,7 @@ const MainLayout = ({ children }) => {
     const { accessToken, user } = useSelector((state) => state.auth);
     const navigate = useNavigate();
     const location = useLocation();
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
     const [mappedScreens, setmappedScreens] = useState([]);
     const [balance, setBalance] = useState(null);
     const [changePasswordOpen, setChangePasswordOpen] = useState(false);
