@@ -131,7 +131,7 @@ const Dashboard = () => {
             href="#!"
             onClick={(e) => {
               e.preventDefault();
-              navigate(`/admin/flight/ticket?ref=${text}`);
+              navigate(`/admin/hotel/ticket?ref=${text}`);
             }}
           >
             {text}
