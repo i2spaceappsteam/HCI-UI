@@ -8,6 +8,7 @@ import {
   Row,
   Select,
   Collapse,
+  Popover,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
@@ -52,6 +53,7 @@ const Hotels = (props) => {
     },
   ];
   const modalRef = useRef(null);
+  const paxWrapperRef = useRef(null);
   const [hotelPaxInfo, setHotelPaxInfo] = useState(defHotelPaxInfo);
   const paxInfo = [...hotelPaxInfo];
   const validateMessages = {
@@ -62,15 +64,23 @@ const Hotels = (props) => {
   const [rooms, setRooms] = useState(false);
   const searchBtn = useRef();
   const [roomlength, setroomlength] = useState(1);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (paxWrapperRef.current && !paxWrapperRef.current.contains(event.target)) {
+        setRooms(false);
+      }
+    };
+    if (rooms) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [rooms]);
+
   const toggleCount = () => {
-
-
-    setRooms((prev) => {
-      const newState = !rooms;
-
-      return newState;
-    });
-
+    setRooms((prev) => !prev);
   };
 
   const addRoom = () => {
@@ -418,151 +428,131 @@ const Hotels = (props) => {
                 className="from-to-inputs hotel-select-jun"
               >
                 <span className="input-names">Rooms & Guests</span>
-                <Form.Item>
-                  <Input
-                    value={
-                      "Room: " + paxInfo.length + ", Guest: " + getPaxCount()
-                    }
-                    size="large"
-                    onClick={toggleCount}
-                  />
-                  <div className="add-room-block">
-
-                    <div
-                      className="pax-modal"
-                      id="pax-modal"
-                      ref={modalRef}
-                      style={{
-                        display: rooms ? "block" : "none",
-                      }}
-                    >
-                      {/* {console.log(rooms, "test")} */}
-                      <div className="pax-modal-wrapper">
-                        <div className="pax-modal-arrow"></div>
-                        <ul className="first-item">
-                          <Collapse
-                            bordered={false}
-                            activeKey={roomlength}
-                            destroyInactivePanel={true}
+                <Popover
+                  trigger="click"
+                  open={rooms}
+                  onOpenChange={(visible) => setRooms(visible)}
+                  placement="bottomLeft"
+                  overlayClassName="pax-popover-overlay"
+                  content={
+                    <div className="pax-modal-wrapper">
+                      <Collapse
+                        bordered={false}
+                        activeKey={roomlength}
+                        destroyInactivePanel={true}
+                      >
+                        {paxInfo.map((pax, index) => (
+                          <Panel
+                            showArrow={false}
+                            collapsible={"header"}
+                            header={
+                              <div>
+                                <div className="room-header-title">
+                                  Room {index + 1}
+                                </div>
+                                <div className="room-header-sub">
+                                  {pax.noOfAdults} Adults, {pax.noOfChilds} Children
+                                </div>
+                              </div>
+                            }
+                            key={index + 1}
+                            extra={
+                              index + 1 !== 1 ? (
+                                <div className="icons-hotel-addes" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                                  <EditOutlined
+                                    onClick={() => onupdate(index + 1)}
+                                    style={{ color: "#017bcf", cursor: "pointer" }}
+                                  />
+                                  <DeleteOutlined
+                                    style={{ color: "#ef4444", cursor: "pointer" }}
+                                    onClick={() => ondelete(index)}
+                                  />
+                                </div>
+                              ) : (
+                                <div className="icons-hotel-addes">
+                                  <EditOutlined
+                                    style={{ color: "#017bcf", cursor: "pointer" }}
+                                    onClick={() => onupdate(index + 1)}
+                                  />
+                                </div>
+                              )
+                            }
                           >
-                            {paxInfo.map((pax, index) => (
-                              <Panel
-                                showArrow={false}
-                                collapsible={"header"}
-                                header={
-                                  <div>
-                                    <span
-                                      style={{
-                                        fontSize: "15px",
-                                        fontWeight: "bold",
-                                      }}
-                                    >
-                                      Room {index + 1}
-                                    </span>{" "}
-                                    <br />
-                                    <span>{pax.noOfAdults} Adults </span>
-                                    <span> {pax.noOfChilds} Children </span>
-                                  </div>
+                            <HotelPassengers
+                              pax={pax}
+                              index={index}
+                              updatePaxInfoFromChild={updatePaxInfoFromChild}
+                              paxInfo={paxInfo}
+                            />
+                          </Panel>
+                        ))}
+                      </Collapse>
+
+                      <div className="pax-bottom-actions">
+                        {paxInfo.length < roomLimit ? (
+                          <span
+                            className="add-room-link"
+                            onClick={addRoom}
+                          >
+                            + Add Another Room
+                          </span>
+                        ) : null}
+                        <Button
+                          type="primary"
+                          block
+                          className="pax-ready-btn"
+                          onClick={() => {
+                            let isValid = true;
+
+                            paxInfo.forEach((pax, index) => {
+                              if (pax.noOfChilds > 0) {
+                                if (pax.childAge.length < pax.noOfChilds) {
+                                  isValid = false;
+                                  alert(
+                                    `Please provide age for all children in Room ${
+                                      index + 1
+                                    }.`
+                                  );
+                                } else {
+                                  pax.childAge.forEach((age, ageIndex) => {
+                                    if (Number(age) < 0 || age === null || age === undefined || age === "") {
+                                      isValid = false;
+                                      alert(
+                                        `Invalid age for child ${
+                                          ageIndex + 1
+                                        } in Room ${
+                                          index + 1
+                                        }. Please enter a valid age.`
+                                      );
+                                    }
+                                  });
                                 }
-                                key={index + 1}
-                                extra={
-                                  index + 1 != 1 ? (
-                                    <div className="icons-hotel-addes">
-                                      {" "}
-                                      <EditOutlined
-                                        onClick={() => onupdate(index + 1)}
-                                        style={{
-                                          marginLeft: "-10px",
-                                          color: "blue",
-                                        }}
-                                      />
-                                      <DeleteOutlined
-                                        style={{ color: "red" }}
-                                        onClick={() => ondelete(index)}
-                                      />
-                                    </div>
-                                  ) : (
-                                    <div className="icons-hotel-addes">
-                                      <EditOutlined
-                                        style={{ color: "blue" }}
-                                        onClick={() => onupdate(index + 1)}
-                                      />
-                                    </div>
-                                  )
-                                }
-                              >
-                                <HotelPassengers
-                                  pax={pax}
-                                  index={index}
-                                  updatePaxInfoFromChild={
-                                    updatePaxInfoFromChild
-                                  }
-                                  paxInfo={paxInfo}
-                                />
-                              </Panel>
-                            ))}
-                          </Collapse>
-                        </ul>
-
-                        <div>
-                          {roomlength < roomLimit ? (
-                            <a
-                              style={{
-                                color: "red",
-                                fontWeight: "700",
-                                fontSize: "15px",
-                              }}
-                              onClick={addRoom}
-                            >
-                              + Add Room
-                            </a>
-                          ) : null}
-                          <Button
-                            block
-                            className="pax-ready-btn"
-                            onClick={() => {
-
-                              let isValid = true;
-
-                              paxInfo.forEach((pax, index) => {
-
-                                if (pax.noOfChilds > 0) {
-                                  if (pax.childAge.length < pax.noOfChilds) {
-                                    isValid = false;
-                                    alert(
-                                      `Please provide age for all children in Room ${index + 1
-                                      }.`
-                                    );
-                                  } else {
-
-                                    pax.childAge.forEach((age, ageIndex) => {
-                                      if (Number(age) <= 0) {
-                                        isValid = false;
-                                        alert(
-                                          `Invalid age for child ${ageIndex + 1
-                                          } in Room ${index + 1
-                                          }. Please enter a valid age.`
-                                        );
-                                      }
-                                    });
-                                  }
-                                }
-                              });
-
-
-                              if (isValid) {
-                                toggleCount();
-                                if (rooms) searchBtn.current.focus();
                               }
-                            }}
-                          >
-                            Confirm
-                          </Button>
-                        </div>
+                            });
+
+                            if (isValid) {
+                              setRooms(false);
+                              if (searchBtn.current) searchBtn.current.focus();
+                            }
+                          }}
+                        >
+                          Done
+                        </Button>
                       </div>
                     </div>
-                  </div>
-                </Form.Item>
+                  }
+                >
+                  <Form.Item style={{ marginBottom: 0 }}>
+                    <Input
+                      readOnly
+                      value={
+                        "Room: " + paxInfo.length + ", Guest: " + getPaxCount()
+                      }
+                      size="large"
+                      style={{ cursor: "pointer", background: "#ffffff" }}
+                    />
+                  </Form.Item>
+                </Popover>
               </Col>
 
               {/* <Col md={4} xs={24}>

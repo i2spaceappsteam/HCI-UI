@@ -1,160 +1,159 @@
-import { message, Popover, Tooltip } from "antd";
 import React, { useState } from "react";
-import { QuestionCircleOutlined } from "@ant-design/icons";
-import "../HotelPassengers/HotelPassengers.scss";
+import { message, Popover } from "antd";
+import { QuestionCircleOutlined, PlusOutlined, MinusOutlined } from "@ant-design/icons";
+import "./HotelPassengers.scss";
 
 const HotelPassengers = ({ pax, index, updatePaxInfoFromChild, paxInfo }) => {
-  const [childAgeErrors, setChildAgeErrors] = useState([]); 
+  const [childAgeErrors, setChildAgeErrors] = useState([]);
 
   const agesList = Array.from({ length: 13 }, (_, i) => ({ id: i.toString(), childYear: i }));
 
- 
-  const validateChildAges = (paxObj) => {
-    const errors = paxObj.childAge.map((age) => (age === null || age === undefined ? "Age needed" : ""));
-    setChildAgeErrors(errors);
-    return errors.every((error) => error === ""); 
-  };
-
-
-  const onRemoveRoom = (i) => {
-    paxInfo.splice(i, 1);
-    updatePaxInfoFromChild(paxInfo);
-  };
-
- 
-  const onIncreaseAdultCount = (paxObj) => {
-    if (paxObj.noOfAdults < 4) {
-      paxObj.noOfAdults += 1;
-      updatePaxInfoFromChild(paxInfo);
+  const onIncreaseAdultCount = () => {
+    if (pax.noOfAdults < 4) {
+      pax.noOfAdults += 1;
+      updatePaxInfoFromChild([...paxInfo]);
     } else {
-      message.error("Maximum 4 adults allowed");
+      message.warning("Maximum 4 adults allowed per room");
     }
   };
 
-  const onDecreaseAdultCount = (paxObj) => {
-    if (paxObj.noOfAdults > 1) {
-      paxObj.noOfAdults -= 1;
-      updatePaxInfoFromChild(paxInfo);
+  const onDecreaseAdultCount = () => {
+    if (pax.noOfAdults > 1) {
+      pax.noOfAdults -= 1;
+      updatePaxInfoFromChild([...paxInfo]);
     } else {
-      message.error("At least 1 adult is required.");
+      message.warning("At least 1 adult is required per room.");
     }
   };
 
-  
-  const onIncreaseChildCount = (paxObj) => {
-    if (paxObj.noOfChilds < 4) {
-      paxObj.noOfChilds += 1;
-      paxObj.childAge.push(null); 
+  const onIncreaseChildCount = () => {
+    if (pax.noOfChilds < 4) {
+      pax.noOfChilds += 1;
+      pax.childAge.push(null);
       setChildAgeErrors([...childAgeErrors, "Age needed"]);
-      updatePaxInfoFromChild(paxInfo);
+      updatePaxInfoFromChild([...paxInfo]);
     } else {
-      message.error("Maximum 4 children allowed.");
+      message.warning("Maximum 4 children allowed per room.");
     }
   };
 
-  const onDecreaseChildCount = (paxObj) => {
-    if (paxObj.noOfChilds > 0) {
-      paxObj.noOfChilds -= 1;
-      paxObj.childAge.pop();
+  const onDecreaseChildCount = () => {
+    if (pax.noOfChilds > 0) {
+      pax.noOfChilds -= 1;
+      pax.childAge.pop();
       childAgeErrors.pop();
-      updatePaxInfoFromChild(paxInfo);
+      setChildAgeErrors([...childAgeErrors]);
+      updatePaxInfoFromChild([...paxInfo]);
     }
   };
 
- 
-  const selectChildAge = (paxIndex, e, paxObj) => {
+  const selectChildAge = (childIndex, e) => {
     const selectedAge = e.target.value;
-    paxObj.childAge[paxIndex] = selectedAge;
-    childAgeErrors[paxIndex] = selectedAge ? "" : "Age needed";
-    setChildAgeErrors([...childAgeErrors]);
-    updatePaxInfoFromChild(paxInfo);
+    pax.childAge[childIndex] = selectedAge;
+    const newErrors = [...childAgeErrors];
+    newErrors[childIndex] = selectedAge ? "" : "Age needed";
+    setChildAgeErrors(newErrors);
+    updatePaxInfoFromChild([...paxInfo]);
   };
 
   return (
-    <div key={"room" + index} className="hotel-pax-box">
-      <li>
-        <ul className="child-item">
-          <li>
-            <div className="lists-wrapper">
-              <p className="roomtitle">Room {index + 1}</p>
-              <p className="remove-btn" onClick={() => onRemoveRoom(index)}>
-                Remove
-              </p>
-            </div>
-          </li>
-          {/* Adult Count */}
-          <li>
-            <div className="lists-wrapper">
-              <div className="pax-label">
-                <p>Adults</p>
-                <span>Above 12 years</span>
+    <div key={"room-" + index} className="hotel-pax-box">
+      {/* Adult Count Row */}
+      <div className="pax-row">
+        <div className="pax-label">
+          <div className="pax-title">Adults</div>
+          <div className="pax-sub">Above 12 years</div>
+        </div>
+        <div className="pax-counter">
+          <button
+            type="button"
+            className={`counter-btn ${pax.noOfAdults <= 1 ? "disabled" : ""}`}
+            onClick={onDecreaseAdultCount}
+            disabled={pax.noOfAdults <= 1}
+          >
+            <MinusOutlined />
+          </button>
+          <span className="counter-val">{pax.noOfAdults}</span>
+          <button
+            type="button"
+            className={`counter-btn ${pax.noOfAdults >= 4 ? "disabled" : ""}`}
+            onClick={onIncreaseAdultCount}
+            disabled={pax.noOfAdults >= 4}
+          >
+            <PlusOutlined />
+          </button>
+        </div>
+      </div>
+
+      {/* Child Count Row */}
+      <div className="pax-row">
+        <div className="pax-label">
+          <div className="pax-title">Children</div>
+          <div className="pax-sub">0 - 12 years</div>
+        </div>
+        <div className="pax-counter">
+          <button
+            type="button"
+            className={`counter-btn ${pax.noOfChilds <= 0 ? "disabled" : ""}`}
+            onClick={onDecreaseChildCount}
+            disabled={pax.noOfChilds <= 0}
+          >
+            <MinusOutlined />
+          </button>
+          <span className="counter-val">{pax.noOfChilds}</span>
+          <button
+            type="button"
+            className={`counter-btn ${pax.noOfChilds >= 4 ? "disabled" : ""}`}
+            onClick={onIncreaseChildCount}
+            disabled={pax.noOfChilds >= 4}
+          >
+            <PlusOutlined />
+          </button>
+        </div>
+      </div>
+
+      {/* Child Ages Dropdowns */}
+      {pax.noOfChilds > 0 && (
+        <div className="child-ages-section">
+          <div className="child-age-header">
+            <span>{pax.noOfChilds > 1 ? "Children's Ages" : "Child's Age"}</span>
+            <Popover
+              overlayClassName="pricepopup"
+              placement="topLeft"
+              content={
+                <div style={{ maxWidth: "220px", fontSize: "12px", color: "#475569" }}>
+                  To find the best room and accurate rates, hotel policies require the age of each child at check-in.
+                </div>
+              }
+              title={<span style={{ fontSize: "13px", fontWeight: 600 }}>Why age is needed</span>}
+            >
+              <QuestionCircleOutlined className="info-icon" />
+            </Popover>
+          </div>
+          <div className="child-ages-grid">
+            {pax.childAge.map((age, childIdx) => (
+              <div key={childIdx} className="child-age-item">
+                <span className="child-tag">Child {childIdx + 1}</span>
+                <select
+                  value={age ?? ""}
+                  onChange={(e) => selectChildAge(childIdx, e)}
+                  className={`child-age-select ${childAgeErrors[childIdx] ? "has-error" : ""}`}
+                >
+                  <option value="">Age</option>
+                  {agesList.map((item) => (
+                    <option key={item.id} value={item.childYear}>
+                      {item.childYear === 0 ? "< 1 yr" : `${item.childYear} yrs`}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="pax-count">
-                <i className="fa fa-minus" onClick={() => onDecreaseAdultCount(pax)}></i>
-                <span>{pax.noOfAdults}</span>
-                <i className="fa fa-plus" onClick={() => onIncreaseAdultCount(pax)}></i>
-              </div>
-            </div>
-          </li>
-          {/* Child Count */}
-          <li>
-            <div className="lists-wrapper">
-              <div className="pax-label">
-                <p>Children</p>
-                <span>Below 12 years</span>
-              </div>
-              <div className="pax-count">
-                <i className="fa fa-minus" onClick={() => onDecreaseChildCount(pax)}></i>
-                <span>{pax.noOfChilds}</span>
-                <i className="fa fa-plus" onClick={() => onIncreaseChildCount(pax)}></i>
-              </div>
-            </div>
-            {/* Child Ages */}
-            {pax.childAge.length >= 0 && (
-              <div className="ages-select">
-                <p className="agetitle">
-                  {pax.noOfChilds > 1 ? "Children's" : "Child's"} Age{" "}
-                  <Popover
-                    overlayClassName="pricepopup"
-                    placement="left"
-                    content={
-                      <div>
-                        <p>
-                          To find a place to stay that fits your group and shows correct pricing,
-                          we need to know how old your children will be at check-out.
-                        </p>
-                      </div>
-                    }
-                    title="Why Age Needed?"
-                  >
-                    <QuestionCircleOutlined style={{ color: "#0f76bb" }} />
-                  </Popover>
-                </p>
-                {pax.childAge.map((_, childIndex) => (
-                  <select
-                    key={childIndex}
-                    value={pax.childAge[childIndex] || ""}
-                    onChange={(e) => selectChildAge(childIndex, e, pax)}
-                    style={{
-                      borderColor: childAgeErrors[childIndex] ? "red" : "",
-                    }}
-                  >
-                    <option value="">Age needed</option>
-                    {agesList.map((ageObj) => (
-                      <option key={ageObj.id} value={ageObj.childYear}>
-                        {ageObj.id}
-                      </option>
-                    ))}
-                  </select>
-                ))}
-                {childAgeErrors.some((error) => error) && (
-                  <p style={{ color: "red" }}>Please select all children's ages.</p>
-                )}
-              </div>
-            )}
-          </li>
-        </ul>
-      </li>
+            ))}
+          </div>
+          {childAgeErrors.some((err) => err) && (
+            <span className="error-hint">Please select all child ages.</span>
+          )}
+        </div>
+      )}
     </div>
   );
 };

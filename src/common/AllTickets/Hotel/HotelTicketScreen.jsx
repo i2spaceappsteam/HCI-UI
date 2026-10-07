@@ -164,22 +164,8 @@ const HotelTicketScreen = ({ mode }) => {
       BookingDate: booking.bookingDate || rootData.BookingDate || "",
       CheckInDate: booking.checkInDate || rootData.CheckInDate || "",
       CheckOutDate: booking.checkOutDate || rootData.CheckOutDate || "",
-      BookingStatus: (() => {
-        let bs = booking.bookingStatus ?? rootData.BookingStatus ?? 2;
-        if (typeof bs === "string") {
-          const lower = bs.toLowerCase();
-          if (lower.includes("confirm")) return 2;
-          if (lower.includes("cancel") || lower.includes("fail")) return 3;
-          if (lower.includes("hold") || lower.includes("pending")) return 6;
-          return 2;
-        }
-        return bs;
-      })(),
-      Status: (() => {
-        let bs = booking.bookingStatus ?? rootData.BookingStatus ?? 2;
-        if (typeof bs === "string") return bs;
-        return bs === 2 ? "Confirmed" : (bs === 3 ? "Cancelled" : "Hold");
-      })(),
+      BookingStatus: booking.bookingStatus,
+      Status: booking.bookingStatus,
       NoOfRooms: booking.noOfRooms || rooms.length || rootData.NoOfRooms || 1,
       HotelAddress: typeof booking.hotelAddress === "string"
         ? { address: booking.hotelAddress || booking.cityName || "" }
@@ -214,17 +200,15 @@ const HotelTicketScreen = ({ mode }) => {
     ApiClient.get("HotelBooking/GetBookingDetailsByRef/" + ref)
       .then((res) => {
         const normalized = normalizeTicketData(res);
-        if (normalized && (normalized.RefNumber || normalized.booking?.referenceNumber)) {
-          if (mode === "USER") {
-            let userId = user?.UserID ?? 1;
-            if (!normalized.booking?.userId || normalized.booking.userId === userId) {
-              setTicketData(normalized);
-            } else {
-              setTicketData({});
-            }
-          } else {
-            setTicketData(normalized);
-          }
+        if (
+          normalized &&
+          (normalized.RefNumber ||
+            normalized.ConfirmationNumber ||
+            normalized.booking?.referenceNumber ||
+            normalized.HotelName ||
+            normalized.booking)
+        ) {
+          setTicketData(normalized);
         } else {
           setTicketData({});
         }
@@ -376,27 +360,29 @@ const HotelTicketScreen = ({ mode }) => {
   // };
 
   const getTicketDetails = () => {
-    const refVal = ticketSearchParams.ref || ticketSearchParams.refNumber || ticketSearchParams.referenceNumber;
+    const refVal =
+      ticketSearchParams.ref ||
+      ticketSearchParams.refNumber ||
+      ticketSearchParams.referenceNumber ||
+      ticketSearchParams.ReferenceNumber ||
+      ticketSearchParams.RefNumber;
     if (refVal) {
       fetchTicketDetails(refVal);
+    } else {
+      setLoadingTicket(false);
+      setTicketData({});
     }
   };
   useEffect(() => {
     getTicketDetails();
-  }, [ticketSearchParams.ref, ticketSearchParams.refNumber, ticketSearchParams.referenceNumber]);
-  // const getCmsFareRules = (serviceType) => {
-  //   APIClient.get(`admin/getFareRulesbyserviceType/${serviceType}`)
-  //     .then((res) => {
-  //       if (res.status == 200) {
-  //         setCmsFareRules(res.data);
-  //       } else {
-  //         setCmsFareRules({});
-  //       }
-  //     })
-  //     .catch((e) => {
-  //       setCmsFareRules({});
-  //     });
-  // };
+  }, [
+    ticketSearchParams.ref,
+    ticketSearchParams.refNumber,
+    ticketSearchParams.referenceNumber,
+    ticketSearchParams.ReferenceNumber,
+    ticketSearchParams.RefNumber,
+  ]);
+
   return (
     <>
       {user?.UserID === 1 ? "" :
@@ -414,11 +400,12 @@ const HotelTicketScreen = ({ mode }) => {
                 <Spin indicator={antIcon} description="Loading..." />
               </div>
             ) : Object.keys(ticketData).length > 0 &&
-              [1, 2, 3, 6, 7, 8, 9].includes(ticketData.BookingStatus) ? (
+              (ticketData.RefNumber ||
+                ticketData.ConfirmationNumber ||
+                ticketData.HotelName ||
+                ticketData.booking ||
+                ticketData.BookingStatus !== undefined) ? (
               <div className="flight-ticket">
-                {/* <PDFViewer>
-                <HotelDoc ticketData={ticketData} cmsFareRules={cmsFareRules} />
-              </PDFViewer> */}
                 <Row gutter={[32, 16]} className="ticket-row">
                   <Col md={18} className="ticket-coloum">
 
@@ -494,8 +481,7 @@ const HotelTicketScreen = ({ mode }) => {
         >
           <>
 
-            {Object.keys(ticketData).length > 0 &&
-              [1, 2, 3, 7, 8, 9].includes(ticketData.BookingStatus) ? (
+            {Object.keys(ticketData).length > 0 ? (
               <div className="wrapper">
                 <p>
                   <b>Reference No</b> : {ticketData.RefNumber}
@@ -539,8 +525,7 @@ const HotelTicketScreen = ({ mode }) => {
           ]}
           width={"600px"}
         >
-          {Object.keys(ticketData).length > 0 &&
-            [1, 2, 7, 8, 9].includes(ticketData.BookingStatus) ? (
+          {Object.keys(ticketData).length > 0 ? (
             <div className="wrapper">
               <p>
                 <b>Reference No</b> : {ticketData.RefNumber}

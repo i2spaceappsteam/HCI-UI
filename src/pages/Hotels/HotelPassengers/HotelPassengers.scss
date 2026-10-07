@@ -1,22 +1,152 @@
 .hotel-pax-box {
-  .ages-select {
-    margin-top: 10px;
+  padding: 4px 0 8px 0;
+
+  .pax-row {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: end;
-    select {
-      // padding: 7px 9px;
-      padding: 1px 2px;
-      background-color: #fff;
-      font-size: 14px;
-      line-height: 24px;
-      color: #1c2b39;
-      border: 1px solid #bcd5f5;
-      border-radius: 3px;
-      outline: none;
-      // margin: 0 4% 10px;
-      margin: 0 1px;
-      margin-bottom: 4px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+
+    .pax-label {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+
+      .pax-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1e293b;
+        line-height: 1.2;
+      }
+
+      .pax-sub {
+        font-size: 11px;
+        color: #94a3b8;
+        margin-top: 2px;
+      }
+    }
+
+    .pax-counter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .counter-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1.5px solid #017bcf;
+        background: #ffffff;
+        color: #017bcf;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        padding: 0;
+
+        &:hover:not(:disabled) {
+          background: #017bcf;
+          color: #ffffff;
+          box-shadow: 0 2px 6px rgba(1, 123, 207, 0.3);
+        }
+
+        &.disabled,
+        &:disabled {
+          border-color: #e2e8f0;
+          color: #cbd5e1;
+          background: #f8fafc;
+          cursor: not-allowed;
+          box-shadow: none;
+        }
+      }
+
+      .counter-val {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0f172a;
+        min-width: 18px;
+        text-align: center;
+      }
+    }
+  }
+
+  .child-ages-section {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+
+    .child-age-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 8px;
+
+      .info-icon {
+        color: #017bcf;
+        font-size: 13px;
+        cursor: pointer;
+      }
+    }
+
+    .child-ages-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .child-age-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+
+        .child-tag {
+          font-size: 10px;
+          font-weight: 600;
+          color: #64748b;
+          text-transform: uppercase;
+        }
+
+        .child-age-select {
+          padding: 4px 8px;
+          background: #ffffff;
+          font-size: 12px;
+          font-weight: 500;
+          color: #1e293b;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+          outline: none;
+          min-width: 80px;
+          transition: border-color 0.2s;
+
+          &:focus {
+            border-color: #017bcf;
+          }
+
+          &.has-error {
+            border-color: #ef4444;
+            background: #fff5f5;
+          }
+        }
+      }
+    }
+
+    .error-hint {
+      display: block;
+      color: #ef4444;
+      font-size: 11px;
+      margin-top: 6px;
+      font-weight: 500;
     }
   }
 }

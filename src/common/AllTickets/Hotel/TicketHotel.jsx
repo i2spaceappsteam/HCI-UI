@@ -66,9 +66,9 @@ const TicketHotel = ({ ticketData = {}, cmsFareRules }) => {
   const starRating = Number(ticketData?.StarRating || ticketData?.booking?.starRating || 5);
 
   const isConfirmed =
-    ticketData?.BookingStatus === 2 ||
-    ticketData?.booking?.bookingStatus === 2 ||
-    ticketData?.Status === "Confirmed";
+    Number(ticketData?.BookingStatus ?? ticketData?.booking?.bookingStatus) === 2 ||
+    String(ticketData?.BookingStatus ?? ticketData?.booking?.bookingStatus ?? "").toLowerCase().includes("confirm") ||
+    String(ticketData?.Status || "").toLowerCase().includes("confirm");
 
   return (
     <div className="premium-ticket-wrapper" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>

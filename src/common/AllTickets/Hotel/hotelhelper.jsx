@@ -162,35 +162,38 @@ export function getHotelPricce(invoiceData = {}) {
 }
 
 export const getStatus = (status) => {
-  switch (status) {
-    case 1: {
-      return <span style={{ color: "#FFA500" }}>FAILED</span>;
-    }
-    case 2: {
-      return <span style={{ color: "#008000" }}>CONFIRMED</span>;
-    }
-    case 3: {
-      return <span style={{ color: "#bd0c21" }}>CANCELLED</span>;
-    }
-    case 4: {
-      return <span style={{ color: "#bd0c21" }}>PENDING</span>;
-    }
-    case 5: {
-      return <span style={{ color: "#f9e218" }}>REJECTED</span>;
-    }
-    case 6: {
-      return <span style={{ color: "#bd0c21" }}>HOLD</span>;
-    }
-    case 7: {
-      return <span style={{ color: "#bd0c21" }}>CANCELLATIONREQUESTED</span>;
-    }
-    case 8: {
-      return <span style={{ color: "#bd0c21" }}>CANCELLATIONPENDING</span>;
-    }
-    case 9: {
-      return <span style={{ color: "#bd0c21" }}>CANCELLATIONPROGRESS</span>;
-    }
-    default:
-      return <span></span>;
+  const statusNum = Number(status);
+  const statusStr = String(status || "").trim().toLowerCase();
+
+  if (statusNum === 2 || statusStr.includes("confirm")) {
+    return <span style={{ color: "#008000" }}>CONFIRMED</span>;
   }
+  if (statusNum === 3 || statusStr.includes("cancel")) {
+    return <span style={{ color: "#bd0c21" }}>CANCELLED</span>;
+  }
+  if (statusNum === 1 || statusStr.includes("fail")) {
+    return <span style={{ color: "#FFA500" }}>FAILED</span>;
+  }
+  if (statusNum === 4 || statusStr.includes("pending")) {
+    return <span style={{ color: "#bd0c21" }}>PENDING</span>;
+  }
+  if (statusNum === 5 || statusStr.includes("reject")) {
+    return <span style={{ color: "#f9e218" }}>REJECTED</span>;
+  }
+  if (statusNum === 6 || statusStr.includes("hold")) {
+    return <span style={{ color: "#bd0c21" }}>HOLD</span>;
+  }
+  if (statusNum === 7 || statusStr.includes("request")) {
+    return <span style={{ color: "#bd0c21" }}>CANCELLATION REQUESTED</span>;
+  }
+  if (statusNum === 8) {
+    return <span style={{ color: "#bd0c21" }}>CANCELLATION PENDING</span>;
+  }
+  if (statusNum === 9 || statusStr.includes("progress")) {
+    return <span style={{ color: "#bd0c21" }}>CANCELLATION IN PROGRESS</span>;
+  }
+  if (statusStr) {
+    return <span>{String(status).toUpperCase()}</span>;
+  }
+  return <span></span>;
 };
