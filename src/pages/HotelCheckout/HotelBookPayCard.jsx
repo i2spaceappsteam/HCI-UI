@@ -69,7 +69,7 @@ const HotelBookPayCard = (props) => {
           </div>
         ) : null}
         <div className=" d-flex flex-wrap" style={{ justifyContent: "center", display: "flex" }}>
-          {props?.bookpaycardinfo === "hotel-review" && (
+          {props?.bookpaycardinfo === "hotel-review" && props.isHoldAllowed && (
             <div className="book-pay-btn mr-2 mb-1 mt-1">
               <Button
                 className="btn-book btn-md"

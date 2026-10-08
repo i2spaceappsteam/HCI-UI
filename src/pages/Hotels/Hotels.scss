@@ -1,4 +1,4 @@
-
+﻿
 
 /* Calander component custom styles */
 @media (max-width: 767px) {
@@ -690,3 +690,8 @@
 .ant-select.ant-select-in-form-item {
   border: none;
 }
+.custom-mob-calendar .ant-picker-header-super-prev-btn, .custom-mob-calendar .ant-picker-header-super-next-btn { display: none !important; }
+
+
+
+.custom-mob-calendar .ant-picker-header-super-prev-btn, .custom-mob-calendar .ant-picker-header-super-next-btn { display: none !important; }

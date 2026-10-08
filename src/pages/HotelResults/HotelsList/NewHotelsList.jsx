@@ -109,9 +109,10 @@ const NewHotelsList = ({
         urlParams?.hotelCityCode ||
         urlParams?.cityId ||
         "",
-      roomGuests: searchHotelReq?.roomGuests
-        ? JSON.stringify(searchHotelReq.roomGuests)
-        : urlParams?.roomGuests || "",
+      roomGuests:
+        typeof searchHotelReq?.roomGuests === "object"
+          ? JSON.stringify(searchHotelReq.roomGuests)
+          : (searchHotelReq?.roomGuests || (typeof urlParams?.roomGuests === "object" ? JSON.stringify(urlParams.roomGuests) : urlParams?.roomGuests) || ""),
       nationality:
         searchHotelReq?.nationality || urlParams?.nationality || "IN",
       supplierParamter: hotelObj?.supplierParamter || "",

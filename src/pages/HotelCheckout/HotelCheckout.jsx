@@ -143,11 +143,11 @@ const HotelCheckout = ({ location }) => {
     guestRequiredFields.map((paxReqFieldsObj) => {
       Object.keys(paxReqFieldsObj).map((paxReqKeys) => {
         if (paxReqFieldsObj[paxReqKeys] === true) {
-          if (paxObj.type === 'adult' && isFirstAdult) {
-            paxObj[paxReqKeys] = "";
+          if (paxObj.guestType === 'Adult' && isFirstAdult) {
+            paxObj[paxReqKeys] = paxObj[paxReqKeys] || "";
             isFirstAdult = false;
-          } else if (paxObj.type !== 'child') {
-            paxObj[paxReqKeys] = "";
+          } else if (paxObj.guestType !== 'Child') {
+            paxObj[paxReqKeys] = paxObj[paxReqKeys] || "";
           }
         }
       });
@@ -272,9 +272,19 @@ const HotelCheckout = ({ location }) => {
               };
             });
 
+            const firstRoomCancelPolicy =
+              combineRooms[0]?.cancellationPolicy ||
+              hotels.rooms?.[0]?.ratePlans?.[0]?.cancellationPolicy ||
+              hotels.rooms?.[0]?.cancellationPolicy ||
+              hotels.cancellationPolicy ||
+              [];
+
             combineRoom = [
               {
                 combineRooms,
+                cancellationPolicy: firstRoomCancelPolicy,
+                inclusions: combineRooms[0]?.inclusions || hotels.inclusions || [],
+                mealPlan: combineRooms[0]?.ratePlanName || combineRooms[0]?.mealPlan || "",
                 price: grandTotal,
                 agentMarkup,
                 priceDetails: {
@@ -323,8 +333,21 @@ const HotelCheckout = ({ location }) => {
             selectedHotelInfo?.address ||
             "";
 
+          const resolvedCancellationPolicy =
+            (hotels.rooms?.[0]?.ratePlans?.[0]?.cancellationPolicy?.length > 0
+              ? hotels.rooms[0].ratePlans[0].cancellationPolicy
+              : null) ||
+            (hotels.cancellationPolicy?.length > 0
+              ? hotels.cancellationPolicy
+              : null) ||
+            hotels.rooms?.[0]?.cancellationPolicy ||
+            hotels.combineRoom?.[0]?.combineRooms?.[0]?.cancellationPolicy ||
+            hotels.combineRoom?.[0]?.cancellationPolicy ||
+            [];
+
           setHotelPriceData({
             ...hotels,
+            cancellationPolicy: resolvedCancellationPolicy,
             hotelName: hotels.hotelName || selectedHotelInfo?.hotelName || "",
             starRating: hotels.starRating || selectedHotelInfo?.starRating || 0,
             address: resolvedAddress,
@@ -350,17 +373,43 @@ const HotelCheckout = ({ location }) => {
           let roomGuests = [];
           if (hotelParams.roomGuests) {
             try {
-              roomGuests = typeof hotelParams.roomGuests === "string" ? JSON.parse(hotelParams.roomGuests) : hotelParams.roomGuests;
+              let parsed = typeof hotelParams.roomGuests === "string" ? JSON.parse(hotelParams.roomGuests) : hotelParams.roomGuests;
+              if (typeof parsed === "string") parsed = JSON.parse(parsed);
+              if (Array.isArray(parsed)) roomGuests = parsed;
             } catch (e) {
               roomGuests = [];
             }
+          }
+          if (!roomGuests || roomGuests.length === 0) {
+            if (selectedHotelInfo?.roomGuests) {
+              try {
+                let parsed = typeof selectedHotelInfo.roomGuests === "string" ? JSON.parse(selectedHotelInfo.roomGuests) : selectedHotelInfo.roomGuests;
+                if (typeof parsed === "string") parsed = JSON.parse(parsed);
+                if (Array.isArray(parsed)) roomGuests = parsed;
+              } catch (e) {
+                roomGuests = [];
+              }
+            }
+          }
+          if (!roomGuests || roomGuests.length === 0) {
+            try {
+              const savedSearch = localStorage.getItem("HotelSearchBar");
+              if (savedSearch) {
+                const parsedSaved = JSON.parse(savedSearch);
+                if (parsedSaved?.roomGuests) {
+                  let parsed = typeof parsedSaved.roomGuests === "string" ? JSON.parse(parsedSaved.roomGuests) : parsedSaved.roomGuests;
+                  if (typeof parsed === "string") parsed = JSON.parse(parsed);
+                  if (Array.isArray(parsed)) roomGuests = parsed;
+                }
+              }
+            } catch (e) { }
           }
           if (!roomGuests || roomGuests.length === 0) {
             if (hotels.rooms?.length > 0) {
               roomGuests = hotels.rooms.map((r) => ({
                 noOfAdults: Number(r.adultCount || 1),
                 noOfChilds: Number(r.childCount || 0),
-                childAge: [],
+                childAge: r.childAge || r.childAges || r.childrenAges || [],
               }));
             }
           }
@@ -378,16 +427,19 @@ const HotelCheckout = ({ location }) => {
 
           // Generate pax guest input lists
           const roomInfoArr = [];
+          const initialFormValues = {};
+
           roomGuests.forEach((room, roomIndex) => {
             const paxListArr = [];
             const noOfAdults = Number(room.noOfAdults || 1);
             const noOfChilds = Number(room.noOfChilds || 0);
 
-            [...Array(noOfAdults)].forEach(() => {
+            [...Array(noOfAdults)].forEach((_, adultIdx) => {
+              const paxIndex = adultIdx;
               let paxObj = {
                 firstName: "",
                 lastName: "",
-                title: "Mr.",
+                title: "Mr",
                 guestType: "Adult",
                 guestInRoom: roomIndex + 1,
                 age: "",
@@ -396,27 +448,71 @@ const HotelCheckout = ({ location }) => {
                 paxObj = HotelGuestReqFields(paxObj, hotels.guestRequiredFields);
               }
               paxListArr.push(paxObj);
+              initialFormValues[`Title_${roomIndex}_${paxIndex}`] = "Mr";
             });
 
-            [...Array(noOfChilds)].forEach((_, index) => {
+            [...Array(noOfChilds)].forEach((_, childIdx) => {
+              const paxIndex = noOfAdults + childIdx;
+              let rawAge =
+                room.childAge?.[childIdx] ??
+                room.childAges?.[childIdx] ??
+                room.childrenAges?.[childIdx] ??
+                room.child_age?.[childIdx] ??
+                (Array.isArray(room.childAge) ? room.childAge[childIdx] : null) ??
+                (typeof room.childAge === "string" && room.childAge.includes(",") ? room.childAge.split(",")[childIdx] : (childIdx === 0 ? room.childAge : null)) ??
+                (typeof room.childAges === "string" && room.childAges.includes(",") ? room.childAges.split(",")[childIdx] : (childIdx === 0 ? room.childAges : null));
+
+              if (rawAge === undefined || rawAge === null || rawAge === "") {
+                try {
+                  const savedSearch = localStorage.getItem("HotelSearchBar");
+                  if (savedSearch) {
+                    const parsedSaved = JSON.parse(savedSearch);
+                    if (parsedSaved?.roomGuests) {
+                      let parsed = typeof parsedSaved.roomGuests === "string" ? JSON.parse(parsedSaved.roomGuests) : parsedSaved.roomGuests;
+                      if (typeof parsed === "string") parsed = JSON.parse(parsed);
+                      if (Array.isArray(parsed) && parsed[roomIndex]) {
+                        rawAge = parsed[roomIndex].childAge?.[childIdx] ?? rawAge;
+                      }
+                    }
+                  }
+                } catch (e) { }
+              }
+
+              let parsedAge = "";
+              if (rawAge !== undefined && rawAge !== null && String(rawAge).trim() !== "" && !isNaN(Number(rawAge))) {
+                parsedAge = Number(rawAge);
+              }
+              const displayAgeText =
+                parsedAge !== ""
+                  ? parsedAge === 0
+                    ? "0 yrs (< 1 yr)"
+                    : `${parsedAge} ${parsedAge === 1 ? "yr" : "yrs"}`
+                  : "";
+
               let paxObj = {
                 firstName: "",
                 lastName: "",
                 title: "Mstr",
                 guestType: "Child",
                 guestInRoom: roomIndex + 1,
-                age: room.childAge?.[index] ? parseInt(room.childAge[index]) : "",
+                age: parsedAge !== "" ? parsedAge : "",
+                displayAge: displayAgeText,
               };
               if (hotels.guestRequiredFields) {
                 paxObj = HotelGuestReqFields(paxObj, hotels.guestRequiredFields);
               }
               paxListArr.push(paxObj);
+              initialFormValues[`Title_${roomIndex}_${paxIndex}`] = "Mstr";
+              if (displayAgeText) {
+                initialFormValues[`childAge_${roomIndex}_${paxIndex}`] = displayAgeText;
+              }
             });
 
             roomInfoArr.push({ paxInfoList: paxListArr });
           });
 
           setRoomGuestInfo(roomInfoArr);
+          guestDetailsForm.setFieldsValue(initialFormValues);
         } else if (res?.errors?.length > 0) {
           res.errors.forEach((err) => {
             if (err.errorCode === "SOLDOUT") {
@@ -519,14 +615,43 @@ const HotelCheckout = ({ location }) => {
                           "YYYY-MM-DDTHH:mm:ss"
                         ),
                       },
-                      guests: roomGuestInfo,
+                      guests: roomGuestInfo.map((room, roomIdx) => ({
+                        ...room,
+                        paxInfoList: room.paxInfoList.map((pax, paxIdx) => {
+                          const titleVal =
+                            passegersData[`Title_${roomIdx}_${paxIdx}`] ||
+                            pax.title ||
+                            (pax.guestType === "Child" ? "Mstr" : "Mr");
+                          const firstVal =
+                            passegersData[`firstname_${roomIdx}_${paxIdx}`] ||
+                            pax.firstName ||
+                            "";
+                          const lastVal =
+                            passegersData[`lastname_${roomIdx}_${paxIdx}`] ||
+                            pax.lastName ||
+                            "";
+                          const ageVal =
+                            pax.guestType === "Child"
+                              ? (pax.age !== "" && pax.age !== undefined && pax.age !== null ? Number(pax.age) : 0)
+                              : (passegersData[`adultage_${roomIdx}_${paxIdx}`] !== undefined && passegersData[`adultage_${roomIdx}_${paxIdx}`] !== null
+                                  ? passegersData[`adultage_${roomIdx}_${paxIdx}`]
+                                  : pax.age);
+                          return {
+                            ...pax,
+                            title: titleVal,
+                            firstName: firstVal,
+                            lastName: lastVal,
+                            age: ageVal,
+                            leadGuest: paxIdx === 0,
+                          };
+                        }),
+                      })),
                       agentTax: agentTax,
 
                       insuranceRequired:
                         passegersData?.insuranceRequired === 1 ? 1 : 0,
                       insuranceData: selectedInsuranceData,
                     };
-                    { console.log(roomGuestInfo, "guest") }
 
                     setHotelCheckOutData(data);
 
@@ -819,18 +944,56 @@ const HotelCheckout = ({ location }) => {
                                   <Form.Item
                                     name={`childAge_${roomIndex}_${paxIndex}`}
                                     label="Child Age"
-                                    initialValue={pax.age ?? ""}
+                                    initialValue={
+                                      pax.displayAge ||
+                                      (pax.age !== "" && pax.age !== undefined && pax.age !== null
+                                        ? Number(pax.age) === 0
+                                          ? "0 yrs (< 1 yr)"
+                                          : `${pax.age} ${Number(pax.age) === 1 ? "yr" : "yrs"}`
+                                        : undefined)
+                                    }
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "Required",
+                                      },
+                                    ]}
                                   >
-
-                                    <Input
-
-                                      className="inputbg"
-                                      size="large"
-
-                                      readOnly
-                                    />
-
-
+                                    {pax.age !== "" && pax.age !== undefined && pax.age !== null ? (
+                                      <Input
+                                        className="inputbg"
+                                        size="large"
+                                        readOnly
+                                        disabled
+                                        style={{
+                                          backgroundColor: "#f1f5f9",
+                                          color: "#00164d",
+                                          fontWeight: "700",
+                                          cursor: "not-allowed",
+                                          border: "1px solid #cbd5e1",
+                                        }}
+                                      />
+                                    ) : (
+                                      <Select
+                                        placeholder="Select Age"
+                                        size="large"
+                                        onChange={(val) => {
+                                          handlePaxField(
+                                            val,
+                                            roomIndex,
+                                            paxIndex,
+                                            "age"
+                                          );
+                                        }}
+                                      >
+                                        <Option value={0}>0 yrs (&lt; 1 yr)</Option>
+                                        {[...Array(12)].map((_, i) => (
+                                          <Option key={i + 1} value={i + 1}>
+                                            {i + 1} {i + 1 === 1 ? "yr" : "yrs"}
+                                          </Option>
+                                        ))}
+                                      </Select>
+                                    )}
                                   </Form.Item>
                                 </Col>
                               ) : (

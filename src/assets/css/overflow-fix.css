@@ -21,6 +21,11 @@ body {
     overflow-x: hidden !important;
 }
 
+.page-wrapper .page-header,
+.page-header {
+    z-index: 1001 !important;
+}
+
 .page-wrapper {
     width: 100%;
     max-width: 100%;

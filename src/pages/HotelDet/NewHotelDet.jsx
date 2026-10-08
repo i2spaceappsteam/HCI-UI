@@ -75,7 +75,7 @@ const HotelDet = () => {
     const fetchHotelDetails = () => {
         const p = queryString.parse(window.location.search);
         const paramsObj = {
-            traceId: p.traceId || "string",
+            traceId: p.traceId || "",
             hotelCode: p.hotelId || p.hotelCode || "",
             checkInDate: p.checkInDate || "",
             checkOutDate: p.checkOutDate || "",
@@ -91,7 +91,7 @@ const HotelDet = () => {
 
     const fetchStaticHotelDetails = (params) => {
         const staticReqObj = {
-            traceId: params.traceId || "string",
+            traceId: params.traceId || "",
             cityId: params.hotelCityCode || "",
             countryCode: params.nationality || "IN",
             hotelId: params.hotelCode || "",
@@ -185,7 +185,7 @@ const HotelDet = () => {
         }
 
         const reqObj = {
-            traceId: params.traceId || "string",
+            traceId: params.traceId || "",
             hotelCode: params.hotelCode,
             checkInDate: params.checkInDate,
             checkOutDate: params.checkOutDate,
@@ -320,6 +320,19 @@ const HotelDet = () => {
                 hotelDetailsRespObj?.hotelAddress ||
                 "";
 
+            let roomGuestsParam = hotelDetSearchParams?.roomGuests || "";
+            if (!roomGuestsParam) {
+                try {
+                    const savedSearch = localStorage.getItem("HotelSearchBar");
+                    if (savedSearch) {
+                        const parsedSaved = JSON.parse(savedSearch);
+                        if (parsedSaved?.roomGuests) {
+                            roomGuestsParam = typeof parsedSaved.roomGuests === "string" ? parsedSaved.roomGuests : JSON.stringify(parsedSaved.roomGuests);
+                        }
+                    }
+                } catch { }
+            }
+
             // Persist hotel and room images and info in Redux store
             const selectedHotelInfoToStore = {
                 ...hotelDetailsRespObj,
@@ -331,6 +344,7 @@ const HotelDet = () => {
                 images: hotelDetailsRespObj?.images || [],
                 selectedRooms: roomsList,
                 roomImages: roomsList[0]?.roomImages || hotelDetailsRespObj?.images || [],
+                roomGuests: roomGuestsParam,
             };
 
             dispatch(setSelectedHotelInfo(selectedHotelInfoToStore));
@@ -343,7 +357,7 @@ const HotelDet = () => {
                 ratePlans: JSON.stringify(ratePlans),
                 checkInDate: hotelDetSearchParams?.checkInDate || hotelDetSearchParams?.checkIn || "",
                 checkOutDate: hotelDetSearchParams?.checkOutDate || hotelDetSearchParams?.checkOut || "",
-                roomGuests: hotelDetSearchParams?.roomGuests || "",
+                roomGuests: roomGuestsParam,
                 nationality: hotelDetSearchParams?.nationality || "IN",
                 currency: "INR",
             };
@@ -856,7 +870,7 @@ const HotelDet = () => {
                                             {hotelRoom?.roomImageList?.length > 0 && (
                                                 <div className="room-slider-wrapper">
                                                     <Slider {...roomSliderSettings}>
-                                                        {hotelRoom.roomImageList.map((img, imgIdx) => (
+                                                        {hotelRoom.roomImageList.slice(0, 4).map((img, imgIdx) => (
                                                             <div key={imgIdx} className="room-slide-item">
                                                                 <img
                                                                     src={img}

@@ -109,9 +109,10 @@ const HotelsList = ({
         urlParams?.hotelCityCode ||
         urlParams?.cityId ||
         "",
-      roomGuests: searchHotelReq?.roomGuests
-        ? JSON.stringify(searchHotelReq.roomGuests)
-        : urlParams?.roomGuests || "",
+      roomGuests:
+        typeof searchHotelReq?.roomGuests === "object"
+          ? JSON.stringify(searchHotelReq.roomGuests)
+          : (searchHotelReq?.roomGuests || (typeof urlParams?.roomGuests === "object" ? JSON.stringify(urlParams.roomGuests) : urlParams?.roomGuests) || ""),
       nationality:
         searchHotelReq?.nationality || urlParams?.nationality || "IN",
       supplierParamter: hotelObj?.supplierParamter || "",
@@ -131,7 +132,7 @@ const HotelsList = ({
         <div className="hotel-media-col">
           <Link className="media-link-wrapper">
             <Carousel autoplay autoplaySpeed={4000} dots={{ className: "carousel-custom-dots" }} effect="fade">
-              {hotelImages.map((img, i) => (
+              {hotelImages.slice(0, 4).map((img, i) => (
                 <div key={i} className="carousel-slide-item">
                   <img
                     src={img}

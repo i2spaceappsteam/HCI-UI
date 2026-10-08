@@ -44,6 +44,29 @@ const { useBreakpoint } = Grid;
 const { Panel } = Collapse;
 
 const dateFormat = "DD-MM-YYYY";
+
+const HotelCardSkeleton = () => (
+  <div className="modern-hotel-card-item" style={{ marginBottom: "16px", backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #e0e0e0", overflow: "hidden" }}>
+    <div className="hotel-card-container" style={{ display: "flex", width: "100%", height: "240px" }}>
+      <div className="hotel-media-col" style={{ width: "280px", minWidth: "280px", height: "100%", padding: 0 }}>
+        <Skeleton.Image active style={{ width: '100%', height: '100%', borderRadius: "12px 0 0 12px" }} />
+      </div>
+      <div className="hotel-info-col" style={{ flex: 1, padding: "20px" }}>
+        <Skeleton active paragraph={{ rows: 3, width: ["80%", "60%", "40%"] }} title={{ width: "70%" }} />
+        <div style={{ marginTop: "16px", display: "flex", gap: "10px" }}>
+          <Skeleton.Button active size="small" shape="round" style={{ width: "100px" }} />
+          <Skeleton.Button active size="small" shape="round" style={{ width: "80px" }} />
+        </div>
+      </div>
+      <div className="hotel-pricing-col" style={{ width: "240px", minWidth: "240px", padding: "20px", borderLeft: "1px solid #f0f0f0", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <div>
+          <Skeleton active paragraph={{ rows: 2, width: ["60%", "100%"] }} title={false} />
+        </div>
+        <Skeleton.Button active size="large" block style={{ borderRadius: "8px" }} />
+      </div>
+    </div>
+  </div>
+);
 const oriDateFormat = "YYYY-MM-DD";
 
 const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
@@ -69,7 +92,7 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
     if (hotelSearchParams) {
       let hotelCityCode = queryString.parse(hotelSearchParams.hotelCityCode);
       let staticObj = {
-        traceId: "string",
+        traceId: "",
         cityId: hotelCityCode.cityId,
         userId: user?.UserID ?? 1,
         roleType: user?.Role?.Role ?? 3,
@@ -138,7 +161,7 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
       if (hotelSearchParams) {
         let hotelCityCode = queryString.parse(hotelSearchParams.hotelCityCode);
         let staticObj = {
-          traceId: "string",
+          traceId: "",
           cityId: hotelCityCode.cityId,
           userId: user?.UserID ?? 1,
           roleType: user?.Role?.RoleId ?? 4,
@@ -148,7 +171,7 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
       }
     } else if (Object.keys(hotelParam).length > 0) {
       let staticObj = {
-        traceId: "string",
+        traceId: "",
         cityId: hotelParam.hotelCityCode,
       };
       getStaticData(staticObj);
@@ -527,7 +550,7 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
                   <Panel
                     showArrow={false}
                     header={
-                      <span className="hotels-hide-search">Modify Search</span>
+                      <span className="hotels-modify-search-text">Modify Search</span>
                     }
                     key="1"
                   >
@@ -560,12 +583,8 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
                       <FilterSkeletonLayout />
                     </Col>
                     <Col md={18} xs={24} className="result-body-skeleton">
-                      <Card className="card-skeleton">
-                        <Skeleton active={true} paragraph={{ rows: 0 }} />
-                      </Card>
-                      <PageLoader />
-                      {[...Array(6)].map((i) => (
-                        <SkeletonLayout key={i} />
+                      {[...Array(6)].map((_, i) => (
+                        <HotelCardSkeleton key={i} />
                       ))}
                     </Col>
                   </Row>
@@ -594,15 +613,18 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
                   <div className="hotels-box">
                     <div  >
                       {isHotelSearchLoad ? (
-                        <Card className="card-skeleton">
-                          <Skeleton active={true} paragraph={{ rows: 0 }} />
-                        </Card>
+                        <>
+                          <HotelCardSkeleton />
+                          <HotelCardSkeleton />
+                          <HotelCardSkeleton />
+                        </>
                       ) : (
                         <><Suspense fallback={
-                          <Card className="card-skeleton">
-                            <Skeleton active={true} paragraph={{ rows: 0 }} />
-
-                          </Card>
+                          <>
+                            <HotelCardSkeleton />
+                            <HotelCardSkeleton />
+                            <HotelCardSkeleton />
+                          </>
                         }>
 
                           {/* <HotelSort
@@ -613,10 +635,10 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
                             setShortedHotelModalVisible={setShortedHotelModalVisible}
                             shortedHotelCount={shortedHotelCount}
                           /> */}
-                          {resultLoading ? <><Card className="card-skeleton">
-                            <Skeleton active={true} paragraph={{ rows: 0 }} />
-
-                          </Card>
+                          {resultLoading ? <>
+                            <HotelCardSkeleton />
+                            <HotelCardSkeleton />
+                            <HotelCardSkeleton />
                             <CustomProgressBar
                               showInfo={false}
                               status="active"

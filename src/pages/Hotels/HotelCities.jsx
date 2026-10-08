@@ -81,7 +81,7 @@ const TripPlanner = () => {
             nationality: "IN",
             currency: "INR",
             countryCode: "IN",
-            traceId: "string",
+            traceId: "",
         };
         const query = queryString.stringify(formData);
         return "/hotels/listing?" + query;

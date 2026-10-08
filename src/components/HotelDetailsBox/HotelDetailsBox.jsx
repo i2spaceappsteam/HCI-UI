@@ -117,22 +117,30 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
   // Inclusions
   const inclusions = hotelDetailsObj?.combineRoom?.[0]?.inclusions || roomData?.inclusions || [];
 
-  // Cancellation policies
-  const cancellationPolicies =
-    hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0]?.cancellationPolicy ||
-    roomData?.cancellationPolicy ||
-    [];
+  // Cancellation policies from all possible API locations
+  const cancellationPolicies = useMemo(() => {
+    const list =
+      hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0]?.cancellationPolicy ||
+      hotelDetailsObj?.combineRoom?.[0]?.cancellationPolicy ||
+      hotelDetailsObj?.rooms?.[0]?.ratePlans?.[0]?.cancellationPolicy ||
+      hotelDetailsObj?.rooms?.[0]?.cancellationPolicy ||
+      hotelDetailsObj?.cancellationPolicy ||
+      roomData?.cancellationPolicy ||
+      [];
+    return Array.isArray(list) ? list : (list ? [list] : []);
+  }, [hotelDetailsObj, roomData]);
 
   const formatCancellationPenalty = (rule) => {
     if (!rule) return "0";
-    if (rule.policies && typeof rule.policies === "string") return rule.policies;
-
     const penalty = rule.penaltyAmount ?? rule.amount ?? rule.penalty ?? 0;
     const penaltyStr = String(penalty).trim();
     const penaltyNum = Number(penaltyStr.replace(/[^0-9.-]/g, ""));
     const chargeType = String(rule.chargeType || "").trim().toLowerCase();
 
-    // 1. Check percentage
+    if (penaltyNum === 0 || penaltyStr === "0") {
+      return "Free (₹0)";
+    }
+
     if (
       chargeType.includes("percent") ||
       chargeType.includes("pct") ||
@@ -144,42 +152,89 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
       return `${penaltyStr.replace("%", "")}%`;
     }
 
-    // 2. Check nights
-    if (
-      chargeType.includes("night") ||
-      rule.chargeType === 3 ||
-      rule.chargeType === "3"
-    ) {
+    if (chargeType.includes("night") || rule.chargeType === 3 || rule.chargeType === "3") {
       return `${penaltyNum} Night${penaltyNum > 1 ? "s" : ""}`;
-    }
-
-    // 3. Check fixed amount / currency
-    if (
-      chargeType.includes("amount") ||
-      chargeType.includes("fixed") ||
-      chargeType.includes("inr") ||
-      chargeType.includes("rs") ||
-      rule.chargeType === 2 ||
-      rule.chargeType === "2"
-    ) {
-      return `₹${penaltyNum.toLocaleString("en-IN")}`;
-    }
-
-    // 4. Heuristic fallback: if penalty <= 100 without explicit currency
-    if (penaltyNum > 0 && penaltyNum <= 100 && !rule.currency && !rule.currencyCode) {
-      return `${penaltyNum}%`;
     }
 
     return `₹${penaltyNum.toLocaleString("en-IN")}`;
   };
 
+  const renderCancellationText = (cancel) => {
+    if (!cancel) return null;
+
+    // Check if policies is a full descriptive string
+    const rawPolicies = Array.isArray(cancel.policies)
+      ? cancel.policies.join(" ")
+      : typeof cancel.policies === "string"
+      ? cancel.policies
+      : "";
+
+    const isGenericWord =
+      !rawPolicies ||
+      ["fixed", "percentage", "percent", "amount", "night", "nights"].includes(rawPolicies.trim().toLowerCase());
+
+    if (!isGenericWord && rawPolicies.length > 15) {
+      return rawPolicies;
+    }
+
+    const parseDateStr = (d) => {
+      if (!d) return "";
+      const m = moment(d, ["DD-MM-YYYY HH:mm:ss", "DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ss", "YYYY-MM-DD"]);
+      return m.isValid() ? m.format("DD MMM, YYYY") : String(d).split(" ")[0];
+    };
+
+    const fromDateStr = parseDateStr(cancel.fromDate);
+    const toDateStr = parseDateStr(cancel.toDate);
+    const penalty = cancel.penaltyAmount ?? cancel.amount ?? cancel.penalty ?? 0;
+    const penaltyNum = Number(String(penalty).replace(/[^0-9.-]/g, ""));
+    const penaltyDisplay = formatCancellationPenalty(cancel);
+
+    if (penaltyNum === 0 || String(penalty) === "0") {
+      if (fromDateStr && toDateStr) {
+        return (
+          <span>
+            From <strong>{fromDateStr}</strong> to <strong>{toDateStr}</strong>: <strong style={{ color: "#16a34a" }}>Free Cancellation (₹0 charge)</strong>
+          </span>
+        );
+      }
+      if (fromDateStr) {
+        return (
+          <span>
+            Cancellation before <strong>{fromDateStr}</strong>: <strong style={{ color: "#16a34a" }}>Free Cancellation (₹0 charge)</strong>
+          </span>
+        );
+      }
+      return <strong style={{ color: "#16a34a" }}>Free Cancellation</strong>;
+    }
+
+    if (fromDateStr && toDateStr) {
+      return (
+        <span>
+          Cancellation between <strong>{fromDateStr}</strong> and <strong>{toDateStr}</strong>:{" "}
+          <strong style={{ color: "#dc2626" }}>{penaltyDisplay} cancellation fee</strong>
+        </span>
+      );
+    }
+
+    if (fromDateStr) {
+      return (
+        <span>
+          Cancellation on or after <strong>{fromDateStr}</strong>:{" "}
+          <strong style={{ color: "#dc2626" }}>{penaltyDisplay} cancellation fee</strong>
+        </span>
+      );
+    }
+
+    return <span>Cancellation fee: <strong style={{ color: "#dc2626" }}>{penaltyDisplay}</strong></span>;
+  };
+
   const isRefundable =
     roomData?.refundable ??
-    (cancellationPolicies.length > 0 && !cancellationPolicies.some(p => {
-      const pNum = Number(p.penaltyAmount || 0);
-      const ct = String(p.chargeType || "").toLowerCase();
-      return (pNum === 100 && (ct.includes("percent") || ct === "" || ct === "%"));
-    }));
+    (cancellationPolicies.length > 0 &&
+      cancellationPolicies.some(p => {
+        const pNum = Number(p.penaltyAmount || 0);
+        return pNum === 0 || String(p.penaltyAmount) === "0";
+      }));
 
   return (
     <div className="modern-hotel-details-box">
@@ -351,17 +406,7 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
             <div className="policy-text-list">
               {cancellationPolicies.map((cancel, index) => (
                 <p key={index} className="policy-rule-desc">
-                  {cancel?.policies ? (
-                    cancel.policies
-                  ) : (
-                    <span>
-                      Cancellation between <strong>{cancel?.fromDate?.split(" ")[0]}</strong> and{" "}
-                      <strong>{cancel?.toDate?.split(" ")[0]}</strong> will incur a charge of{" "}
-                      <strong style={{ color: "#b91c1c" }}>
-                        {formatCancellationPenalty(cancel)}
-                      </strong>.
-                    </span>
-                  )}
+                  {renderCancellationText(cancel)}
                 </p>
               ))}
             </div>

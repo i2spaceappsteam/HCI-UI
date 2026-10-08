@@ -484,7 +484,12 @@ return (
                     isEditable={false}
                   />
                 </div>
-                <HotelBookPayCard
+                {(() => {
+                  const roomsList = hotelCheckOutData?.hotelPriceData?.hotels?.rooms || hotelCheckOutData?.hotelPriceData?.rooms || [];
+                  const isHoldAllowed = roomsList.some(r => r.ratePlans?.some(rp => rp.isHold)) || false;
+                  return (
+                    <HotelBookPayCard
+                      isHoldAllowed={isHoldAllowed}
                   isLoading={false}
                   pgIsLoading={pgIsLoading.direct}
                   holdLoading={pgIsLoading.hold}
@@ -499,6 +504,8 @@ return (
                   loadingSpin={loadingSpin}
                   loadSpin={loadSpin}
                 />
+                  );
+                })()}
 
               </Col>
             </Row>
