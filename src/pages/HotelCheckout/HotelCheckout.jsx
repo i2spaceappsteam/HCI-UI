@@ -634,8 +634,8 @@ const HotelCheckout = ({ location }) => {
                             pax.guestType === "Child"
                               ? (pax.age !== "" && pax.age !== undefined && pax.age !== null ? Number(pax.age) : 0)
                               : (passegersData[`adultage_${roomIdx}_${paxIdx}`] !== undefined && passegersData[`adultage_${roomIdx}_${paxIdx}`] !== null
-                                  ? passegersData[`adultage_${roomIdx}_${paxIdx}`]
-                                  : pax.age);
+                                ? passegersData[`adultage_${roomIdx}_${paxIdx}`]
+                                : pax.age);
                           return {
                             ...pax,
                             title: titleVal,
@@ -1235,73 +1235,73 @@ const HotelCheckout = ({ location }) => {
                           <Col md={8} sm={12} xs={24}>
                             <Form.Item
                               label="Phone number"
-                              name="phoneNo"
                               className="phno"
-                              rules={[
-                                {
-                                  required: true,
-                                  message: "Required",
-                                },
-
-
-                                {
-                                  minLength: 10,
-                                  maxLength: 10,
-                                  pattern: "^[0-9]{10}$",
-                                  message: "Must be 10 digits",
-                                },
-
-                              ]}
+                              style={{ marginBottom: 0 }}
                             >
-                              <Input
-                                placeholder="Enter Mobile Number"
-                                size="large"
-                                ref={mobileRef}
-                                addonBefore={
-                                  <Form.Item
-                                    style={{ width: "35%" }}
-                                    name="areaCode"
-                                    className="phno"
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message:
-                                          "Phone Number Code Required",
-                                      },
-                                    ]}
-                                    noStyle
+                              <div style={{ display: 'flex', width: '100%' }}>
+                                <Form.Item
+                                  name="areaCode"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Code Required",
+                                    },
+                                  ]}
+                                  style={{ marginBottom: 0, width: '35%' }}
+                                >
+                                  <Select
+                                    showSearch
+                                    placeholder="Code"
+                                    size="large"
+                                    style={{ width: "100%" }}
+                                    onChange={handleAreaCodeChange}
+                                    ref={areaCodeRef}
+                                    focusRef={mobile}
+                                    filterOption={(input, option) =>
+                                      String(option.children)
+                                        .toLowerCase()
+                                        .indexOf(input.toLowerCase()) >= 0
+                                    }
                                   >
-                                    <Select
-                                      showSearch
-                                      placeholder="Select "
-                                      style={{ width: "100%" }}
-                                      onChange={handleAreaCodeChange}
-                                      ref={areaCodeRef}
-
-                                      focusRef={mobile}
-                                      filterOption={(input, option) =>
-                                        option.children
-                                          .toLowerCase()
-                                          .indexOf(input.toLowerCase()) >= 0
+                                    {CountryList.map((item, index) => (
+                                      <Option
+                                        key={`${item.code}-${index}`}
+                                        value={item.dial_code}
+                                      >
+                                        {/* {item.code}  */}
+                                        {item.dial_code}
+                                      </Option>
+                                    ))}
+                                  </Select>
+                                </Form.Item>
+                                <Form.Item
+                                  name="phoneNo"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Required",
+                                    },
+                                    {
+                                      minLength: 10,
+                                      maxLength: 10,
+                                      pattern: "^[0-9]{10}$",
+                                      message: "Must be 10 digits",
+                                    },
+                                  ]}
+                                  style={{ marginBottom: 0, width: '65%' }}
+                                >
+                                  <Input
+                                    placeholder="Enter Mobile Number"
+                                    size="large"
+                                    ref={mobileRef}
+                                    onKeyPress={(event) => {
+                                      if (!/[0-9]/.test(event.key)) {
+                                        event.preventDefault();
                                       }
-                                    >
-                                      {CountryList.map((item) => (
-                                        <Option
-                                          key={item.dial_code}
-                                          value={item.dial_code}
-                                        >
-                                          {item.dial_code}
-                                        </Option>
-                                      ))}
-                                    </Select>
-                                  </Form.Item>
-                                }
-                                onKeyPress={(event) => {
-                                  if (!/[0-9]/.test(event.key)) {
-                                    event.preventDefault();
-                                  }
-                                }}
-                              />
+                                    }}
+                                  />
+                                </Form.Item>
+                              </div>
                             </Form.Item>
                           </Col>
 

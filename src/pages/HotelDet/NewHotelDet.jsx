@@ -861,7 +861,7 @@ const HotelDet = () => {
                                                         <UserOutlined /> Max Adults: {hotelRoom?.maxAdult || hotelRoom?.adultCount || hotelRoom?.maxOccupancy || totalAdults}
                                                     </span>
                                                     <span className="occ-badge">
-                                                        Children: {hotelRoom?.minChildren ?? hotelRoom?.childCount ?? totalChilds}
+                                                        Children: {Number(hotelRoom?.minChildren) || Number(hotelRoom?.childCount) || totalChilds}
                                                     </span>
                                                 </div>
                                             </div>

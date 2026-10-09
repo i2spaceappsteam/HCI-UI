@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Row, Col, Tag, Badge, Tooltip } from "antd";
+import { Row, Col, Tag, Badge, Tooltip, Modal, Button } from "antd";
 import moment from "moment";
 import queryString from "query-string";
 import { useNavigate } from "react-router";
@@ -23,6 +23,7 @@ const ImBaseUrl = import.meta.env.VITE_Image_URL;
 const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
   const history = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null);
+  const [showPolicyModal, setShowPolicyModal] = useState(false);
   const selectedHotelInfo = useSelector((state) => state.hotel.selectedHotelInfo);
 
   // Collect all available images from Redux store & props (hotel photos + room photos)
@@ -331,6 +332,16 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
                   <CoffeeOutlined /> {mealPlan}
                 </span>
               )}
+              {hotelDetailsObj?.hotelPolicy && hotelDetailsObj.hotelPolicy.length > 0 && (
+                <Button 
+                  type="link" 
+                  size="small"
+                  onClick={() => setShowPolicyModal(true)} 
+                  style={{ marginLeft: '10px', padding: 0 }}
+                >
+                  View Hotel Policy
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -413,6 +424,25 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
           </div>
         )}
       </div>
+      {/* Hotel Policy Modal */}
+      {hotelDetailsObj?.hotelPolicy && (
+        <Modal
+          title="Hotel Policy"
+          open={showPolicyModal}
+          onCancel={() => setShowPolicyModal(false)}
+          footer={null}
+          width={700}
+        >
+          <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {hotelDetailsObj.hotelPolicy.map((policy, idx) => (
+              <li key={idx}>
+                {/* Sometimes policies contain HTML entities, so we use dangerouslySetInnerHTML if needed, but for safety we can just render it as text, or if it contains HTML we can use a basic parser. Let's try parsing basic HTML if any. */}
+                <span dangerouslySetInnerHTML={{ __html: policy }} />
+              </li>
+            ))}
+          </ul>
+        </Modal>
+      )}
     </div>
   );
 };

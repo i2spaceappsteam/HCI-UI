@@ -233,7 +233,7 @@ const HotelPreview = () => {
         zipCode: hotelCheckOutData?.addressInfo?.zipCode || ""
       },
       paymentModeType: "deposit",
-      purchaseType: hotelCheckOutData?.hotelPriceData?.purchaseType || "instant"
+      purchaseType: blockType === 2 ? "Block" : (hotelCheckOutData?.hotelPriceData?.purchaseType || "instant")
     };
 
     let paymentPaxInfo = {
@@ -468,6 +468,22 @@ return (
 
                 <Card bordered={false} className="hotel-card-wrapper" style={{ padding: 10 }}>
                   <HotelPassengers passengersInfo={hotelCheckOutData.guests} />
+                </Card>
+
+                <div className="contact-header">
+                  <div className="contact-title">
+                    <p className="booking-summary-div" style={{ marginTop: 10 }}>Contact Details</p>
+                  </div>
+                </div>
+                <Card bordered={false} className="hotel-card-wrapper" style={{ padding: 10 }}>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <p style={{ margin: "5px 0" }}><strong>Email:</strong> {hotelCheckOutData?.addressInfo?.email}</p>
+                    </Col>
+                    <Col span={12}>
+                      <p style={{ margin: "5px 0" }}><strong>Phone No:</strong> {hotelCheckOutData?.addressInfo?.areaCode} {hotelCheckOutData?.addressInfo?.phoneNo}</p>
+                    </Col>
+                  </Row>
                 </Card>
               </Col>
               <Col md={8} sm={24} xs={24}>

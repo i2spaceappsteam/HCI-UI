@@ -241,6 +241,46 @@ const TicketSidebar = ({
     window.print();
   };
 
+  const confirmHoldTicket = () => {
+    let data = {
+      referenceNumber: ticketData?.booking?.referenceNumber || ticketData?.RefNumber || ticketData?.ConfirmationNumber || "",
+      paymentModeType: "deposit",
+      creditCardInfo: {
+        securityId: "",
+        cardNumber: "",
+        expirationMonth: "",
+        expirationYear: "",
+        firstName: "",
+        lastName: "",
+        billingAmount: "",
+        billingCurrency: "",
+        cardHolderAddress: {
+          addressLine1: "",
+          addressLine2: "",
+          city: "",
+          zipcode: "",
+          countryCode: ""
+        }
+      }
+    }
+
+
+    ApiClient.post("Hotel/ConfirmHoldTicket", data)
+      .then((res) => {
+        const dataObj = res.data || res;
+        if (dataObj && dataObj.errors && dataObj.errors.length > 0) {
+          message.error(dataObj.errors[0]?.message || "Failed to confirm hold ticket.");
+        } else {
+          message.success("Hold ticket confirmed successfully.");
+          getTicketDetails();
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        message.error("An error occurred while confirming the ticket.");
+      });
+  };
+
 
   return (
     <div className="actionable-buttons sidebar-card">
@@ -331,6 +371,12 @@ const TicketSidebar = ({
         {type === "Hotel" && ticketData?.BookingStatus !== "CANCELLED" && ticketData?.BookingStatus !== 4 ? (
           <button className="sidebar-btn sidebar-btn-danger" onClick={() => handleCancel("Hotel")}>
             <FileExcelOutlined /> Cancel Voucher
+          </button>
+        ) : null}
+
+        {type === "Hotel" && (ticketData?.BookingStatus === "Hold" || ticketData?.BookingStatus === 6 || String(ticketData?.BookingStatus).toLowerCase() === "hold") ? (
+          <button className="sidebar-btn sidebar-btn-primary" onClick={confirmHoldTicket} style={{ background: "#28a745", color: "#fff", borderColor: "#28a745", marginBottom: "10px" }}>
+            <DollarOutlined /> Hold Confirm
           </button>
         ) : null}
 

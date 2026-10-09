@@ -236,9 +236,15 @@ const NewHotelsList = ({
 
           {/* Perks & Cancellation Highlights */}
           <div className="hotel-perks-row">
-            <span className="perk-highlight green">
-              <CheckOutlined /> Free Cancellation Available
-            </span>
+            {hotelCardProps?.isRefundable ? (
+              <span className="perk-highlight green">
+                <CheckOutlined /> Free Cancellation Available
+              </span>
+            ) : (
+              <span className="perk-highlight red" style={{ color: '#d93025', backgroundColor: '#fce8e6', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                Non-Refundable
+              </span>
+            )}
             <span className="perk-highlight blue">
               <CheckOutlined /> Instant Confirmation
             </span>
