@@ -287,7 +287,7 @@ const HotelTicketScreen = ({ mode }) => {
       traceId: ticketData.booking?.tokenId || ticketData.traceId || "",
       supplierParameter: ticketData.booking?.supplierParameter || ticketData.supplierParameter || "",
       confirmationNo: ticketData.booking?.pnr || ticketData.SupplierConfirmationNo || "",
-      RefNumber: refNum,
+      ReferenceNumber: refNum,
     };
 
     Apiclient1.post("Hotel/HotelCancel", data)
