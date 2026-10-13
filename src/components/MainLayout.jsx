@@ -117,7 +117,7 @@ const MainLayout = ({ children }) => {
     return (
         <div className={`page-wrapper compact-wrapper modern-type ${collapsed ? 'sidebar-close' : ''}`} id="pageWrapper">
             <ChangePassword isOpen={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
-            <div className="page-header">
+            <div className="page-header no-print">
                 <div className="header-wrapper row m-0">
 
                     <div className="header-logo-wrapper col-auto p-0">
@@ -207,7 +207,7 @@ const MainLayout = ({ children }) => {
                 </div>
             </div>
             <div className="page-body-wrapper" >
-                <div className={`sidebar-wrapper ${collapsed ? 'close_icon' : ''}`}>
+                <div className={`sidebar-wrapper ${collapsed ? 'close_icon' : ''} no-print`}>
                     <div>
                         <div className="logo-wrapper">
                             <Link to="/">
@@ -274,7 +274,7 @@ const MainLayout = ({ children }) => {
                     </div>
 
 
-                    <footer className="footer">
+                    <footer className="footer no-print">
 
                         <div className="row">
                             <div className="col-md-12 footer-copyright text-center">

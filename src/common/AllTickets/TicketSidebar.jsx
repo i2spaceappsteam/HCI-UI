@@ -19,7 +19,7 @@ import {
   Row,
   Collapse,
 } from "antd";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink, pdf } from "@react-pdf/renderer";
 import { useSelector } from "react-redux";
 import { selectIsAgent } from "../../store/slices/authSlice";
 import { getPassengerData } from "../../Helpers/PassegerData";
@@ -241,6 +241,83 @@ const TicketSidebar = ({
   const handleReshedule = (ticketType) => {
     onResheduleTicket(ticketType);
   };
+  const [downloadingVoucher, setDownloadingVoucher] = useState(false);
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+
+  const handleDownloadVoucher = async () => {
+    if (downloadingVoucher) return;
+    setDownloadingVoucher(true);
+    const hideMsg = message.loading("Generating E-Voucher PDF...", 0);
+    try {
+      const doc = (
+        <HotelDoc
+          ticketData={ticketData}
+          cmsFareRules={cmsFareRules}
+          withFare={true}
+        />
+      );
+      const asPdf = pdf(doc);
+      const blob = await asPdf.toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const refName =
+        ticketData?.RefNumber ||
+        ticketData?.ConfirmationNumber ||
+        ticketData?.booking?.referenceNumber ||
+        "Voucher";
+      link.download = `Hotel_Voucher_${refName}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      hideMsg();
+      message.success("E-Voucher downloaded successfully!");
+    } catch (err) {
+      hideMsg();
+      console.error("Error generating hotel voucher PDF:", err);
+      message.error("Failed to generate PDF. You can also use 'Print E-Voucher' and Save as PDF.");
+    } finally {
+      setDownloadingVoucher(false);
+    }
+  };
+
+  const handleDownloadInvoice = async () => {
+    if (downloadingInvoice) return;
+    setDownloadingInvoice(true);
+    const hideMsg = message.loading("Generating Invoice PDF...", 0);
+    try {
+      const doc = (
+        <HotelNewInvoiceDoc
+          invoiceData={invoiceData}
+          type={"invoice"}
+        />
+      );
+      const asPdf = pdf(doc);
+      const blob = await asPdf.toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const refName =
+        invoiceData?.RefNumber ||
+        invoiceData?.booking?.referenceNumber ||
+        "Invoice";
+      link.download = `Hotel_Invoice_${refName}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      hideMsg();
+      message.success("Invoice downloaded successfully!");
+    } catch (err) {
+      hideMsg();
+      console.error("Error generating invoice PDF:", err);
+      message.error("Failed to generate Invoice PDF.");
+    } finally {
+      setDownloadingInvoice(false);
+    }
+  };
+
   const printTicket = () => {
     window.print();
   };
@@ -297,57 +374,42 @@ const TicketSidebar = ({
 
       <div className="sidebar-actions-list">
         {type === "Hotel" ? (
-          <PDFDownloadLink
-            document={
-              <HotelDoc
-                ticketData={ticketData}
-                cmsFareRules={cmsFareRules}
-                withFare={true}
-              />
-            }
-            fileName="hotelVoucher.pdf"
-            style={{ textDecoration: "none", display: "block" }}
+          <button
+            className="sidebar-btn sidebar-btn-primary"
+            onClick={handleDownloadVoucher}
+            disabled={downloadingVoucher}
           >
-            {({ blob, url, loading, error }) =>
-              loading ? (
-                <button className="sidebar-btn sidebar-btn-primary" disabled>
-                  <DownloadOutlined /> Preparing Voucher...
-                </button>
-              ) : (
-                <button className="sidebar-btn sidebar-btn-primary">
-                  <DownloadOutlined /> Download E-Voucher
-                </button>
-              )
-            }
-          </PDFDownloadLink>
+            {downloadingVoucher ? (
+              <>
+                <LoadingOutlined spin /> Downloading...
+              </>
+            ) : (
+              <>
+                <DownloadOutlined /> Download E-Voucher
+              </>
+            )}
+          </button>
         ) : null}
 
         {invoiceData.BookingStatus !== 6 && type === "Hotel" && (
           (invoiceData.BookingStatus === 2 && agent) ||
           ((user !== null) && (invoiceData.BookingStatus === 2 && user?.UserID === 1))
         ) ? (
-          <PDFDownloadLink
-            document={
-              <HotelNewInvoiceDoc
-                invoiceData={invoiceData}
-                type={"invoice"}
-              />
-            }
-            fileName="Hotel_Invoice.pdf"
-            style={{ textDecoration: "none", display: "block" }}
+          <button
+            className="sidebar-btn sidebar-btn-invoice"
+            onClick={handleDownloadInvoice}
+            disabled={downloadingInvoice}
           >
-            {({ blob, url, loading, error }) =>
-              loading ? (
-                <button className="sidebar-btn sidebar-btn-invoice" disabled>
-                  <FileExcelOutlined /> Loading Invoice...
-                </button>
-              ) : (
-                <button className="sidebar-btn sidebar-btn-invoice">
-                  <FileExcelOutlined /> Download Invoice
-                </button>
-              )
-            }
-          </PDFDownloadLink>
+            {downloadingInvoice ? (
+              <>
+                <LoadingOutlined spin /> Downloading...
+              </>
+            ) : (
+              <>
+                <FileExcelOutlined /> Download Invoice
+              </>
+            )}
+          </button>
         ) : null}
 
         <button className="sidebar-btn sidebar-btn-secondary" onClick={() => printTicket()}>

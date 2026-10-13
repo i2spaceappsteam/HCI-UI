@@ -1195,8 +1195,118 @@
 }
 
 @media print {
-  .actionable-buttons {
+  @page {
+    size: auto;
+    margin: 8mm 10mm;
+  }
+
+  // Hide the navigation header, search bar, top controls, left sidebar, and footer
+  .page-header,
+  .header-wrapper,
+  .header-logo-wrapper,
+  .nav-right,
+  .sidebar-wrapper,
+  .sidebar-main,
+  #sidebar-menu,
+  .footer,
+  footer,
+  .no-print,
+  .ant-modal-root,
+  .ant-modal-mask,
+  .ant-modal-wrap,
+  .toggle-sidebar,
+  .back-btn,
+  .left-arrow,
+  .right-arrow {
     display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  // Hide Ticket sidebar actions & buttons
+  .tic-info-flight,
+  .web-tic-info,
+  .mobile-tic-info,
+  .actionable-buttons,
+  .sidebar-card,
+  .sidebar-actions-list,
+  .sidebar-header {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  // Remove wrapper margins, paddings, backgrounds, and shadows
+  html,
+  body,
+  #pageWrapper,
+  .page-wrapper,
+  .page-body-wrapper,
+  .page-body,
+  .container-fluid,
+  .flight-ticket-collapse,
+  .fligh-ticket-container,
+  .flight-ticket {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+    float: none !important;
+    position: static !important;
+  }
+
+  // Remove Ant card container borders, shadows, and paddings
+  .flight-ticket-collapse .ant-card,
+  .flight-ticket-collapse .ant-card-bordered,
+  .flight-ticket-collapse .ant-card-body {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  // Expand the ticket column to 100% full width
+  .ticket-row {
+    margin: 0 !important;
+    width: 100% !important;
+    display: block !important;
+  }
+
+  .ticket-coloum {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .premium-ticket-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    box-shadow: none !important;
+  }
+
+  // Preserve vivid voucher colors, badges, backgrounds, and borders
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
+
 

@@ -417,7 +417,7 @@ const HotelTicketScreen = ({ mode }) => {
                     />
                   </Col>
 
-                  <Col xs={24} md={6} className="tic-info-flight">
+                  <Col xs={24} md={6} className="tic-info-flight no-print">
                     <div className="web-tic-info">
                       <TicketSidebar
                         ticketData={ticketData}
