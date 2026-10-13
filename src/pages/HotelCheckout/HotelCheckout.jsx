@@ -492,7 +492,7 @@ const HotelCheckout = ({ location }) => {
               let paxObj = {
                 firstName: "",
                 lastName: "",
-                title: "Mstr",
+                title: "Miss",
                 guestType: "Child",
                 guestInRoom: roomIndex + 1,
                 age: parsedAge !== "" ? parsedAge : "",
@@ -502,7 +502,7 @@ const HotelCheckout = ({ location }) => {
                 paxObj = HotelGuestReqFields(paxObj, hotels.guestRequiredFields);
               }
               paxListArr.push(paxObj);
-              initialFormValues[`Title_${roomIndex}_${paxIndex}`] = "Mstr";
+              initialFormValues[`Title_${roomIndex}_${paxIndex}`] = "Miss";
               if (displayAgeText) {
                 initialFormValues[`childAge_${roomIndex}_${paxIndex}`] = displayAgeText;
               }
@@ -621,7 +621,7 @@ const HotelCheckout = ({ location }) => {
                           const titleVal =
                             passegersData[`Title_${roomIdx}_${paxIdx}`] ||
                             pax.title ||
-                            (pax.guestType === "Child" ? "Mstr" : "Mr");
+                            (pax.guestType === "Child" ? "Miss" : "Mr");
                           const firstVal =
                             passegersData[`firstname_${roomIdx}_${paxIdx}`] ||
                             pax.firstName ||
@@ -845,8 +845,9 @@ const HotelCheckout = ({ location }) => {
                                       }}
                                     >
                                       <Option value="Mr">Mr</Option>
-                                      <Option value="Ms">Ms</Option>
                                       <Option value="Mrs">Mrs</Option>
+                                      <Option value="Miss">Miss</Option>
+                                      <Option value="Ms">Ms</Option>
                                     </Select>
                                   </Form.Item>
                                 ) : (
@@ -872,7 +873,10 @@ const HotelCheckout = ({ location }) => {
                                         );
                                       }}
                                     >
-                                      <Option value="Mstr">Mstr</Option>
+                                      <Option value="Miss">Miss</Option>
+                                      <Option value="Mr">Mr</Option>
+                                      <Option value="Ms">Ms</Option>
+                                      <Option value="Mrs">Mrs</Option>
                                     </Select>
                                   </Form.Item>
                                 )}

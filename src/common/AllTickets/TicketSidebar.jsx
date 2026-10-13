@@ -6,6 +6,7 @@ import {
   MessageOutlined,
   PrinterOutlined,
   DollarOutlined,
+  LoadingOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -27,7 +28,7 @@ import "./NewTicket.scss";
 import HotelDoc from "../PdfDocuments/Hotel/HotelDoc";
 import HotelNewInvoiceDoc from "../PdfDocuments/Hotel/HotelInvoice";
 
-
+import Apiclient1 from "../../Helpers/Apiclient1";
 
 
 import ReactDOMServer from "react-dom/server";
@@ -43,9 +44,12 @@ const TicketSidebar = ({
   cmsFareRules = {},
   fareRulesResp = null,
   onResheduleTicket,
+  cancelLoading = false,
 }) => {
   const user = useSelector((state) => state.auth.user);
   const agent = useSelector(selectIsAgent);
+
+  const [holdLoading, setHoldLoading] = useState(false);
 
   const logo = "";
   const agentLogo = "";
@@ -242,6 +246,8 @@ const TicketSidebar = ({
   };
 
   const confirmHoldTicket = () => {
+    if (holdLoading) return;
+    setHoldLoading(true);
     let data = {
       referenceNumber: ticketData?.booking?.referenceNumber || ticketData?.RefNumber || ticketData?.ConfirmationNumber || "",
       paymentModeType: "deposit",
@@ -262,11 +268,11 @@ const TicketSidebar = ({
           countryCode: ""
         }
       }
-    }
+    };
 
-
-    ApiClient.post("Hotel/ConfirmHoldTicket", data)
+    Apiclient1.post("Hotel/ConfirmHoldTicket", data)
       .then((res) => {
+        setHoldLoading(false);
         const dataObj = res.data || res;
         if (dataObj && dataObj.errors && dataObj.errors.length > 0) {
           message.error(dataObj.errors[0]?.message || "Failed to confirm hold ticket.");
@@ -276,6 +282,7 @@ const TicketSidebar = ({
         }
       })
       .catch((error) => {
+        setHoldLoading(false);
         console.error(error);
         message.error("An error occurred while confirming the ticket.");
       });
@@ -368,15 +375,57 @@ const TicketSidebar = ({
           </button>
         ) : null}
 
-        {type === "Hotel" && ticketData?.BookingStatus !== "CANCELLED" && ticketData?.BookingStatus !== 4 ? (
-          <button className="sidebar-btn sidebar-btn-danger" onClick={() => handleCancel("Hotel")}>
-            <FileExcelOutlined /> Cancel Voucher
+        {type === "Hotel" &&
+        ticketData?.BookingStatus !== "CANCELLED" &&
+        ticketData?.BookingStatus !== 3 &&
+        ticketData?.BookingStatus !== "3" &&
+        ticketData?.BookingStatus !== 4 &&
+        ticketData?.BookingStatus !== "4" &&
+        String(ticketData?.BookingStatus).toUpperCase() !== "CANCELLED" ? (
+          <button
+            className="sidebar-btn sidebar-btn-danger"
+            onClick={() => handleCancel("Hotel")}
+            disabled={cancelLoading}
+            style={{
+              opacity: cancelLoading ? 0.7 : 1,
+              cursor: cancelLoading ? "not-allowed" : "pointer",
+            }}
+          >
+            {cancelLoading ? (
+              <>
+                <LoadingOutlined spin /> Cancelling...
+              </>
+            ) : (
+              <>
+                <FileExcelOutlined /> Cancel Voucher
+              </>
+            )}
           </button>
         ) : null}
 
         {type === "Hotel" && (ticketData?.BookingStatus === "Hold" || ticketData?.BookingStatus === 6 || String(ticketData?.BookingStatus).toLowerCase() === "hold") ? (
-          <button className="sidebar-btn sidebar-btn-primary" onClick={confirmHoldTicket} style={{ background: "#28a745", color: "#fff", borderColor: "#28a745", marginBottom: "10px" }}>
-            <DollarOutlined /> Hold Confirm
+          <button
+            className="sidebar-btn sidebar-btn-primary"
+            onClick={confirmHoldTicket}
+            disabled={holdLoading}
+            style={{
+              background: "#28a745",
+              color: "#fff",
+              borderColor: "#28a745",
+              marginBottom: "10px",
+              opacity: holdLoading ? 0.7 : 1,
+              cursor: holdLoading ? "not-allowed" : "pointer",
+            }}
+          >
+            {holdLoading ? (
+              <>
+                <LoadingOutlined spin /> Confirming...
+              </>
+            ) : (
+              <>
+                <DollarOutlined /> Hold Confirm
+              </>
+            )}
           </button>
         ) : null}
 

@@ -277,7 +277,8 @@ const HotelTicketScreen = ({ mode }) => {
   const submitCancelForm = (val) => {
     setLoading(true);
 
-    if (!ticketData?.booking) {
+    const refNum = ticketData.RefNumber || ticketData.booking?.referenceNumber || "";
+    if (!ticketData?.booking && !refNum) {
       setLoading(false);
       return;
     }
@@ -286,7 +287,7 @@ const HotelTicketScreen = ({ mode }) => {
       traceId: ticketData.booking?.tokenId || ticketData.traceId || "",
       supplierParameter: ticketData.booking?.supplierParameter || ticketData.supplierParameter || "",
       confirmationNo: ticketData.booking?.pnr || ticketData.SupplierConfirmationNo || "",
-      RefNumber: ticketData.RefNumber || ticketData.booking?.referenceNumber || "",
+      RefNumber: refNum,
     };
 
     Apiclient1.post("Hotel/HotelCancel", data)
@@ -315,6 +316,7 @@ const HotelTicketScreen = ({ mode }) => {
       .catch((error) => {
         setLoading(false);
         console.error(error);
+        message.error("An error occurred while cancelling the voucher.");
       });
   };
 
@@ -425,6 +427,7 @@ const HotelTicketScreen = ({ mode }) => {
                         getTicketDetails={getTicketDetails}
                         cmsFareRules={cmsFareRules}
                         onGetStatus={getStatus}
+                        cancelLoading={loading}
                       />
                     </div>
 
@@ -444,6 +447,7 @@ const HotelTicketScreen = ({ mode }) => {
                                 getTicketDetails={getTicketDetails}
                                 cmsFareRules={cmsFareRules}
                                 onGetStatus={getStatus}
+                                cancelLoading={loading}
                               />
                             ),
                           },
@@ -460,20 +464,30 @@ const HotelTicketScreen = ({ mode }) => {
         </Card>
 
         <Modal
-          title="Cancel Ticket"
+          title="Cancel Voucher"
           className="promo-modal-header"
           open={modalVisible}
-          onOk={(e) => setModalVisible(false)}
-          onCancel={(e) => setModalVisible(false)}
+          maskClosable={!loading}
+          closable={!loading}
+          onOk={(e) => !loading && setModalVisible(false)}
+          onCancel={(e) => !loading && setModalVisible(false)}
           footer={[
             <div>
               <Button
+                key="close"
+                onClick={() => setModalVisible(false)}
+                disabled={loading}
+              >
+                Close
+              </Button>
+              <Button
                 key="add"
                 type="primary"
+                danger
                 onClick={submitCancelForm}
                 loading={loading}
               >
-                Cancel Ticket
+                Cancel Voucher
               </Button>
             </div>,
           ]}

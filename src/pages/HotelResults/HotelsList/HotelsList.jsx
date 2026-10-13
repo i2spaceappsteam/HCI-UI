@@ -307,7 +307,7 @@ const HotelsList = ({
                   <span className="amount">{currencyValue(publishPrice)}</span>
                   <span className="night-lbl">/ night</span>
                 </div>
-                <span className="taxes-note">+ taxes & charges exclusive</span>
+                <span className="taxes-note">+ taxes & charges Inclusive</span>
               </div>
             )}
           </div>

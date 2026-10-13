@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Row, Col, Tag, Badge, Tooltip, Modal, Button } from "antd";
 import moment from "moment";
 import queryString from "query-string";
+import parse from "html-react-parser";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import {
@@ -167,15 +168,15 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
     const rawPolicies = Array.isArray(cancel.policies)
       ? cancel.policies.join(" ")
       : typeof cancel.policies === "string"
-      ? cancel.policies
-      : "";
+        ? cancel.policies
+        : "";
 
     const isGenericWord =
       !rawPolicies ||
       ["fixed", "percentage", "percent", "amount", "night", "nights"].includes(rawPolicies.trim().toLowerCase());
 
     if (!isGenericWord && rawPolicies.length > 15) {
-      return rawPolicies;
+      return <span>{parse(rawPolicies)}</span>;
     }
 
     const parseDateStr = (d) => {
@@ -275,7 +276,7 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
                 }}
               />
               <div className="hotel-photo-badge">
-                <SafetyCertificateOutlined /> Verified
+                {/* <SafetyCertificateOutlined /> Verified */}
               </div>
             </div>
 
@@ -333,10 +334,10 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
                 </span>
               )}
               {hotelDetailsObj?.hotelPolicy && hotelDetailsObj.hotelPolicy.length > 0 && (
-                <Button 
-                  type="link" 
+                <Button
+                  type="link"
                   size="small"
-                  onClick={() => setShowPolicyModal(true)} 
+                  onClick={() => setShowPolicyModal(true)}
                   style={{ marginLeft: '10px', padding: 0 }}
                 >
                   View Hotel Policy
@@ -427,20 +428,114 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
       {/* Hotel Policy Modal */}
       {hotelDetailsObj?.hotelPolicy && (
         <Modal
-          title="Hotel Policy"
+          title={
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "16px", fontWeight: 600, color: "#0b214a" }}>
+              <SafetyCertificateOutlined style={{ color: "#2563eb" }} />
+              <span>Hotel Policy & Important Guidelines</span>
+            </div>
+          }
           open={showPolicyModal}
           onCancel={() => setShowPolicyModal(false)}
           footer={null}
-          width={700}
+          width={760}
+          className="hotel-policy-details-modal"
         >
-          <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {hotelDetailsObj.hotelPolicy.map((policy, idx) => (
-              <li key={idx}>
-                {/* Sometimes policies contain HTML entities, so we use dangerouslySetInnerHTML if needed, but for safety we can just render it as text, or if it contains HTML we can use a basic parser. Let's try parsing basic HTML if any. */}
-                <span dangerouslySetInnerHTML={{ __html: policy }} />
-              </li>
-            ))}
-          </ul>
+          <div className="hotel-policy-modal-body" style={{ maxHeight: "70vh", overflowY: "auto", padding: "8px 4px" }}>
+            {(() => {
+              const rawPolicies = Array.isArray(hotelDetailsObj.hotelPolicy)
+                ? hotelDetailsObj.hotelPolicy
+                : [hotelDetailsObj.hotelPolicy];
+
+              const renderPolicyItem = (policy, idx) => {
+                if (!policy) return null;
+
+                if (typeof policy !== "string") {
+                  return (
+                    <div key={idx} className="policy-block-item" style={{ marginBottom: 12 }}>
+                      {policy}
+                    </div>
+                  );
+                }
+
+                const trimmed = policy.trim();
+
+                // If policy is already an HTML block with lists or paragraphs
+                if (/<(ul|ol|li|div|p|h[1-6]|table)/i.test(trimmed)) {
+                  return (
+                    <div
+                      key={idx}
+                      className="policy-html-block"
+                      style={{
+                        marginBottom: 14,
+                        padding: "10px 14px",
+                        background: "#f8fafc",
+                        borderRadius: "8px",
+                        border: "1px solid #e2e8f0",
+                        fontSize: "13px",
+                        lineHeight: "1.6",
+                        color: "#334155"
+                      }}
+                    >
+                      {parse(trimmed)}
+                    </div>
+                  );
+                }
+
+                // If policy is a "Label: Value" format (e.g., "CheckIn Time-Begin: 2:00 PM")
+                const colonIdx = trimmed.indexOf(":");
+                if (colonIdx > 0 && colonIdx < 35 && !trimmed.toLowerCase().startsWith("http")) {
+                  const label = trimmed.slice(0, colonIdx).trim();
+                  const val = trimmed.slice(colonIdx + 1).trim();
+                  return (
+                    <div
+                      key={idx}
+                      className="policy-field-row"
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: "8px",
+                        padding: "8px 12px",
+                        background: "#f8fafc",
+                        borderRadius: "6px",
+                        marginBottom: "8px",
+                        fontSize: "13px"
+                      }}
+                    >
+                      <strong style={{ color: "#0f172a", minWidth: "160px", flexShrink: 0 }}>
+                        {label}:
+                      </strong>
+                      <span style={{ color: "#334155", flex: 1, lineHeight: "1.5" }}>
+                        {val ? parse(val) : "—"}
+                      </span>
+                    </div>
+                  );
+                }
+
+                // Normal single sentence or comma-separated tags/notes
+                return (
+                  <div
+                    key={idx}
+                    className="policy-regular-row"
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "10px",
+                      marginBottom: "8px",
+                      padding: "4px 2px",
+                      fontSize: "13px",
+                      color: "#334155",
+                      lineHeight: "1.5"
+                    }}
+                  >
+                    <CheckCircleFilled style={{ color: "#2563eb", marginTop: "3px", fontSize: "14px", flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>{parse(trimmed)}</div>
+                  </div>
+                );
+              };
+
+              return rawPolicies.map(renderPolicyItem);
+            })()}
+          </div>
         </Modal>
       )}
     </div>

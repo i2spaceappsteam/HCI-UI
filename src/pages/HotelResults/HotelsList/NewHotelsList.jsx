@@ -154,7 +154,8 @@ const NewHotelsList = ({
                 <SafetyCertificateFilled /> Luxury Stay
               </span>
             ) : (
-              <span className="featured-tag">Verified Hotel</span>
+              null
+              // <span className="featured-tag">Verified Hotel</span>
             )}
 
             <button

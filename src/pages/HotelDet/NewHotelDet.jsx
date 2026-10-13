@@ -657,7 +657,7 @@ const HotelDet = () => {
                                         </div>
                                     )}
                                     <span className="verified-badge">
-                                        <SafetyCertificateOutlined /> Verified Property
+                                        {/* <SafetyCertificateOutlined /> Verified Property */}
                                     </span>
                                 </div>
                                 <h1 className="main-hotel-name">{hotelNameDisplay || "Luxury Hotel & Suites"}</h1>

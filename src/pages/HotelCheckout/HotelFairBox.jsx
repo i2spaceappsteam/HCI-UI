@@ -289,11 +289,11 @@ const HotelFairBox = ({ hotelDetailsObj, hotelSearchData, isPromoVisible, locati
             {"₹"} {Number(hotelDetailsObj?.combineRoom?.[0]?.priceDetails?.totalBasePrice || hotelDetailsObj?.hotels?.priceSummary?.base || hotelDetailsObj?.priceSummary?.base || 0).toFixed(2)}
           </p>
         </div>
-        
+
         {roomsArray.length > 1 && roomsArray.map((room, roomIdx) => {
           const roomPrice = room?.ratePlans?.[0]?.price;
           if (!roomPrice) return null;
-          
+
           return (
             <div key={roomIdx} className="daily-breakup-list" style={{ marginTop: '10px', fontSize: '12px', borderTop: '1px solid #ddd', paddingTop: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: "10px" }}>
@@ -308,30 +308,30 @@ const HotelFairBox = ({ hotelDetailsObj, hotelSearchData, isPromoVisible, locati
       </div>
     );
   };
-  
+
   const taxBreakupFare = () => {
     const roomsArray = hotelDetailsObj?.hotels?.rooms || hotelDetailsObj?.rooms || [];
     let hasBreakup = false;
-    
+
     const content = roomsArray.length > 1 ? roomsArray.map((room, roomIdx) => {
-          const roomPrice = room?.ratePlans?.[0]?.price;
-          if (!roomPrice) return null;
-          hasBreakup = true;
-          
-          return (
-            <div key={roomIdx} className="daily-breakup-list" style={{ marginTop: roomIdx > 0 ? '10px' : '8px', fontSize: '12px', borderTop: '1px solid #ddd', paddingTop: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: "20px" }}>
-                <span>Room {roomIdx + 1} Tax:</span>
-                <div style={{ textAlign: "right", fontWeight: "600" }}>
-                  <div>₹ {Number(roomPrice.tax || 0).toFixed(2)}</div>
-                </div>
-              </div>
+      const roomPrice = room?.ratePlans?.[0]?.price;
+      if (!roomPrice) return null;
+      hasBreakup = true;
+
+      return (
+        <div key={roomIdx} className="daily-breakup-list" style={{ marginTop: roomIdx > 0 ? '10px' : '8px', fontSize: '12px', borderTop: '1px solid #ddd', paddingTop: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: "20px" }}>
+            <span>Room {roomIdx + 1} Tax:</span>
+            <div style={{ textAlign: "right", fontWeight: "600" }}>
+              <div>₹ {Number(roomPrice.tax || 0).toFixed(2)}</div>
             </div>
-          );
+          </div>
+        </div>
+      );
     }) : null;
-    
+
     if (hasBreakup) {
-       return <div className="pax-count-acc-body-container" style={{ minWidth: "220px" }}>{content}</div>;
+      return <div className="pax-count-acc-body-container" style={{ minWidth: "220px" }}>{content}</div>;
     }
     return null;
   };
@@ -549,7 +549,7 @@ const HotelFairBox = ({ hotelDetailsObj, hotelSearchData, isPromoVisible, locati
             <span>100% Safe &amp; Secure Booking</span>
           </div>
 
-          {agent && (
+          {/* {agent && (
             <Collapse
               size="small"
               defaultActiveKey={[]}
@@ -574,7 +574,7 @@ const HotelFairBox = ({ hotelDetailsObj, hotelSearchData, isPromoVisible, locati
                 },
               ]}
             />
-          )}
+          )} */}
 
           <Modal
             title="Edit Tax Amount"
