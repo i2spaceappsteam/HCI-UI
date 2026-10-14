@@ -56,7 +56,7 @@ const UserNavigation = () => {
         <Route path="Admin/agentMarkup" element={<AgentMarkup />} />
         <Route path="admin/bookingreports" element={<BookingReports />} />
         <Route path="admin/siteadminbookingreports" element={<SiteAdminBookingReports />} />
-        <Route path="admin/siteadminbookingReports" element={<SiteAdminBookingReports />} />
+        {/* <Route path="admin/siteadminbookingReports" element={<SiteAdminBookingReports />} /> */}
         <Route path="admin/ledgerstatement" element={<LedgerStatement />} />
         <Route path="admin/consolidatedledger" element={<ConsolidatedLedger />} />
         <Route path="myprofile" element={<MyProfile />} />
