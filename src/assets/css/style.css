@@ -37909,28 +37909,11 @@ body[class*="dark-"] .for-light {
 }
 
 .toggle-sidebar:before {
-  content: "";
-  position: absolute;
-  height: 40px;
-  width: 40px;
-  background-color: rgba(74, 164, 217, 0.1);
-  border-radius: 100%;
-  left: -11px;
-  z-index: -2;
-  top: -8px;
-  -webkit-transform: scale(0);
-  transform: scale(0);
-  -webkit-transition: all 0.3s ease;
-  transition: all 0.3s ease
+  display: none;
 }
 
 .toggle-sidebar:hover:before {
-  height: 40px;
-  width: 40px;
-  -webkit-transform: scale(1);
-  transform: scale(1);
-  -webkit-transition: all 0.3s ease;
-  transition: all 0.3s ease
+  display: none;
 }
 
 .toggle-sidebar:hover>svg {
@@ -41054,7 +41037,9 @@ body[class*="dark-"] .for-light {
 }
 
 .page-wrapper.modern-type .page-header .header-wrapper .toggle-sidebar {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   top: unset;
   right: unset;

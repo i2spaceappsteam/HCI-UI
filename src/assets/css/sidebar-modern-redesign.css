@@ -362,28 +362,45 @@
    7. TOGGLE SIDEBAR BUTTON
    =================================== */
 
+.page-wrapper .page-header .header-wrapper .toggle-sidebar,
+.page-wrapper.modern-type .page-header .header-wrapper .toggle-sidebar,
 .toggle-sidebar {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   cursor: pointer;
   border-radius: 10px;
   transition: all 0.25s ease;
+  position: relative;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+/* Remove legacy pseudo-elements that cause duplicate overlapping hover circles/boxes */
+.toggle-sidebar::before,
+.toggle-sidebar::after {
+  content: none !important;
+  display: none !important;
 }
 
 .toggle-sidebar:hover {
   background: rgba(59, 130, 246, 0.1);
 }
 
-.toggle-sidebar i {
-  width: 20px;
-  height: 20px;
+.toggle-sidebar i,
+.toggle-sidebar svg {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: block !important;
   transition: transform 0.3s ease;
 }
 
-.sidebar-close .toggle-sidebar i {
+.sidebar-close .toggle-sidebar i,
+.sidebar-close .toggle-sidebar svg {
   transform: rotate(180deg);
 }
 

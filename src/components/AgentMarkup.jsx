@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Card, Button, Table } from 'antd';
+import { Table, Form, Modal, InputNumber, Select } from 'antd';
 import ApiClient from '../Helpers/ApiClient';
-import { Form, Modal, InputNumber, Select } from 'antd';
 import { notifySuccess, notifyError, notifyWarning } from "../../public/js/notify/notify";
 import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router';
 
 const { Option } = Select;
 
@@ -15,27 +15,89 @@ const AgentMarkup = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [open, setOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const openDeleteModal = (id) => {
-    setDeleteId(id);
-    setDeleteOpen(true);
+  const userId = user?.id || user?.userId || 0;
+
+  // ── Fetch Markups ───────────────────────────────────────────────────
+  const GetData = () => {
+    setLoading(true);
+    const request = {
+      userId: userId,
+      fromDate: null,
+      toDate: null,
+    };
+
+    ApiClient.post("AgentMarkup/GetAgentMarkup", request)
+      .then((res) => {
+        if (res?.success === true) {
+          setDataList(res.data || []);
+        } else if (res?.status === 409) {
+          notifyWarning("warning", res.message);
+        } else {
+          notifyError("danger", res?.message || "Something went wrong");
+        }
+      })
+      .catch(() => {
+        notifyError("danger", "Failed to load agent markups");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
+  useEffect(() => {
+    GetData();
+  }, [user]);
+
+  // ── Open Add Modal ──────────────────────────────────────────────────
+  const handleOpenAdd = () => {
+    form.resetFields();
+    form.setFieldsValue({ markupType: 0, markupValue: 0 });
+    setId(null);
+    setOpen(true);
+  };
+
+  // ── Edit Record ─────────────────────────────────────────────────────
+  const editRecord = (record) => {
+    const targetId = record.commId || record.id;
+    if (targetId) {
+      ApiClient.get(`AgentMarkup/GetAgentMarkupById/${targetId}`)
+        .then((res) => {
+          const item = (res?.success === true && res.data) ? res.data : record;
+          form.setFieldsValue({
+            markupType: item.markupType,
+            markupValue: item.markupValue,
+          });
+          setId(item.commId || targetId);
+          setOpen(true);
+        })
+        .catch(() => {
+          form.setFieldsValue({
+            markupType: record.markupType,
+            markupValue: record.markupValue,
+          });
+          setId(targetId);
+          setOpen(true);
+        });
+    }
+  };
+
+  // ── Submit (Add or Update) ──────────────────────────────────────────
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
       const request = {
-        commId: id == null ? 0 : id,
-        userId: user?.id || 0,
-        starRating: values.starRating || 0,
-        markupType: values.markupType || 0,
-        markupValue: values.markupValue || 0,
+        commId: id == null ? 0 : Number(id),
+        userId: userId,
+        markupType: Number(values.markupType ?? 0),
+        markupValue: Number(values.markupValue ?? 0),
       };
 
       const res = await ApiClient.post("AgentMarkup/AddAgentMarkup", request);
 
       if (res?.success === true) {
-        notifySuccess("success", res.message);
+        notifySuccess("success", res.message || (id == null ? "Agent markup added successfully" : "Agent markup updated successfully"));
         setOpen(false);
         form.resetFields();
         GetData();
@@ -56,52 +118,32 @@ const AgentMarkup = () => {
     setId(null);
   };
 
-  useEffect(() => {
-    GetData();
-  }, []);
+  // ── Delete ──────────────────────────────────────────────────────────
+  const openDeleteModal = (recordId) => {
+    setDeleteId(recordId);
+    setDeleteOpen(true);
+  };
 
-  function GetData() {
-    const request = { userId: user?.id || 0 }; 
-    ApiClient.post("AgentMarkup/GetAgentMarkup", request)
-      .then((res) => {
-        if (res?.success === true) {
-          setDataList(res.data || []);
-        } else if (res?.status == 409) {
-          notifyWarning("warning", res.message);
-        } else {
-          notifyError("danger", res.message);
-        }
-      })
-      .catch((e) => {});
-  }
-
-  function editRecord(record) {
-    form.setFieldsValue({
-      starRating: record.starRating,
-      markupType: record.markupType,
-      markupValue: record.markupValue,
-    });
-    setId(record.commId || record.id);
-    setOpen(true);
-  }
-
-  function handleDelete() {
+  const handleDelete = () => {
     ApiClient.put(`AgentMarkup/DeleteAgentMarkup/${deleteId}`)
       .then((res) => {
         if (res?.success === true) {
           setDeleteId(null);
           setDeleteOpen(false);
           GetData();
-          notifySuccess("success", res.message);
-        } else if (res?.status == 409) {
+          notifySuccess("success", res.message || "Agent markup deleted successfully");
+        } else if (res?.status === 409) {
           notifyWarning("warning", res.message);
         } else {
-          notifyError("danger", res.message);
+          notifyError("danger", res.message || "Something went wrong");
         }
       })
-      .catch((e) => {});
-  }
+      .catch(() => {
+        notifyError("danger", "Failed to delete agent markup");
+      });
+  };
 
+  // ── Table Columns ───────────────────────────────────────────────────
   const columns = [
     {
       title: 'Actions',
@@ -110,30 +152,52 @@ const AgentMarkup = () => {
         <div className="d-flex align-items-center gap-3">
           <i
             className="fa fa-pencil-square-o text-warning"
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "pointer", fontSize: "16px" }}
             title="Edit"
             onClick={() => editRecord(m)}
           ></i>
           <i
             className="fa fa-trash-o text-danger"
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "pointer", fontSize: "16px" }}
             title="Delete"
             onClick={() => openDeleteModal(m.commId || m.id)}
           ></i>
         </div>
       ),
     },
-    { 
-      title: 'Star Rating', 
-      dataIndex: 'starRating', 
-      key: 'starRating',
-      render: (val) => {
-        const ratings = {0: 'All', 1: 'One Star', 2: 'Two Star', 3: 'Three Star', 4: 'Four Star', 5: 'Five Star'};
-        return ratings[val] || val;
-      }
+    {
+      title: 'Markup Type',
+      dataIndex: 'markupType',
+      key: 'markupType',
+      render: (val) =>
+        val === 1 ? (
+          <span className="badge" style={{ backgroundColor: "#0d6efd", color: "#fff", padding: "5px 10px", borderRadius: "4px" }}>
+            Percentage
+          </span>
+        ) : (
+          <span className="badge" style={{ backgroundColor: "#6c757d", color: "#fff", padding: "5px 10px", borderRadius: "4px" }}>
+            Fixed
+          </span>
+        ),
     },
-    { title: 'Markup Type', dataIndex: 'markupType', key: 'markupType', render: (val) => val === 1 ? 'Percentage' : 'Fixed' },
-    { title: 'Markup Value', dataIndex: 'markupValue', key: 'markupValue' },
+    {
+      title: 'Markup Value',
+      dataIndex: 'markupValue',
+      key: 'markupValue',
+      render: (val, record) => (record.markupType === 1 ? `${val}%` : `${val}`),
+    },
+    {
+      title: 'Created By',
+      dataIndex: 'createdBy',
+      key: 'createdBy',
+      render: (val) => val || '-',
+    },
+    {
+      title: 'Created Date',
+      dataIndex: 'createdDate',
+      key: 'createdDate',
+      render: (val) => (val ? new Date(val).toLocaleString() : '-'),
+    },
   ];
 
   return (
@@ -142,26 +206,28 @@ const AgentMarkup = () => {
         <div className="card">
           <div className="card-header card-header--2">
             <h5>All Agent Markups</h5>
-            <button type="button" className="btn btn-theme" onClick={() => setOpen(true)}>
+            <button type="button" className="btn btn-theme" onClick={handleOpenAdd}>
               <i data-feather="plus-square"></i> Add New
             </button>
           </div>
 
           <div className="card-body">
             <div className="table-responsive table-desi">
-              <Table 
-                columns={columns} 
-                dataSource={dataList} 
-                size="small" 
-                scroll={{ x: 'max-content' }} 
+              <Table
+                columns={columns}
+                dataSource={dataList}
+                size="small"
+                scroll={{ x: 'max-content' }}
                 rowKey={(record) => record.commId || record.id}
                 pagination={{ pageSize: 10 }}
+                loading={loading}
               />
             </div>
           </div>
         </div>
       </div>
 
+      {/* Delete Confirmation Modal */}
       <Modal open={deleteOpen} footer={null} closable={false} width={420} centered>
         <div className="card mb-0">
           <div className="card-header py-2 px-3 d-flex align-items-center justify-content-between">
@@ -171,7 +237,6 @@ const AgentMarkup = () => {
 
           <div className="card-body text-center py-4">
             <i className="fa fa-trash text-danger fs-2 mb-2"></i>
-
             <h6 className="mb-1">Are you sure you want to delete?</h6>
             <small className="text-muted">This action cannot be undone.</small>
           </div>
@@ -187,8 +252,9 @@ const AgentMarkup = () => {
         </div>
       </Modal>
 
-      <Modal open={open} footer={null} closable={false} centered width={800} onCancel={handleCancel}>
-        <div className="card">
+      {/* Add / Update Modal */}
+      <Modal open={open} footer={null} closable={false} centered width={500} onCancel={handleCancel}>
+        <div className="card mb-0">
           <div className="card-header d-flex justify-content-between align-items-center">
             <h5>{id == null ? "Add Agent Markup" : "Update Agent Markup"}</h5>
             <button type="button" className="btn-close" onClick={handleCancel}></button>
@@ -205,33 +271,33 @@ const AgentMarkup = () => {
               }
             `}</style>
             <Form layout="vertical" form={form} className="theme-form mega-form">
-              <div className="row">
-                <div className="col-md-12 mb-2">
-                  <label className="form-label-title">Star Rating</label>
-                  <Form.Item name="starRating">
+              <div className="row g-3">
+                {/* Markup Type */}
+                <div className="col-md-6">
+                  <label className="form-label-title">Markup Type</label>
+                  <Form.Item
+                    name="markupType"
+                    rules={[{ required: true, message: 'Please select markup type' }]}
+                  >
                     <Select placeholder="Please select">
-                      <Option value={0}>All</Option>
-                      <Option value={1}>One Star</Option>
-                      <Option value={2}>Two Star</Option>
-                      <Option value={3}>Three Star</Option>
-                      <Option value={4}>Four Star</Option>
-                      <Option value={5}>Five Star</Option>
+                      <Option value={0}>Fixed</Option>
+                      <Option value={1}>Percentage</Option>
                     </Select>
                   </Form.Item>
                 </div>
-                <div className="col-md-6 mb-2">
-                  <label className="form-label-title">Markup Type</label>
-                  <Form.Item name="markupType">
-                   <Select placeholder="Please select">
-                    <Option value={0}>Fixed</Option>
-                    <Option value={1}>Percentage</Option>
-                  </Select>
-                  </Form.Item>
-                </div>
-                <div className="col-md-6 mb-2">
+
+                {/* Markup Value */}
+                <div className="col-md-6">
                   <label className="form-label-title">Markup Value</label>
-                  <Form.Item name="markupValue">
-                    <InputNumber placeholder="0" style={{ width: '100%' }} />
+                  <Form.Item
+                    name="markupValue"
+                    rules={[{ required: true, message: 'Please enter markup value' }]}
+                  >
+                    <InputNumber
+                      placeholder="0"
+                      min={0}
+                      style={{ width: '100%' }}
+                    />
                   </Form.Item>
                 </div>
               </div>

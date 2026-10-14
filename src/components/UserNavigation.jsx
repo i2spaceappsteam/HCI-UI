@@ -22,6 +22,7 @@ import HotelDet from "../pages/HotelDet/NewHotelDet"
 import HotelCheckout from "../pages/HotelCheckout/HotelCheckout"
 import HotelReview from "../pages/HotelPreview/HotelPreview"
 import BookingReports from './BookingReports';
+import SiteAdminBookingReports from './SiteAdminBookingReports';
 import LedgerStatement from '../pages/LedgerStatement/LedgerStatement';
 import ConsolidatedLedger from '../pages/ConsolidatedLedger/ConsolidatedLedger';
 import MyProfile from './MyProfile';
@@ -29,7 +30,7 @@ import Operator from './Operator/Operator';
 import Currency from './Currency';
 import Hotels from '../pages/Hotels/Hotels';
 import HotelTicketScreen from '../common/AllTickets/Hotel/HotelTicketScreen';
-
+import AgentMarkup from "../components/AgentMarkup";
 
 const UserNavigation = () => {
   return (
@@ -52,8 +53,10 @@ const UserNavigation = () => {
 
         <Route path="Admin/UserIpConfig" element={<UserIpConfig />} />
         <Route path="Admin/CommissionMarkup" element={<CommissionMarkup />} />
-
+        <Route path="Admin/agentMarkup" element={<AgentMarkup />} />
         <Route path="admin/bookingreports" element={<BookingReports />} />
+        <Route path="admin/siteadminbookingreports" element={<SiteAdminBookingReports />} />
+        <Route path="admin/siteadminbookingReports" element={<SiteAdminBookingReports />} />
         <Route path="admin/ledgerstatement" element={<LedgerStatement />} />
         <Route path="admin/consolidatedledger" element={<ConsolidatedLedger />} />
         <Route path="myprofile" element={<MyProfile />} />
