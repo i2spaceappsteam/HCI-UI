@@ -203,112 +203,87 @@ const UserIpConfig = () => {
       </div>
 
       {/* ── Delete Confirm Modal ─────────────────────────────────── */}
-      <Modal open={deleteOpen} footer={null} closable={false} width={420} centered>
-        <div className="card mb-0">
-          <div className="card-header py-2 px-3 d-flex align-items-center justify-content-between">
-            <h6 className="mb-0">Confirm Delete</h6>
-            <i
-              className="fa fa-times cursor-pointer"
-              style={{ fontSize: '16px' }}
-              onClick={() => setDeleteOpen(false)}
-            ></i>
-          </div>
-          <div className="card-body text-center py-4">
-            <i className="fa fa-trash text-danger fs-2 mb-2"></i>
-            <h6 className="mb-1">Are you sure you want to delete this IP address?</h6>
-            <small className="text-muted">This action cannot be undone.</small>
-          </div>
-          <div className="card-footer text-center py-2">
-            <button className="btn btn-danger me-2 px-4" onClick={handleDelete}>
-              Delete
-            </button>
-            <button
-              className="btn btn-outline-secondary px-4"
-              onClick={() => setDeleteOpen(false)}
-            >
-              Cancel
-            </button>
-          </div>
+      <Modal
+        title="Delete Confirmation"
+        open={deleteOpen}
+        onOk={handleDelete}
+        onCancel={() => setDeleteOpen(false)}
+        okText="Delete"
+        okButtonProps={{ danger: true }}
+        cancelText="Cancel"
+        width={380}
+        centered
+      >
+        <div className="text-center py-3">
+          <i className="fa fa-trash-o text-danger fs-1 mb-2 d-block"></i>
+          <h6 className="mb-1">Are you sure you want to delete this IP address?</h6>
+          <small className="text-muted">This action cannot be undone.</small>
         </div>
       </Modal>
 
       {/* ── Add / Update Modal ───────────────────────────────────── */}
       <Modal
+        title={editId === null ? 'Add IP Address' : 'Update IP Address'}
         open={open}
-        footer={null}
-        closable={false}
-        centered
-        width={500}
+        onOk={handleSubmit}
         onCancel={handleCancel}
+        okText={editId === null ? 'Submit' : 'Update'}
+        cancelText="Cancel"
+        width={460}
+        centered
+        destroyOnClose
       >
-        <div className="card">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <h5>{editId === null ? 'Add IP Address' : 'Update IP Address'}</h5>
-            <button type="button" className="btn-close" onClick={handleCancel}></button>
-          </div>
-          <div className="card-body">
-            <Form layout="vertical" form={form} className="theme-form mega-form">
-              <Row gutter={16}>
-                {/* User dropdown */}
-                <Col span={24}>
-                  <Form.Item
-                    label="User"
-                    name="userId"
-                    rules={[{ required: true, message: 'Please select a user' }]}
-                  >
-                    <Select
-                      showSearch
-                      placeholder="-- Select Company --"
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
-                      }
-                      style={{ width: '100%', height: '36px' }}
-                    >
-                      {usersList && usersList.length > 0 ? (
-                        usersList.map(item => (
-                          <Select.Option 
-                            key={item.id || item.userId} 
-                            value={item.id || item.userId}
-                          >
-                            {item.companyName || item.userName || item.name || 'Unknown'}
-                          </Select.Option>
-                        ))
-                      ) : (
-                        <Select.Option value="" disabled>No users available</Select.Option>
-                      )}
-                    </Select>
-                  </Form.Item>
-                </Col>
+        <Form layout="vertical" form={form} className="theme-form mega-form">
+          <Row gutter={16}>
+            {/* User dropdown */}
+            <Col span={24}>
+              <Form.Item
+                label="User"
+                name="userId"
+                rules={[{ required: true, message: 'Please select a user' }]}
+              >
+                <Select
+                  showSearch
+                  placeholder="-- Select Company --"
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                >
+                  {usersList && usersList.length > 0 ? (
+                    usersList.map(item => (
+                      <Select.Option 
+                        key={item.id || item.userId} 
+                        value={item.id || item.userId}
+                      >
+                        {item.companyName || item.userName || item.name || 'Unknown'}
+                      </Select.Option>
+                    ))
+                  ) : (
+                    <Select.Option value="" disabled>No users available</Select.Option>
+                  )}
+                </Select>
+              </Form.Item>
+            </Col>
 
-                {/* IP Address */}
-                <Col span={24}>
-                  <Form.Item
-                    label="IP Address"
-                    name="ipAddress"
-                    rules={[
-                      { required: true, message: 'IP Address is required' },
-                      {
-                        pattern: /^(\d{1,3}\.){3}\d{1,3}$|^\*$/,
-                        message: 'Enter a valid IP address (e.g. 192.168.1.1)',
-                      },
-                    ]}
-                  >
-                    <Input placeholder="e.g. 192.168.1.1" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Form>
-          </div>
-          <div className="card-footer text-end">
-            <button className="btn btn-primary me-3" onClick={handleSubmit}>
-              {editId === null ? 'Submit' : 'Update'}
-            </button>
-            <button className="btn btn-outline-primary" onClick={handleCancel}>
-              Cancel
-            </button>
-          </div>
-        </div>
+            {/* IP Address */}
+            <Col span={24}>
+              <Form.Item
+                label="IP Address"
+                name="ipAddress"
+                rules={[
+                  { required: true, message: 'IP Address is required' },
+                  {
+                    pattern: /^(\d{1,3}\.){3}\d{1,3}$|^\*$/,
+                    message: 'Enter a valid IP address (e.g. 192.168.1.1)',
+                  },
+                ]}
+              >
+                <Input placeholder="e.g. 192.168.1.1" />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
       </Modal>
     </div>
   );

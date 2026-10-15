@@ -228,91 +228,68 @@ const AgentMarkup = () => {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <Modal open={deleteOpen} footer={null} closable={false} width={420} centered>
-        <div className="card mb-0">
-          <div className="card-header py-2 px-3 d-flex align-items-center justify-content-between">
-            <h6 className="mb-0">Confirm Delete</h6>
-            <i className="fa fa-times cursor-pointer" style={{ fontSize: "16px" }} onClick={() => setDeleteOpen(false)}></i>
-          </div>
-
-          <div className="card-body text-center py-4">
-            <i className="fa fa-trash text-danger fs-2 mb-2"></i>
-            <h6 className="mb-1">Are you sure you want to delete?</h6>
-            <small className="text-muted">This action cannot be undone.</small>
-          </div>
-
-          <div className="card-footer text-center py-2">
-            <button className="btn btn-danger me-2 px-4" onClick={handleDelete}>
-              Delete
-            </button>
-            <button className="btn btn-outline-secondary px-4" onClick={() => setDeleteOpen(false)}>
-              Cancel
-            </button>
-          </div>
+      <Modal
+        title="Delete Confirmation"
+        open={deleteOpen}
+        onOk={handleDelete}
+        onCancel={() => setDeleteOpen(false)}
+        okText="Delete"
+        okButtonProps={{ danger: true }}
+        cancelText="Cancel"
+        width={380}
+        centered
+      >
+        <div className="text-center py-3">
+          <i className="fa fa-trash-o text-danger fs-1 mb-2 d-block"></i>
+          <h6 className="mb-1">Are you sure you want to delete this agent markup?</h6>
+          <small className="text-muted">This action cannot be undone.</small>
         </div>
       </Modal>
 
       {/* Add / Update Modal */}
-      <Modal open={open} footer={null} closable={false} centered width={500} onCancel={handleCancel}>
-        <div className="card mb-0">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <h5>{id == null ? "Add Agent Markup" : "Update Agent Markup"}</h5>
-            <button type="button" className="btn-close" onClick={handleCancel}></button>
-          </div>
+      <Modal
+        title={id == null ? "Add Agent Markup" : "Update Agent Markup"}
+        open={open}
+        onOk={handleSubmit}
+        onCancel={handleCancel}
+        okText={id == null ? "Submit" : "Update"}
+        cancelText="Cancel"
+        width={460}
+        centered
+        destroyOnClose
+      >
+        <Form layout="vertical" form={form}>
+          <div className="row g-3">
+            {/* Markup Type */}
+            <div className="col-md-6">
+              <Form.Item
+                label="Markup Type"
+                name="markupType"
+                rules={[{ required: true, message: 'Please select markup type' }]}
+              >
+                <Select placeholder="Please select">
+                  <Option value={0}>Fixed</Option>
+                  <Option value={1}>Percentage</Option>
+                </Select>
+              </Form.Item>
+            </div>
 
-          <div className="card-body">
-            <style>{`
-              .mega-form .ant-form-item {
-                margin-bottom: 0 !important;
-              }
-              .mega-form .ant-select-single:not(.ant-select-customize) .ant-select-input {
-                background: transparent !important;
-                border: none !important;
-              }
-            `}</style>
-            <Form layout="vertical" form={form} className="theme-form mega-form">
-              <div className="row g-3">
-                {/* Markup Type */}
-                <div className="col-md-6">
-                  <label className="form-label-title">Markup Type</label>
-                  <Form.Item
-                    name="markupType"
-                    rules={[{ required: true, message: 'Please select markup type' }]}
-                  >
-                    <Select placeholder="Please select">
-                      <Option value={0}>Fixed</Option>
-                      <Option value={1}>Percentage</Option>
-                    </Select>
-                  </Form.Item>
-                </div>
-
-                {/* Markup Value */}
-                <div className="col-md-6">
-                  <label className="form-label-title">Markup Value</label>
-                  <Form.Item
-                    name="markupValue"
-                    rules={[{ required: true, message: 'Please enter markup value' }]}
-                  >
-                    <InputNumber
-                      placeholder="0"
-                      min={0}
-                      style={{ width: '100%' }}
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-            </Form>
+            {/* Markup Value */}
+            <div className="col-md-6">
+              <Form.Item
+                label="Markup Value"
+                name="markupValue"
+                rules={[{ required: true, message: 'Please enter markup value' }]}
+              >
+                <InputNumber
+                  placeholder="0"
+                  min={0}
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </div>
           </div>
-
-          <div className="card-footer text-end">
-            <button className="btn btn-primary me-3" onClick={handleSubmit}>
-              {id == null ? "Submit" : "Update"}
-            </button>
-            <button className="btn btn-outline-primary" onClick={handleCancel}>
-              Cancel
-            </button>
-          </div>
-        </div>
+        </Form>
       </Modal>
     </div>
   );

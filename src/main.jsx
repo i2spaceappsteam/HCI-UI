@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import store from './store/index.js';
 import App from './App.jsx';
+import './assets/css/admin-modal.css';
 // // import './assets/scss/style.scss';
 // import "./assets/scss/base/_reset.scss";
 // import "./assets/scss/base/_typography.scss";

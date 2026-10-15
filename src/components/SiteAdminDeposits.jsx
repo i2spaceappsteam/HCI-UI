@@ -200,27 +200,22 @@ const SiteAdminDeposits = () => {
 
             {/* Create Deposit Modal */}
             <Modal
+                title="Create New Deposit"
                 open={createModalVisible}
+                onOk={() => createForm.submit()}
                 onCancel={() => setCreateModalVisible(false)}
-                footer={null}
-                closable={false}
+                okText="Submit"
+                confirmLoading={modalLoading}
+                cancelText="Cancel"
+                width={640}
                 centered
+                destroyOnClose
             >
-                <div className="card mb-0">
-                    <div className="card-header d-flex justify-content-between align-items-center">
-                        <h5 className="mb-0">Create New Deposit</h5>
-                        <button
-                            type="button"
-                            className="btn-close"
-                            onClick={() => setCreateModalVisible(false)}
-                        ></button>
-                    </div>
-                    <div className="card-body">
-                        <Form form={createForm} layout="vertical" onFinish={handleCreateSubmit}>
+                <Form form={createForm} layout="vertical" onFinish={handleCreateSubmit}>
                     <Row gutter={16}>
                         <Col span={12}>
                             <Form.Item name="amount" label="Amount" rules={[{ required: true, message: 'Required' }]}>
-                                <Input type="number" prefix="₹" min={0} onWheel={(e) => e.target.blur()} onKeyDown={(e) => { if (e.key === '-' || e.key === 'e') e.preventDefault(); }} />
+                                <Input type="number" prefix="₹" min={0} placeholder="Amount" onWheel={(e) => e.target.blur()} onKeyDown={(e) => { if (e.key === '-' || e.key === 'e') e.preventDefault(); }} />
                             </Form.Item>
                         </Col>
                         <Col span={12}>
@@ -230,7 +225,7 @@ const SiteAdminDeposits = () => {
                         </Col>
                         <Col span={12}>
                             <Form.Item name="paymentMode" label="Payment Mode">
-                                <Select>
+                                <Select placeholder="Select Payment Mode">
                                     <Option value="0">Cash</Option>
                                     <Option value="1">Bank Transfer</Option>
                                     <Option value="2">UPI</Option>
@@ -240,29 +235,21 @@ const SiteAdminDeposits = () => {
                         </Col>
                         <Col span={12}>
                             <Form.Item name="referenceNumber" label="Reference Number">
-                                <Input />
+                                <Input placeholder="Reference Number" />
                             </Form.Item>
                         </Col>
                         <Col span={12}>
                             <Form.Item name="transactionId" label="Transaction ID">
-                                <Input />
+                                <Input placeholder="Transaction ID" />
                             </Form.Item>
                         </Col>
                         <Col span={12}>
                             <Form.Item name="remarks" label="Remarks">
-                                <Input />
+                                <Input placeholder="Remarks" />
                             </Form.Item>
                         </Col>
                     </Row>
-                    <Form.Item className="text-end mb-0">
-                        <Space>
-                            <Button onClick={() => setCreateModalVisible(false)}>Cancel</Button>
-                            <Button type="primary" htmlType="submit" loading={modalLoading}>Submit</Button>
-                        </Space>
-                    </Form.Item>
                 </Form>
-                </div>
-                </div>
             </Modal>
 
         </div>

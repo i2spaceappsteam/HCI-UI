@@ -185,126 +185,76 @@ const Screens = () => {
 
                 </div>
             </div>
+            {/* Delete Confirmation Modal */}
             <Modal
+                title="Delete Confirmation"
                 open={deleteOpen}
-                footer={null}
-                closable={false}
-                width={420}
+                onOk={handleDelete}
+                onCancel={() => setDeleteOpen(false)}
+                okText="Delete"
+                okButtonProps={{ danger: true }}
+                cancelText="Cancel"
+                width={380}
                 centered
             >
-                <div className="card mb-0">
-                    <div className="card-header py-2 px-3 d-flex align-items-center justify-content-between">
-                        <h6 className="mb-0">Confirm Delete</h6>
-                        <i
-                            className="fa fa-times cursor-pointer"
-                            style={{ fontSize: "16px" }}
-                            onClick={() => setDeleteOpen(false)}
-                        ></i>
-                    </div>
-
-
-                    <div className="card-body text-center py-4">
-                        <i className="fa fa-trash text-danger fs-2 mb-2"></i>
-
-                        <h6 className="mb-1">Are you sure you want to delete?</h6>
-                        <small className="text-muted">
-                            This action cannot be undone.
-                        </small>
-                    </div>
-
-                    <div className="card-footer text-center py-2">
-                        <button
-                            className="btn btn-danger me-2 px-4"
-                            onClick={handleDelete}
-                        >
-                            Delete
-                        </button>
-                        <button
-                            className="btn btn-outline-secondary px-4"
-                            onClick={() => setDeleteOpen(false)}
-                        >
-                            Cancel
-                        </button>
-                    </div>
+                <div className="text-center py-3">
+                    <i className="fa fa-trash-o text-danger fs-1 mb-2 d-block"></i>
+                    <h6 className="mb-1">Are you sure you want to delete this screen?</h6>
+                    <small className="text-muted">
+                        This action cannot be undone.
+                    </small>
                 </div>
             </Modal>
 
-
-
+            {/* Add / Update Screen Modal */}
             <Modal
+                title={id == null ? "Add Screen" : "Update Screen"}
                 open={open}
-                footer={null}
-                closable={false}
-                centered
-                width={900}
+                onOk={handleSubmit}
                 onCancel={handleCancel}
+                okText={id == null ? "Submit" : "Update"}
+                cancelText="Cancel"
+                width={680}
+                centered
+                destroyOnClose
             >
-                <div className="card">
-                    <div className="card-header d-flex justify-content-between align-items-center">
-                        <h5>{id == null ? "Add Screen" : "Update Screen"}</h5>
-                        <button
-                            type="button"
-                            className="btn-close"
-                            onClick={handleCancel}
-                        ></button>
-                    </div>
-
-                    <div className="card-body">
-                        <Form form={form}>
-                            <Row gutter={16}>
-                                <Col span={8}>
-                                    <div className="mb-3">
-                                        <label className="form-label-title">Screen Name</label>
-
-                                        <Form.Item
-                                            name="category"
-                                            rules={[{ required: true, message: "Please select category" }]}
-                                        >
-                                            <Select placeholder="Please select category" style={{ height: "50px" }}>
-                                                {categoryList.map(item => (
-                                                    <Select.Option key={item.id} value={item.id}>
-                                                        {item.categoryName}
-                                                    </Select.Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item></div>
-                                </Col>
-                                <Col span={8}>
-                                    <div className="mb-3">
-                                        <label className="form-label-title">Screen Name</label>
-                                        <Form.Item
-                                            name="screen"
-                                               rules={[{ required: true, message: "Please select screen name" }]}
-                                        >
-                                            <Input style={{ height: "50px" }} placeholder="Name" />
-                                        </Form.Item>
-                                    </div>
-                                </Col>  <Col span={8}>
-                                    <div className="mb-3">
-                                        <label className="form-label-title">Screen Url</label>
-                                        <Form.Item
-                                            name="url"
-                                                rules={[{ required: true, message: "Please select screen url" }]}
-                                        >
-                                            <Input style={{ height: "50px" }} placeholder="Url" />
-                                        </Form.Item>
-                                    </div>
-                                </Col>
-
-                            </Row>
-
-                        </Form>
-                    </div>
-
-                    <div className="card-footer text-end">
-                        <button className="btn btn-primary me-3" onClick={handleSubmit}>
-                            {id == null ? "Submit" : "Update"}
-                        </button>
-                        <button className="btn btn-outline-primary" onClick={handleCancel}>
-                            Cancel
-                        </button>
-                    </div>
-                </div>
+                <Form form={form} layout="vertical">
+                    <Row gutter={16}>
+                        <Col span={8}>
+                            <Form.Item
+                                label="Category"
+                                name="category"
+                                rules={[{ required: true, message: "Please select category" }]}
+                            >
+                                <Select placeholder="Select category">
+                                    {categoryList.map(item => (
+                                        <Select.Option key={item.id} value={item.id}>
+                                            {item.categoryName}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item
+                                label="Screen Name"
+                                name="screen"
+                                rules={[{ required: true, message: "Please enter screen name" }]}
+                            >
+                                <Input placeholder="Enter screen name" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item
+                                label="Screen URL"
+                                name="url"
+                                rules={[{ required: true, message: "Please enter screen URL" }]}
+                            >
+                                <Input placeholder="e.g. /Admin/Screens" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </Form>
             </Modal>
 
 

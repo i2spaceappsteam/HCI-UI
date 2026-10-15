@@ -47,92 +47,70 @@ const ChangePassword = ({ isOpen, onClose }) => {
 
     return (
         <Modal
+            title={
+                <span className="d-flex align-items-center gap-2">
+                    <LockOutlined /> Change Password
+                </span>
+            }
             open={isOpen}
-            footer={null}
-            closable={false}
+            onOk={() => form.submit()}
+            onCancel={handleCancel}
+            okText="Update Password"
+            confirmLoading={loading}
+            cancelText="Cancel"
             centered
-            destroyOnHidden
-            width={500}
+            width={420}
+            destroyOnClose
         >
-            <div className="card mb-0">
-                <div className="card-header d-flex justify-content-between align-items-center">
-                    <h5 className="mb-0 d-flex align-items-center gap-2">
-                        <LockOutlined />
-                        Change Password
-                    </h5>
-                    <button type="button" className="btn-close" onClick={handleCancel}></button>
-                </div>
-                <div className="card-body">
-                    <Form
-                        form={form}
-                        layout="vertical"
-                        onFinish={handleSubmit}
-                        autoComplete="off"
-                        className="theme-form"
-                    >
-                        <Form.Item
-                            name="oldPassword"
-                            label="Current Password"
-                            rules={[
-                                { required: true, message: "Current password is required" },
-                                { min: 6, message: "Password must be at least 6 characters" }
-                            ]}
-                        >
-                            <Input.Password
-                                placeholder="Enter your current password"
-                                size="large"
-                                prefix={<LockOutlined />}
-                            />
-                        </Form.Item>
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit}
+                autoComplete="off"
+            >
+                <Form.Item
+                    name="oldPassword"
+                    label="Current Password"
+                    rules={[
+                        { required: true, message: "Current password is required" },
+                        { min: 6, message: "Password must be at least 6 characters" }
+                    ]}
+                >
+                    <Input.Password
+                        placeholder="Enter your current password"
+                        prefix={<LockOutlined />}
+                    />
+                </Form.Item>
 
-                        <Form.Item
-                            name="newPassword"
-                            label="New Password"
-                            rules={[
-                                { required: true, message: "New password is required" },
-                                { min: 6, message: "Password must be at least 6 characters" },
-                                { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, message: "Password must contain uppercase, lowercase, and numbers" }
-                            ]}
-                        >
-                            <Input.Password
-                                placeholder="Enter your new password"
-                                size="large"
-                                prefix={<LockOutlined />}
-                            />
-                        </Form.Item>
+                <Form.Item
+                    name="newPassword"
+                    label="New Password"
+                    rules={[
+                        { required: true, message: "New password is required" },
+                        { min: 6, message: "Password must be at least 6 characters" },
+                        { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, message: "Password must contain uppercase, lowercase, and numbers" }
+                    ]}
+                >
+                    <Input.Password
+                        placeholder="Enter your new password"
+                        prefix={<LockOutlined />}
+                    />
+                </Form.Item>
 
-                        <Form.Item
-                            name="confirmPassword"
-                            label="Confirm Password"
-                            rules={[
-                                { required: true, message: "Please confirm your password" }
-                            ]}
-                            dependencies={['newPassword']}
-                        >
-                            <Input.Password
-                                placeholder="Confirm your new password"
-                                size="large"
-                                prefix={<LockOutlined />}
-                            />
-                        </Form.Item>
-
-                        <div className="card-footer text-end py-2 px-0 mb-0 mt-3 border-top-0 pb-0">
-                            <Space>
-                                <button type="button" className="btn btn-outline-secondary px-4" onClick={handleCancel}>
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="btn btn-theme px-4"
-                                    disabled={loading}
-                                >
-                                    {loading ? 'Updating...' : 'Update Password'}
-                                </button>
-                            </Space>
-                        </div>
-                    </Form>
-                </div>
-            </div>
+                <Form.Item
+                    name="confirmPassword"
+                    label="Confirm Password"
+                    rules={[
+                        { required: true, message: "Please confirm your password" }
+                    ]}
+                    dependencies={['newPassword']}
+                >
+                    <Input.Password
+                        placeholder="Confirm your new password"
+                        prefix={<LockOutlined />}
+                    />
+                </Form.Item>
+            </Form>
         </Modal>
     );
 };

@@ -271,103 +271,71 @@ const Operator = () => {
 
       {/* Add/Edit Modal */}
       <Modal
+        title={editingOperator ? 'Edit Operator' : 'Add New Operator'}
         open={isModalVisible}
-        footer={null}
-        closable={false}
-        width={560}
+        onOk={() => form.submit()}
+        onCancel={handleModalClose}
+        okText={editingOperator ? 'Update' : 'Add Operator'}
+        confirmLoading={loading}
+        cancelText="Cancel"
+        width={460}
         centered
-        destroyOnHidden
+        destroyOnClose
       >
-        <div className="card mb-0">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <h5 className="mb-0">
-              {editingOperator ? 'Edit Operator' : 'Add New Operator'}
-            </h5>
-            <button type="button" className="btn-close" onClick={handleModalClose}></button>
-          </div>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          autoComplete="off"
+        >
+          <Form.Item
+            name="airLineName"
+            label="Airline Name"
+            rules={[
+              { required: true, message: 'Please enter airline name' },
+              { min: 2, message: 'Airline name must be at least 2 characters' },
+              { max: 100, message: 'Airline name must not exceed 100 characters' },
+            ]}
+          >
+            <Input placeholder="Enter airline name (e.g., Air India)" />
+          </Form.Item>
 
-          <div className="card-body">
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={handleSubmit}
-              autoComplete="off"
-              className="theme-form"
-            >
-              <Form.Item
-                name="airLineName"
-                label="Airline Name"
-                rules={[
-                  { required: true, message: 'Please enter airline name' },
-                  { min: 2, message: 'Airline name must be at least 2 characters' },
-                  { max: 100, message: 'Airline name must not exceed 100 characters' },
-                ]}
-              >
-                <Input placeholder="Enter airline name (e.g., Air India)" />
-              </Form.Item>
-
-              <Form.Item
-                name="airLineCode"
-                label="Airline Code"
-                rules={[
-                  { required: true, message: 'Please enter airline code' },
-                  {
-                    pattern: /^[A-Z0-9]{2,3}$/,
-                    message: 'Airline code must be 2-3 uppercase letters/numbers',
-                  },
-                ]}
-              >
-                <Input
-                  placeholder="Enter airline code (e.g., AI, 6E)"
-                  maxLength={3}
-                  style={{ textTransform: 'uppercase' }}
-                />
-              </Form.Item>
-
-              <div className="card-footer text-end py-2 px-0">
-                <Space>
-                  <button type="button" className="btn btn-outline-secondary px-4" onClick={handleModalClose}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-theme px-4" disabled={loading}>
-                    {loading ? 'Saving...' : editingOperator ? 'Update' : 'Add'}
-                  </button>
-                </Space>
-              </div>
-            </Form>
-          </div>
-        </div>
+          <Form.Item
+            name="airLineCode"
+            label="Airline Code"
+            rules={[
+              { required: true, message: 'Please enter airline code' },
+              {
+                pattern: /^[A-Z0-9]{2,3}$/,
+                message: 'Airline code must be 2-3 uppercase letters/numbers',
+              },
+            ]}
+          >
+            <Input
+              placeholder="Enter airline code (e.g., AI, 6E)"
+              maxLength={3}
+              style={{ textTransform: 'uppercase' }}
+            />
+          </Form.Item>
+        </Form>
       </Modal>
 
       {/* Delete Confirm Modal */}
-      <Modal open={deleteModalVisible} footer={null} closable={false} width={420} centered>
-        <div className="card mb-0">
-          <div className="card-header py-2 px-3 d-flex align-items-center justify-content-between">
-            <h6 className="mb-0">Confirm Delete</h6>
-            <i
-              className="fa fa-times cursor-pointer"
-              style={{ fontSize: '16px' }}
-              onClick={() => { setDeleteModalVisible(false); setDeletingId(null); }}
-            ></i>
-          </div>
-
-          <div className="card-body text-center py-4">
-            <i className="fa fa-trash text-danger fs-2 mb-2"></i>
-            <h6 className="mb-1">Are you sure you want to delete this operator?</h6>
-            <small className="text-muted">This action cannot be undone.</small>
-          </div>
-
-          <div className="card-footer text-center py-2">
-            <button className="btn btn-danger me-2 px-4" onClick={handleDelete} disabled={loading}>
-              {loading ? 'Deleting...' : 'Delete'}
-            </button>
-            <button
-              className="btn btn-outline-secondary px-4"
-              onClick={() => { setDeleteModalVisible(false); setDeletingId(null); }}
-            >
-              Cancel
-            </button>
-          </div>
+      <Modal
+        title="Delete Confirmation"
+        open={deleteModalVisible}
+        onOk={handleDelete}
+        onCancel={() => { setDeleteModalVisible(false); setDeletingId(null); }}
+        okText="Delete"
+        okButtonProps={{ danger: true, loading: loading }}
+        cancelText="Cancel"
+        width={380}
+        centered
+      >
+        <div className="text-center py-3">
+          <i className="fa fa-trash-o text-danger fs-1 mb-2 d-block"></i>
+          <h6 className="mb-1">Are you sure you want to delete this operator?</h6>
+          <small className="text-muted">This action cannot be undone.</small>
         </div>
       </Modal>
     </div>

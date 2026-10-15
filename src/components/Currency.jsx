@@ -158,95 +158,52 @@ const Currency = () => {
 
             {/* Delete Modal */}
             <Modal
+                title="Delete Confirmation"
                 open={deleteOpen}
-                footer={null}
-                closable={false}
-                width={420}
+                onOk={handleDelete}
+                onCancel={() => setDeleteOpen(false)}
+                okText="Delete"
+                okButtonProps={{ danger: true }}
+                cancelText="Cancel"
+                width={380}
                 centered
             >
-                <div className="card mb-0">
-                    <div className="card-header py-2 px-3 d-flex align-items-center justify-content-between">
-                        <h6 className="mb-0">Confirm Delete</h6>
-                        <i
-                            className="fa fa-times cursor-pointer"
-                            style={{ fontSize: "16px" }}
-                            onClick={() => setDeleteOpen(false)}
-                        ></i>
-                    </div>
-
-                    <div className="card-body text-center py-4">
-                        <i className="fa fa-trash text-danger fs-2 mb-2"></i>
-                        <h6 className="mb-1">Are you sure you want to delete?</h6>
-                        <small className="text-muted">
-                            This action cannot be undone.
-                        </small>
-                    </div>
-
-                    <div className="card-footer text-center py-2">
-                        <button
-                            className="btn btn-danger me-2 px-4"
-                            onClick={handleDelete}
-                        >
-                            Delete
-                        </button>
-                        <button
-                            className="btn btn-outline-secondary px-4"
-                            onClick={() => setDeleteOpen(false)}
-                        >
-                            Cancel
-                        </button>
-                    </div>
+                <div className="text-center py-3">
+                    <i className="fa fa-trash-o text-danger fs-1 mb-2 d-block"></i>
+                    <h6 className="mb-1">Are you sure you want to delete this currency?</h6>
+                    <small className="text-muted">This action cannot be undone.</small>
                 </div>
             </Modal>
 
             {/* Add/Edit Modal */}
             <Modal
+                title={id == null ? "Add Currency" : "Update Currency"}
                 open={open}
-                footer={null}
-                closable={false}
-                centered
-                width={600}
+                onOk={handleSubmit}
                 onCancel={handleCancel}
+                okText={id == null ? "Submit" : "Update"}
+                cancelText="Cancel"
+                width={460}
+                centered
+                destroyOnClose
             >
-                <div className="card">
-                    <div className="card-header d-flex justify-content-between align-items-center">
-                        <h5>{id == null ? "Add Currency" : "Update Currency"}</h5>
-                        <button
-                            type="button"
-                            className="btn-close"
-                            onClick={handleCancel}
-                        ></button>
-                    </div>
+                <Form form={form} layout="vertical">
+                    <Form.Item
+                        name="countryName"
+                        label="Country Name"
+                        rules={[{ required: true, message: "Country Name is required" }]}
+                    >
+                        <Input placeholder="Enter country name" />
+                    </Form.Item>
 
-                    <div className="card-body">
-                        <Form form={form} layout="vertical">
-                            <Form.Item
-                                name="countryName"
-                                label="Country Name"
-                                rules={[{ required: true, message: "Country Name is required" }]}
-                            >
-                                <Input style={{ height: "50px" }} placeholder="Country Name" />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="currencyCode"
-                                label="Currency Code"
-                                rules={[{ required: true, message: "Currency Code is required" }]}
-                            >
-                                <Input style={{ height: "50px" }} placeholder="Currency Code (e.g., USD, INR)" maxLength={3} />
-                            </Form.Item>
-                        </Form>
-                    </div>
-
-                    <div className="card-footer text-end">
-                        <button className="btn btn-primary me-3" onClick={handleSubmit}>
-                            {id == null ? "Submit" : "Update"}
-                        </button>
-                        <button className="btn btn-outline-primary" onClick={handleCancel}>
-                            Cancel
-                        </button>
-                    </div>
-                </div>
+                    <Form.Item
+                        name="currencyCode"
+                        label="Currency Code"
+                        rules={[{ required: true, message: "Currency Code is required" }]}
+                    >
+                        <Input placeholder="Enter currency code (e.g. USD, INR)" maxLength={3} />
+                    </Form.Item>
+                </Form>
             </Modal>
         </div>
     );

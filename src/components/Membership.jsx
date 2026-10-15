@@ -145,58 +145,46 @@ const Membership = () => {
         </div>
       </div>
 
-      <Modal open={deleteOpen} footer={null} closable={false} width={420} centered>
-        <div className="card mb-0">
-          <div className="card-header py-2 px-3 d-flex align-items-center justify-content-between">
-            <h6 className="mb-0">Confirm Delete</h6>
-            <i className="fa fa-times cursor-pointer" style={{ fontSize: "16px" }} onClick={() => setDeleteOpen(false)}></i>
-          </div>
-
-          <div className="card-body text-center py-4">
-            <i className="fa fa-trash text-danger fs-2 mb-2"></i>
-
-            <h6 className="mb-1">Are you sure you want to delete?</h6>
-            <small className="text-muted">This action cannot be undone.</small>
-          </div>
-
-          <div className="card-footer text-center py-2">
-            <button className="btn btn-danger me-2 px-4" onClick={handleDelete}>
-              Delete
-            </button>
-            <button className="btn btn-outline-secondary px-4" onClick={() => setDeleteOpen(false)}>
-              Cancel
-            </button>
-          </div>
+      {/* Delete Confirmation Modal */}
+      <Modal
+        title="Delete Confirmation"
+        open={deleteOpen}
+        onOk={handleDelete}
+        onCancel={() => setDeleteOpen(false)}
+        okText="Delete"
+        okButtonProps={{ danger: true }}
+        cancelText="Cancel"
+        width={380}
+        centered
+      >
+        <div className="text-center py-3">
+          <i className="fa fa-trash-o text-danger fs-1 mb-2 d-block"></i>
+          <h6 className="mb-1">Are you sure you want to delete this membership?</h6>
+          <small className="text-muted">This action cannot be undone.</small>
         </div>
       </Modal>
 
-      <Modal open={open} footer={null} closable={false} centered width={600} onCancel={handleCancel}>
-        <div className="card">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <h5>{id == null ? "Add Membership" : "Update Membership"}</h5>
-            <button type="button" className="btn-close" onClick={handleCancel}></button>
-          </div>
-
-          <div className="card-body">
-            <Form layout="vertical" form={form} className="theme-form mega-form">
-              <div className="mb-3">
-                <label className="form-label-title">Membership Name</label>
-                <Form.Item name="membershipname" rules={[{ required: true, message: "Membership Name is required" }]}> 
-                  <Input className="form-control" placeholder="Membership Name" />
-                </Form.Item>
-              </div>
-            </Form>
-          </div>
-
-          <div className="card-footer text-end">
-            <button className="btn btn-primary me-3" onClick={handleSubmit}>
-              {id == null ? "Submit" : "Update"}
-            </button>
-            <button className="btn btn-outline-primary" onClick={handleCancel}>
-              Cancel
-            </button>
-          </div>
-        </div>
+      {/* Add / Update Membership Modal */}
+      <Modal
+        title={id == null ? "Add Membership" : "Update Membership"}
+        open={open}
+        onOk={handleSubmit}
+        onCancel={handleCancel}
+        okText={id == null ? "Submit" : "Update"}
+        cancelText="Cancel"
+        width={460}
+        centered
+        destroyOnClose
+      >
+        <Form layout="vertical" form={form}>
+          <Form.Item
+            label="Membership Name"
+            name="membershipname"
+            rules={[{ required: true, message: "Membership Name is required" }]}
+          >
+            <Input placeholder="Enter membership name" />
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );

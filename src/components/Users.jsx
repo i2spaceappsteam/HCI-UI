@@ -250,112 +250,58 @@ console.log("gh",statusId)
 
                 </div>
             </div>
+            {/* Delete Confirmation Modal */}
             <Modal
+                title="Delete Confirmation"
                 open={deleteOpen}
-                footer={null}
-                closable={false}
-                width={420}
+                onOk={handleDelete}
+                onCancel={() => setDeleteOpen(false)}
+                okText="Delete"
+                okButtonProps={{ danger: true }}
+                cancelText="Cancel"
+                width={380}
                 centered
             >
-                <div className="card mb-0">
-                    <div className="card-header py-2 px-3 d-flex align-items-center justify-content-between">
-                        <h6 className="mb-0">Confirm Delete</h6>
-                        <i
-                            className="fa fa-times cursor-pointer"
-                            style={{ fontSize: "16px" }}
-                            onClick={() => setDeleteOpen(false)}
-                        ></i>
-                    </div>
-
-
-                    <div className="card-body text-center py-4">
-                        <i className="fa fa-trash text-danger fs-2 mb-2"></i>
-
-                        <h6 className="mb-1">Are you sure you want to delete?</h6>
-                        <small className="text-muted">
-                            This action cannot be undone.
-                        </small>
-                    </div>
-
-                    <div className="card-footer text-center py-2">
-                        <button
-                            className="btn btn-danger me-2 px-4"
-                            onClick={handleDelete}
-                        >
-                            Delete
-                        </button>
-                        <button
-                            className="btn btn-outline-secondary px-4"
-                            onClick={() => setDeleteOpen(false)}
-                        >
-                            Cancel
-                        </button>
-                    </div>
+                <div className="text-center py-3">
+                    <i className="fa fa-trash-o text-danger fs-1 mb-2 d-block"></i>
+                    <h6 className="mb-1">Are you sure you want to delete this user?</h6>
+                    <small className="text-muted">
+                        This action cannot be undone.
+                    </small>
                 </div>
             </Modal>
 
-   <Modal
-                open={statusOpen}
-                footer={null}
-                closable={false}
-                width={420}
-                centered
-            >
-                <div className="card mb-0">
-                    <div className="card-header py-2 px-3 d-flex align-items-center justify-content-between">
-                        <h6 className="mb-0">Confirm Status Change</h6>
-                        <i
-                            className="fa fa-times cursor-pointer"
-                            style={{ fontSize: "16px" }}
-                            onClick={() => setStatusOpen(false)}
-                        ></i>
-                    </div>
-
-
-                    <div className="card-body text-center py-4">
-                        <i className="fa fa-trash text-danger fs-2 mb-2"></i>
-
-                        <h6 className="mb-1">Are you sure you want to change status?</h6>
-                    </div>
-
-                    <div className="card-footer text-center py-2">
-                        <button
-                            className="btn btn-danger me-2 px-4"
-                            onClick={handleStatus}
-                        >
-                            Change Status
-                        </button>
-                        <button
-                            className="btn btn-outline-secondary px-4"
-                            onClick={() => setStatusOpen(false)}
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            </Modal>
-
+            {/* Status Change Modal */}
             <Modal
-                open={open}
-                footer={null}
-                closable={false}
+                title="Confirm Status Change"
+                open={statusOpen}
+                onOk={handleStatus}
+                onCancel={() => setStatusOpen(false)}
+                okText="Change Status"
+                cancelText="Cancel"
+                width={380}
                 centered
-                width={900}
-                onCancel={handleCancel}
             >
-                <div className="card">
-                    <div className="card-header d-flex justify-content-between align-items-center">
-                        <h5>{id == null ? "Add User" : "Update User"}</h5>
-                        <button
-                            type="button"
-                            className="btn-close"
-                            onClick={handleCancel}
-                        ></button>
-                    </div>
+                <div className="text-center py-3">
+                    <i className="fa fa-refresh text-warning fs-1 mb-2 d-block"></i>
+                    <h6 className="mb-1">Are you sure you want to change this user's status?</h6>
+                    <small className="text-muted">This will toggle the active state of the user account.</small>
+                </div>
+            </Modal>
 
-                    <div className="card-body">
-                        <Form form={form} layout="vertical">
-
+            {/* Add / Update User Modal */}
+            <Modal
+                title={id == null ? "Add User" : "Update User"}
+                open={open}
+                onOk={handleSubmit}
+                onCancel={handleCancel}
+                okText={id == null ? "Submit" : "Update"}
+                cancelText="Cancel"
+                width={720}
+                centered
+                destroyOnClose
+            >
+                <Form form={form} layout="vertical">
                             <Row gutter={16}>
                                 <Col span={8}>
                                     <Form.Item
@@ -363,7 +309,7 @@ console.log("gh",statusId)
                                         label="User Name"
                                         rules={[{ required: true, message: "User Name is required" }]}
                                     >
-                                        <Input style={{ height: "50px" }} placeholder="User Name" />
+                                        <Input placeholder="User Name" />
                                     </Form.Item>
                                 </Col>
 
@@ -373,7 +319,7 @@ console.log("gh",statusId)
                                         label="First Name"
                                         rules={[{ required: true, message: "First Name is required" }]}
                                     >
-                                        <Input style={{ height: "50px" }} placeholder="First Name" />
+                                        <Input placeholder="First Name" />
                                     </Form.Item>
                                 </Col>
 
@@ -383,7 +329,7 @@ console.log("gh",statusId)
                                         label="Last Name"
                                         rules={[{ required: true, message: "Last Name is required" }]}
                                     >
-                                        <Input style={{ height: "50px" }} placeholder="Last Name" />
+                                        <Input placeholder="Last Name" />
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -392,23 +338,23 @@ console.log("gh",statusId)
                                 <Col span={8}>
                                     <Form.Item
                                         name="emailId"
-                                        label="Email Id"
+                                        label="Email ID"
                                         rules={[
                                             { required: true, message: "Email is required" },
                                             { type: 'email', message: 'Please enter a valid email!' },
                                         ]}
                                     >
-                                        <Input style={{ height: "50px" }} placeholder="Email" type="email" />
+                                        <Input placeholder="Email Address" type="email" />
                                     </Form.Item>
                                 </Col>
 
                                 <Col span={8}>
                                     <Form.Item
                                         name="isd"
-                                        label="ISD"
+                                        label="ISD Code"
                                         rules={[{ required: true, message: "ISD is required" }]}
                                     >
-                                        <Input type="number" min={1} max={999} style={{ height: "50px" }} placeholder="ISD" />
+                                        <Input type="number" min={1} max={999} placeholder="ISD (e.g. 91)" />
                                     </Form.Item>
                                 </Col>
 
@@ -418,7 +364,7 @@ console.log("gh",statusId)
                                         label="Phone Number"
                                         rules={[{ required: true, message: "Phone Number is required" }]}
                                     >
-                                        <Input type="number" maxLength={15} style={{ height: "50px" }} placeholder="Phone Number" />
+                                        <Input type="number" maxLength={15} placeholder="Phone Number" />
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -427,10 +373,10 @@ console.log("gh",statusId)
                                 <Col span={8}>
                                     <Form.Item
                                         name="memberShip"
-                                        label="Membership Name"
+                                        label="Membership"
                                         rules={[{ required: true, message: "Please select membership" }]}
                                     >
-                                        <Select placeholder="Please select membership" style={{ height: "50px" }}>
+                                        <Select placeholder="Select membership">
                                             {memberships.map(item => (
                                                 <Select.Option key={item.id} value={item.id}>
                                                     {item.membership}
@@ -443,10 +389,10 @@ console.log("gh",statusId)
                                 <Col span={8}>
                                     <Form.Item
                                         name="role"
-                                        label="Role Name"
+                                        label="Role"
                                         rules={[{ required: true, message: "Please select role" }]}
                                     >
-                                        <Select placeholder="Please select role" style={{ height: "50px" }}>
+                                        <Select placeholder="Select role">
                                             {rolesList.map(item => (
                                                 <Select.Option key={item.id} value={item.id}>
                                                     {item.roleName}
@@ -462,7 +408,7 @@ console.log("gh",statusId)
                                         label="Gender"
                                         rules={[{ required: true, message: "Gender is required" }]}
                                     >
-                                        <Select placeholder="Please select gender" style={{ height: "50px" }}>
+                                        <Select placeholder="Select gender">
                                             <Select.Option key={1} value="Male">Male</Select.Option>
                                             <Select.Option key={2} value="Female">Female</Select.Option>
                                             <Select.Option key={3} value="Others">Others</Select.Option>
@@ -478,7 +424,7 @@ console.log("gh",statusId)
                                         label="Title"
                                         rules={[{ required: true, message: "Title is required" }]}
                                     >
-                                        <Input style={{ height: "50px" }} placeholder="Title" />
+                                        <Input placeholder="Title (e.g. Mr, Ms)" />
                                     </Form.Item>
                                 </Col>
 
@@ -488,7 +434,7 @@ console.log("gh",statusId)
                                         label="Company Name"
                                         rules={[{ required: true, message: "Company Name is required" }]}
                                     >
-                                        <Input style={{ height: "50px" }} placeholder="Company Name" />
+                                        <Input placeholder="Company Name" />
                                     </Form.Item>
                                 </Col>
 
@@ -498,7 +444,7 @@ console.log("gh",statusId)
                                         label="City"
                                         rules={[{ required: true, message: "City is required" }]}
                                     >
-                                        <Input style={{ height: "50px" }} placeholder="City" />
+                                        <Input placeholder="City" />
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -510,7 +456,7 @@ console.log("gh",statusId)
                                         label="State"
                                         rules={[{ required: true, message: "State is required" }]}
                                     >
-                                        <Input style={{ height: "50px" }} placeholder="State" />
+                                        <Input placeholder="State" />
                                     </Form.Item>
                                 </Col>
 
@@ -520,7 +466,7 @@ console.log("gh",statusId)
                                         label="Country"
                                         rules={[{ required: true, message: "Country is required" }]}
                                     >
-                                        <Input style={{ height: "50px" }} placeholder="Country" />
+                                        <Input placeholder="Country" />
                                     </Form.Item>
                                 </Col>
 
@@ -530,7 +476,7 @@ console.log("gh",statusId)
                                         label="Address"
                                         rules={[{ required: true, message: "Address is required" }]}
                                     >
-                                        <Input style={{ height: "50px" }} placeholder="Address" />
+                                        <Input placeholder="Address" />
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -542,7 +488,7 @@ console.log("gh",statusId)
                                         label="Pincode"
                                         rules={[{ required: true, message: "Pincode is required" }]}
                                     >
-                                        <Input style={{ height: "50px" }} type="number" placeholder="Pincode" />
+                                        <Input type="number" placeholder="Pincode" />
                                     </Form.Item>
                                 </Col>
 
@@ -554,7 +500,7 @@ console.log("gh",statusId)
                                             { required: true, message: "Currency is required" }
                                         ]}
                                     >
-                                        <Select placeholder="Please select currency" style={{ height: "50px" }}>
+                                        <Select placeholder="Select currency">
                                             {currenciesList.map(item => (
                                                 <Select.Option key={item.id} value={item.currencyName}>
                                                     {item.currencyName} - {item.countryName}
@@ -564,18 +510,7 @@ console.log("gh",statusId)
                                     </Form.Item>
                                 </Col>
                             </Row>
-                        </Form>
-                    </div>
-
-                    <div className="card-footer text-end">
-                        <button className="btn btn-primary me-3" onClick={handleSubmit}>
-                            {id == null ? "Submit" : "Update"}
-                        </button>
-                        <button className="btn btn-outline-primary" onClick={handleCancel}>
-                            Cancel
-                        </button>
-                    </div>
-                </div>
+                </Form>
             </Modal>
 
         </div>

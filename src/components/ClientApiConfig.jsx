@@ -215,189 +215,139 @@ const ClientApiConfig = () => {
 
         </div>
       </div>
+      {/* Delete Confirmation Modal */}
       <Modal
+        title="Delete Confirmation"
         open={deleteOpen}
-        footer={null}
-        closable={false}
-        width={420}
+        onOk={handleDelete}
+        onCancel={() => setDeleteOpen(false)}
+        okText="Delete"
+        okButtonProps={{ danger: true }}
+        cancelText="Cancel"
+        width={380}
         centered
       >
-        <div className="card mb-0">
-          <div className="card-header py-2 px-3 d-flex align-items-center justify-content-between">
-            <h6 className="mb-0">Confirm Delete</h6>
-            <i
-              className="fa fa-times cursor-pointer"
-              style={{ fontSize: "16px" }}
-              onClick={() => setDeleteOpen(false)}
-            ></i>
-          </div>
-
-
-          <div className="card-body text-center py-4">
-            <i className="fa fa-trash text-danger fs-2 mb-2"></i>
-
-            <h6 className="mb-1">Are you sure you want to delete?</h6>
-            <small className="text-muted">
-              This action cannot be undone.
-            </small>
-          </div>
-
-          <div className="card-footer text-center py-2">
-            <button
-              className="btn btn-danger me-2 px-4"
-              onClick={handleDelete}
-            >
-              Delete
-            </button>
-            <button
-              className="btn btn-outline-secondary px-4"
-              onClick={() => setDeleteOpen(false)}
-            >
-              Cancel
-            </button>
-          </div>
+        <div className="text-center py-3">
+          <i className="fa fa-trash-o text-danger fs-1 mb-2 d-block"></i>
+          <h6 className="mb-1">Are you sure you want to delete this configuration?</h6>
+          <small className="text-muted">
+            This action cannot be undone.
+          </small>
         </div>
       </Modal>
 
-
-
+      {/* Add / Update Configuration Modal */}
       <Modal
+        title={id == null ? "Add Configuration" : "Update Configuration"}
         open={open}
-        footer={null}
-        closable={false}
-        centered
-        width={800}
+        onOk={handleSubmit}
         onCancel={handleCancel}
+        okText={id == null ? "Submit" : "Update"}
+        cancelText="Cancel"
+        width={720}
+        centered
+        destroyOnClose
       >
-        <div className="card">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <h5>{id == null ? "Add Config" : "Update Config"}</h5>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={handleCancel}
-            ></button>
-          </div>
+        <Form form={form} layout="vertical">
+          <Row gutter={16}>
+            <Col span={isUser ? 8 : 12}>
+              <Form.Item
+                label="Role"
+                name="usertype"
+                rules={[{ required: true, message: "Please select role" }]}
+              >
+                <Select
+                  placeholder="Select role"
+                  onChange={(val) => {
+                    if (val === 2) setIsUser(true);
+                    else setIsUser(false);
+                  }}
+                >
+                  <Select.Option key={1} value={1}>
+                    Admin
+                  </Select.Option>
+                  <Select.Option key={2} value={2}>
+                    Site Admin
+                  </Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
 
-          <div className="card-body">
-            <Form form={form}>
-              <Row gutter={16}>
-                <Col span={8}>
-                  <div className="mb-3">
-                    <label className="form-label-title">Role</label>
+            {isUser && (
+              <Col span={8}>
+                <Form.Item
+                  label="Company Name"
+                  name="userId"
+                  rules={[{ required: true, message: "Please select company" }]}
+                >
+                  <Select placeholder="Select company">
+                    {usersList.map((item) => (
+                      <Select.Option key={item.id} value={item.id}>
+                        {item.companyName}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            )}
 
-                    <Form.Item
-                      name="usertype"
-                      rules={[{ required: true, message: "Please select role" }]}
-                    >
-                      <Select placeholder="Please select role" onChange={(val) => {
-                        if (val == 2)
-                          setIsUser(true)
-                        else
-                          setIsUser(false)
-                      }
-                      } style={{ height: "50px" }} >
+            <Col span={isUser ? 8 : 12}>
+              <Form.Item
+                label="Services"
+                name="services"
+                rules={[{ required: true, message: "Please select service" }]}
+              >
+                <Select
+                  placeholder="Select service"
+                  maxTagCount="responsive"
+                  mode="multiple"
+                >
+                  <Select.Option key={1} value={1}>
+                    Domestic Hotels
+                  </Select.Option>
+                  <Select.Option key={2} value={2}>
+                    International Hotels
+                  </Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
 
-                        <Select.Option key={1} value={1} >
-                          Admin
-                        </Select.Option>
-                        <Select.Option key={2} value={2} >
-                          Site Admin
-                        </Select.Option>
+          <Row gutter={16}>
+            <Col span={24}>
+              <div className="mt-2">
+                <label className="form-label-title mb-2">
+                  <span className="text-danger">*</span> Suppliers
+                </label>
 
-                      </Select>
-                    </Form.Item>
-                  </div>
-                </Col>{isUser &&
-                  <Col span={8}>
-                    <div className="mb-3">
-                      <label className="form-label-title">Company Name</label>
-
-                      <Form.Item
-                        name="userId"
-                        rules={[{ required: true, message: "Please select company" }]}
-                      >
-                        <Select placeholder="Please select company" style={{ height: "50px" }}>
-                          {usersList.map(item => (
-                            <Select.Option key={item.id} value={item.id}>
-                              {item.companyName}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      </Form.Item>
-                    </div>
-                  </Col>
-                }
-                <Col span={8}>
-                  <div className="mb-3">
-                    <label className="form-label-title">Services</label>
-
-                    <Form.Item
-                      name="services"
-                      rules={[{ required: true, message: "Please select servivce" }]}
-                    >
-                      <Select placeholder="Please select Service" style={{ height: "50px" }} maxTagCount="responsive" mode='multiple'>
-
-                        <Select.Option key={1} value={1} >
-                          Domestic Hotels
-                        </Select.Option>
-                        <Select.Option key={2} value={2} >
-                          International Hotels
-                        </Select.Option>
-
-                      </Select>
-                    </Form.Item>
-                  </div>
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col span={24}>
-                  <div class="row mt-3">
-                    <div class="col-md-12">
-                      <label><span class="text-danger">*</span> Supplier</label>
-
-                      <div class="row">
-                        {supplierList.map((supplier, index) => (
-                          <div className="col-md-3" key={supplier.id || index}>
-                            <div className="form-check">
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id={`supplier-${supplier.id || index}`}
-                                checked={selectedSuppliers.includes(supplier.id)}
-                                onChange={(e) =>
-                                  handleSupplierChange(supplier.id, e.target.checked)
-                                }
-                              />
-                              <label
-                                className="form-check-label"
-                                htmlFor={`supplier-${supplier.id || index}`}
-                              >
-                                {supplier.supplierName}
-                              </label>
-                            </div>
-                          </div>
-                        ))}
-
-
-
+                <div className="row g-2 p-3 bg-light rounded-3 border">
+                  {supplierList.map((supplier, index) => (
+                    <div className="col-md-3 col-sm-6" key={supplier.id || index}>
+                      <div className="form-check d-flex align-items-center gap-2">
+                        <input
+                          className="form-check-input mt-0"
+                          type="checkbox"
+                          id={`supplier-${supplier.id || index}`}
+                          checked={selectedSuppliers.includes(supplier.id)}
+                          onChange={(e) =>
+                            handleSupplierChange(supplier.id, e.target.checked)
+                          }
+                        />
+                        <label
+                          className="form-check-label text-dark fw-medium"
+                          htmlFor={`supplier-${supplier.id || index}`}
+                          style={{ cursor: "pointer", fontSize: "13px" }}
+                        >
+                          {supplier.supplierName}
+                        </label>
                       </div>
                     </div>
-                  </div>
-                </Col>
-              </Row>
-            </Form>
-          </div>
-
-          <div className="card-footer text-end">
-            <button className="btn btn-primary me-3" onClick={handleSubmit}>
-              {id == null ? "Submit" : "Update"}
-            </button>
-            <button className="btn btn-outline-primary" onClick={handleCancel}>
-              Cancel
-            </button>
-          </div>
-        </div>
+                  ))}
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </Form>
       </Modal>
 
 
