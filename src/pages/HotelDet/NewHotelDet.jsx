@@ -93,7 +93,8 @@ const HotelDet = () => {
         const staticReqObj = {
             traceId: params.traceId || "",
             cityId: params.hotelCityCode || "",
-            countryCode: params.nationality || "IN",
+            // countryCode: params.nationality || "IN",
+            countryCode: "",
             hotelId: params.hotelCode || "",
             detailLevel: "high"
         };
