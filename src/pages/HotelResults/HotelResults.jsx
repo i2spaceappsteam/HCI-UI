@@ -196,7 +196,8 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
     const staticReqObj = {
       traceId: "string",
       cityId: searchReqObj.hotelCityCode,
-      countryCode: searchReqObj.countryCode || "IN",
+      // countryCode: searchReqObj.countryCode || "IN",
+      countryCode: "",
       hotelId: "",
       detailLevel: "high",
     };
@@ -288,12 +289,12 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
                 description: matchedStatic?.description || hotel.description || hotel.Description || "",
                 starRating: Number(
                   matchedStatic?.starRating ??
-                    matchedStatic?.StarRating ??
-                    hotel.starRating ??
-                    hotel.StarRating ??
-                    hotel.starRatings ??
-                    hotel.stars ??
-                    0
+                  matchedStatic?.StarRating ??
+                  hotel.starRating ??
+                  hotel.StarRating ??
+                  hotel.starRatings ??
+                  hotel.stars ??
+                  0
                 ),
                 images:
                   matchedStatic?.images?.length > 0 ? matchedStatic.images : hotel.images || hotel.Images || [],
@@ -305,8 +306,8 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
                   matchedStatic?.addresses?.length > 0
                     ? matchedStatic.addresses
                     : hotel.addresses?.length > 0
-                    ? hotel.addresses
-                    : [{ address: hotel.address || hotel.Address || "", cityName: hotel.city || hotel.cityName || "" }],
+                      ? hotel.addresses
+                      : [{ address: hotel.address || hotel.Address || "", cityName: hotel.city || hotel.cityName || "" }],
                 city: matchedStatic?.city || hotel.city || hotel.City || hotel.cityName || "",
                 isPriceAvailable: true,
                 isVisible: true,
