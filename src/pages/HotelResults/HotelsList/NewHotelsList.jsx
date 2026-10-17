@@ -75,7 +75,16 @@ const NewHotelsList = ({
     ].filter(Boolean).join(", ")
     : hotelCardProps?.city || hotelCardProps?.cityName || "City Center";
 
-  const starRatingNum = Number(hotelCardProps?.starRating || 0);
+  const starRatingNum = Number(
+    hotelCardProps?.starRating ??
+    hotelCardProps?.StarRating ??
+    hotelCardProps?.starRatings ??
+    hotelCardProps?.stars ??
+    0
+  );
+  const displayRating = starRatingNum > 0
+    ? (starRatingNum % 1 !== 0 ? starRatingNum.toFixed(1) : String(starRatingNum))
+    : null;
   const rawPrice = Number(hotelCardProps?.hotelPublishPrice || hotelCardProps?.hotelMinPrice || 0);
   const publishPrice = rawPrice > 0 ? rawPrice : 0;
   const originalFakePrice = publishPrice > 0 ? publishPrice * 1.15 : 0;
@@ -200,14 +209,14 @@ const NewHotelsList = ({
                 <h3 className="hotel-card-title">{hotelCardProps?.hotelName || "Premium Hotel & Suites"}</h3>
               </Link>
 
-              {starRatingNum > 0 && (
+              {/* {starRatingNum > 0 && (
                 <div className="hotel-star-badge">
                   {[...Array(Math.min(5, Math.floor(starRatingNum)))].map((_, i) => (
                     <StarFilled key={i} className="star-icon" />
                   ))}
                   <span className="star-rating-text">{starRatingNum} Star</span>
                 </div>
-              )}
+              )} */}
             </div>
 
             <p className="hotel-address-line">
@@ -254,8 +263,23 @@ const NewHotelsList = ({
 
         {/* 3. Right Price & Action Column */}
         <div className="hotel-pricing-col">
-          {/* TripAdvisor or Rating Badge */}
-          {hotelCardProps?.tripAdvisorRating ? (
+          {/* Star Rating / Review Badge above price block */}
+          {starRatingNum > 0 ? (
+            <div className="review-score-box">
+              <div className="score-text">
+                <div style={{ display: "flex", gap: "2px", justifyContent: "flex-end", marginBottom: "2px" }}>
+                  {[...Array(Math.min(5, Math.floor(starRatingNum)))].map((_, i) => (
+                    <StarFilled key={i} style={{ color: "#f59e0b", fontSize: "11px" }} />
+                  ))}
+                </div>
+                {/* <strong>{starRatingNum} Star Hotel</strong> */}
+                <span>Hotel Rating</span>
+              </div>
+              <div className="score-badge">
+                {displayRating} <StarFilled style={{ fontSize: "10px", color: "#f59e0b", marginLeft: "2px" }} />
+              </div>
+            </div>
+          ) : hotelCardProps?.tripAdvisorRating ? (
             <div className="review-score-box">
               <div className="score-text">
                 <strong>{Number(hotelCardProps.tripAdvisorRating) >= 4 ? "Excellent" : "Very Good"}</strong>
@@ -268,10 +292,12 @@ const NewHotelsList = ({
           ) : (
             <div className="review-score-box">
               <div className="score-text">
-                <strong>Top Rated</strong>
-                <span>Guest Choice</span>
+                <strong>Standard</strong>
+                <span>Hotel Rating</span>
               </div>
-              <div className="score-badge">4.5</div>
+              <div className="score-badge">
+                <StarFilled style={{ color: "#f59e0b", fontSize: "11px" }} />
+              </div>
             </div>
           )}
 

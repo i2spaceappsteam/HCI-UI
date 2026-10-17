@@ -193,67 +193,73 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
   };
 
   const getHotelDetails = (searchReqObj) => {
-    // Step 1: Get search results first
-    Apiclient1.post("Hotel/HotelSearch", searchReqObj)
-      .then((res) => {
-        let hotels = res?.hotels || res?.data?.hotels || [];
-        console.log("Search response:", res);
-        console.log("Search hotels:", hotels.length, "| Sample keys:", Object.keys(hotels[0] || {}));
+    const staticReqObj = {
+      traceId: "string",
+      cityId: searchReqObj.hotelCityCode,
+      countryCode: searchReqObj.countryCode || "IN",
+      hotelId: "",
+      detailLevel: "high",
+    };
 
-        if (hotels.length === 0) {
-          console.log("No hotels from search.");
-          setResultLoading(false);
-          setIsHotelSearchLoad(false);
-          setIsLoading(false);
-          return;
-        }
+    // Step 1: Call StaticData/GetHotelDetails first
+    Apiclient1.post("StaticData/GetHotelDetails", staticReqObj)
+      .then((staticRes) => {
+        console.log("Static response:", staticRes);
 
-        setTraceId(res.traceId);
+        // Extract static hotels — check all possible keys
+        const rawStaticHotels =
+          staticRes?.hotelDetails ||
+          staticRes?.hotels ||
+          staticRes?.data?.hotelDetails ||
+          staticRes?.data?.hotels ||
+          staticRes?.data ||
+          (Array.isArray(staticRes) ? staticRes : []);
 
-        // Step 2: Extract hotel codes from search results to query static API
-        const hotelCodesFromSearch = hotels.map(h =>
-          String(h.hotelCode || h.HotelCode || h.hotelId || h.HotelId || "")
-        ).filter(Boolean);
+        console.log(
+          "Static hotels count:",
+          rawStaticHotels.length,
+          "| Sample keys:",
+          Object.keys(rawStaticHotels[0] || {})
+        );
 
-        const staticReqObj = {
-          traceId: "string",
-          cityId: searchReqObj.hotelCityCode,
-          countryCode: searchReqObj.countryCode || "IN",
-          hotelId: "",
-          detailLevel: "high"
-        };
+        // Build a lookup map from static data for O(1) matching
+        const staticMap = {};
+        rawStaticHotels.forEach((sh) => {
+          const id1 = String(sh.hotelId || sh.HotelId || "");
+          const id2 = String(sh.hotelCode || sh.HotelCode || "");
+          if (id1) staticMap[id1] = sh;
+          if (id2 && id2 !== id1) staticMap[id2] = sh;
+        });
 
-        // Step 3: Get static data
-        return Apiclient1.post("StaticData/GetHotelDetails", staticReqObj)
-          .then((staticRes) => {
-            console.log("Static response:", staticRes);
+        console.log("Static map keys sample:", Object.keys(staticMap).slice(0, 5));
 
-            // Extract static hotels — check all possible keys
-            const rawStaticHotels =
-              staticRes?.hotelDetails ||
-              staticRes?.hotels ||
-              staticRes?.data?.hotelDetails ||
-              staticRes?.data?.hotels ||
-              staticRes?.data ||
-              (Array.isArray(staticRes) ? staticRes : []);
+        // Step 2: Call Hotel/HotelSearch after static details
+        return Apiclient1.post("Hotel/HotelSearch", searchReqObj)
+          .then((res) => {
+            let hotels = res?.hotels || res?.data?.hotels || [];
+            console.log("Search response:", res);
+            console.log(
+              "Search hotels:",
+              hotels.length,
+              "| Sample keys:",
+              Object.keys(hotels[0] || {})
+            );
 
-            console.log("Static hotels count:", rawStaticHotels.length, "| Sample keys:", Object.keys(rawStaticHotels[0] || {}));
+            if (hotels.length === 0) {
+              console.log("No hotels from search.");
+              setResultLoading(false);
+              setIsHotelSearchLoad(false);
+              setIsLoading(false);
+              return;
+            }
 
-            // Build a lookup map from static data for O(1) matching
-            const staticMap = {};
-            rawStaticHotels.forEach(sh => {
-              const id1 = String(sh.hotelId || sh.HotelId || "");
-              const id2 = String(sh.hotelCode || sh.HotelCode || "");
-              if (id1) staticMap[id1] = sh;
-              if (id2 && id2 !== id1) staticMap[id2] = sh;
-            });
+            setTraceId(res.traceId);
 
-            console.log("Static map keys sample:", Object.keys(staticMap).slice(0, 5));
-            console.log("Search hotelCode sample:", hotelCodesFromSearch.slice(0, 5));
-
-            // Step 4: Merge search + static data
+            // Step 3: Merge search + static data
             const combinedHotelDetails = hotels.map((hotel) => {
-              const searchId = String(hotel.hotelCode || hotel.HotelCode || hotel.hotelId || hotel.HotelId || "");
+              const searchId = String(
+                hotel.hotelCode || hotel.HotelCode || hotel.hotelId || hotel.HotelId || ""
+              );
               const matchedStatic = staticMap[searchId];
 
               if (!matchedStatic) {
@@ -266,20 +272,41 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
                 // Always preserve search API pricing (don't let static overwrite it)
                 hotelCode: hotel.hotelCode || hotel.HotelCode,
                 hotelMinPrice: hotel.hotelMinPrice || hotel.HotelMinPrice || hotel.minPrice || 0,
-                hotelPublishPrice: hotel.hotelPublishPrice || hotel.HotelPublishPrice || hotel.hotelMinPrice || hotel.minPrice || 0,
+                hotelPublishPrice:
+                  hotel.hotelPublishPrice || hotel.HotelPublishPrice || hotel.hotelMinPrice || hotel.minPrice || 0,
                 traceId: res.traceId,
                 supplier: hotel.supplier,
                 // Normalized fields with all fallbacks
-                hotelName: (matchedStatic?.hotelName || matchedStatic?.HotelName || hotel.hotelName || hotel.HotelName || hotel.propertyName || hotel.name || ""),
+                hotelName:
+                  matchedStatic?.hotelName ||
+                  matchedStatic?.HotelName ||
+                  hotel.hotelName ||
+                  hotel.HotelName ||
+                  hotel.propertyName ||
+                  hotel.name ||
+                  "",
                 description: matchedStatic?.description || hotel.description || hotel.Description || "",
-                starRating: Number(matchedStatic?.starRating ?? matchedStatic?.StarRating ?? hotel.starRating ?? hotel.StarRating ?? hotel.starRatings ?? hotel.stars ?? 0),
-                images: (matchedStatic?.images?.length > 0) ? matchedStatic.images : (hotel.images || hotel.Images || []),
-                hotelFacility: (matchedStatic?.facilities?.length > 0) ? matchedStatic.facilities : (matchedStatic?.hotelFacility || hotel.hotelFacility || hotel.facilities || []),
-                addresses: (matchedStatic?.addresses?.length > 0)
-                  ? matchedStatic.addresses
-                  : (hotel.addresses?.length > 0
+                starRating: Number(
+                  matchedStatic?.starRating ??
+                    matchedStatic?.StarRating ??
+                    hotel.starRating ??
+                    hotel.StarRating ??
+                    hotel.starRatings ??
+                    hotel.stars ??
+                    0
+                ),
+                images:
+                  matchedStatic?.images?.length > 0 ? matchedStatic.images : hotel.images || hotel.Images || [],
+                hotelFacility:
+                  matchedStatic?.facilities?.length > 0
+                    ? matchedStatic.facilities
+                    : matchedStatic?.hotelFacility || hotel.hotelFacility || hotel.facilities || [],
+                addresses:
+                  matchedStatic?.addresses?.length > 0
+                    ? matchedStatic.addresses
+                    : hotel.addresses?.length > 0
                     ? hotel.addresses
-                    : [{ address: hotel.address || hotel.Address || "", cityName: hotel.city || hotel.cityName || "" }]),
+                    : [{ address: hotel.address || hotel.Address || "", cityName: hotel.city || hotel.cityName || "" }],
                 city: matchedStatic?.city || hotel.city || hotel.City || hotel.cityName || "",
                 isPriceAvailable: true,
                 isVisible: true,
@@ -293,13 +320,33 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
             setResultLoading(false);
             setIsHotelSearchLoad(false);
             setIsLoading(false);
+          })
+          .catch((searchErr) => {
+            console.error("HotelSearch error:", searchErr);
+            setIsHotelSearchLoad(false);
+            setIsLoading(false);
+            setResultLoading(false);
           });
       })
       .catch((err) => {
-        console.error(err);
-        setIsHotelSearchLoad(false);
-        setIsLoading(false);
-        setResultLoading(false);
+        console.error("StaticData error, attempting fallback to HotelSearch directly:", err);
+        // Fallback: If static call fails, still call HotelSearch directly
+        Apiclient1.post("Hotel/HotelSearch", searchReqObj)
+          .then((res) => {
+            let hotels = res?.hotels || res?.data?.hotels || [];
+            setTraceId(res?.traceId);
+            setMainHotelsListResp(hotels);
+            setListOfHotels(hotels);
+            setResultLoading(false);
+            setIsHotelSearchLoad(false);
+            setIsLoading(false);
+          })
+          .catch((searchErr) => {
+            console.error("HotelSearch fallback error:", searchErr);
+            setIsHotelSearchLoad(false);
+            setIsLoading(false);
+            setResultLoading(false);
+          });
       });
   };
 
