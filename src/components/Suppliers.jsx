@@ -245,7 +245,6 @@ const Suppliers = () => {
               <Form.Item
                 label="User Name"
                 name="userName"
-                rules={[{ required: true, message: "User Name is required" }]}
               >
                 <Input placeholder="Enter user name" />
               </Form.Item>
@@ -257,7 +256,6 @@ const Suppliers = () => {
               <Form.Item
                 label="Password"
                 name="password"
-                rules={[{ required: true, message: "Password is required" }]}
               >
                 <Input.Password placeholder="Enter password" />
               </Form.Item>
@@ -267,7 +265,6 @@ const Suppliers = () => {
               <Form.Item
                 label="API Key"
                 name="apiKey"
-                rules={[{ required: true, message: "API Key is required" }]}
               >
                 <Input placeholder="Enter API key" />
               </Form.Item>
@@ -302,11 +299,22 @@ const Suppliers = () => {
                 {(fields, { add, remove }) => (
                   <>
                     {fields.map(({ key, name, ...restField }) => (
-                      <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                      <div
+                        key={key}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          marginBottom: 10,
+                          width: '100%',
+                          flexWrap: 'nowrap',
+                        }}
+                      >
                         <Form.Item
                           {...restField}
                           name={[name, 'key']}
                           rules={[{ required: true, message: 'Missing key' }]}
+                          style={{ marginBottom: 0, width: '32%', flexShrink: 0 }}
                         >
                           <Input placeholder="Configuration Key" />
                         </Form.Item>
@@ -314,11 +322,15 @@ const Suppliers = () => {
                           {...restField}
                           name={[name, 'value']}
                           rules={[{ required: true, message: 'Missing value' }]}
+                          style={{ marginBottom: 0, flex: 1 }}
                         >
                           <Input placeholder="Configuration Value" />
                         </Form.Item>
-                        <MinusCircleOutlined onClick={() => remove(name)} style={{ color: '#ef4444', cursor: 'pointer', fontSize: '16px' }} />
-                      </Space>
+                        <MinusCircleOutlined
+                          onClick={() => remove(name)}
+                          style={{ color: '#ef4444', cursor: 'pointer', fontSize: '18px', flexShrink: 0 }}
+                        />
+                      </div>
                     ))}
                     <Form.Item>
                       <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>

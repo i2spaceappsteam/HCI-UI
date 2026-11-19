@@ -565,29 +565,17 @@ const HotelResults = ({ hotelParam = false, isFromPackage = false }) => {
             </section>
           )}
           {isLoading ? (
-            <section>
-              <div className="hotel-skeleton-layout">
-
-
-
-                <div className="hotel-skeleton-layout-container">
-                  <Row gutter={16}>
-                    {/* <Col md={24} xs={24} style={{ marginTop: "-10px" }}>
-                      <CustomProgressBar
-                        showInfo={false}
-                        status="active"
-                        strokeColor="#da251c"
-                      />
-                    </Col> */}
-                    <Col md={6} xs={0} className="filter-skeleton">
-                      <FilterSkeletonLayout />
-                    </Col>
-                    <Col md={18} xs={24} className="result-body-skeleton">
-                      {[...Array(6)].map((_, i) => (
-                        <HotelCardSkeleton key={i} />
-                      ))}
-                    </Col>
-                  </Row>
+            <section className="hotels_list">
+              <div className="hotels-list-wrapper">
+                <div className="list-container">
+                  <div className="filters-box">
+                    <FilterSkeletonLayout />
+                  </div>
+                  <div className="hotels-box">
+                    {[...Array(6)].map((_, i) => (
+                      <HotelCardSkeleton key={i} />
+                    ))}
+                  </div>
                 </div>
               </div>
             </section>
