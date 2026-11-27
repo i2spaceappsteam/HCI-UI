@@ -157,6 +157,20 @@ const HotelCheckout = ({ location }) => {
 
 
 
+  const hasPolicy = (p) => {
+    if (!p) return false;
+    if (Array.isArray(p)) return p.length > 0;
+    if (typeof p === "object") {
+      return (
+        (Array.isArray(p.cancellationPolicy) && p.cancellationPolicy.length > 0) ||
+        (Array.isArray(p.policies) && p.policies.length > 0) ||
+        (Array.isArray(p.rules) && p.rules.length > 0) ||
+        Object.keys(p).length > 0
+      );
+    }
+    return Boolean(p);
+  };
+
   const fetchHotelPrice = () => {
     const hotelParams = queryString.parse(window.location.search);
 
@@ -271,20 +285,6 @@ const HotelCheckout = ({ location }) => {
                 refundable: ratePlan.refundable ?? true,
               };
             });
-
-            const hasPolicy = (p) => {
-              if (!p) return false;
-              if (Array.isArray(p)) return p.length > 0;
-              if (typeof p === "object") {
-                return (
-                  (Array.isArray(p.cancellationPolicy) && p.cancellationPolicy.length > 0) ||
-                  (Array.isArray(p.policies) && p.policies.length > 0) ||
-                  (Array.isArray(p.rules) && p.rules.length > 0) ||
-                  Object.keys(p).length > 0
-                );
-              }
-              return Boolean(p);
-            };
 
             const firstRoomCancelPolicy =
               (hasPolicy(combineRooms[0]?.cancellationPolicy) ? combineRooms[0].cancellationPolicy : null) ||
