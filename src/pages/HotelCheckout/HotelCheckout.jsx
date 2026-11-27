@@ -267,22 +267,38 @@ const HotelCheckout = ({ location }) => {
                 },
                 price: total,
                 cancellationPolicy: ratePlan.cancellationPolicy || [],
-                lastCancellationDate: ratePlan.lastCancellationDate || null,
+                lastCancellationDate: ratePlan.lastCancellationDate || selectedHotelInfo?.selectedRooms?.[0]?.lastCancellationDate || null,
                 refundable: ratePlan.refundable ?? true,
               };
             });
 
+            const hasPolicy = (p) => {
+              if (!p) return false;
+              if (Array.isArray(p)) return p.length > 0;
+              if (typeof p === "object") {
+                return (
+                  (Array.isArray(p.cancellationPolicy) && p.cancellationPolicy.length > 0) ||
+                  (Array.isArray(p.policies) && p.policies.length > 0) ||
+                  (Array.isArray(p.rules) && p.rules.length > 0) ||
+                  Object.keys(p).length > 0
+                );
+              }
+              return Boolean(p);
+            };
+
             const firstRoomCancelPolicy =
-              combineRooms[0]?.cancellationPolicy ||
-              hotels.rooms?.[0]?.ratePlans?.[0]?.cancellationPolicy ||
-              hotels.rooms?.[0]?.cancellationPolicy ||
-              hotels.cancellationPolicy ||
+              (hasPolicy(combineRooms[0]?.cancellationPolicy) ? combineRooms[0].cancellationPolicy : null) ||
+              (hasPolicy(hotels.rooms?.[0]?.ratePlans?.[0]?.cancellationPolicy) ? hotels.rooms[0].ratePlans[0].cancellationPolicy : null) ||
+              (hasPolicy(hotels.rooms?.[0]?.cancellationPolicy) ? hotels.rooms[0].cancellationPolicy : null) ||
+              (hasPolicy(hotels.cancellationPolicy) ? hotels.cancellationPolicy : null) ||
+              (hasPolicy(selectedHotelInfo?.selectedRooms?.[0]?.cancellationPolicy) ? selectedHotelInfo.selectedRooms[0].cancellationPolicy : null) ||
               [];
 
             combineRoom = [
               {
                 combineRooms,
                 cancellationPolicy: firstRoomCancelPolicy,
+                lastCancellationDate: combineRooms[0]?.lastCancellationDate || selectedHotelInfo?.selectedRooms?.[0]?.lastCancellationDate || hotels.lastCancellationDate || null,
                 inclusions: combineRooms[0]?.inclusions || hotels.inclusions || [],
                 mealPlan: combineRooms[0]?.ratePlanName || combineRooms[0]?.mealPlan || "",
                 price: grandTotal,
@@ -334,15 +350,24 @@ const HotelCheckout = ({ location }) => {
             "";
 
           const resolvedCancellationPolicy =
-            (hotels.rooms?.[0]?.ratePlans?.[0]?.cancellationPolicy?.length > 0
+            (hasPolicy(hotels.rooms?.[0]?.ratePlans?.[0]?.cancellationPolicy)
               ? hotels.rooms[0].ratePlans[0].cancellationPolicy
               : null) ||
-            (hotels.cancellationPolicy?.length > 0
+            (hasPolicy(hotels.cancellationPolicy)
               ? hotels.cancellationPolicy
               : null) ||
-            hotels.rooms?.[0]?.cancellationPolicy ||
-            hotels.combineRoom?.[0]?.combineRooms?.[0]?.cancellationPolicy ||
-            hotels.combineRoom?.[0]?.cancellationPolicy ||
+            (hasPolicy(hotels.rooms?.[0]?.cancellationPolicy)
+              ? hotels.rooms[0].cancellationPolicy
+              : null) ||
+            (hasPolicy(hotels.combineRoom?.[0]?.combineRooms?.[0]?.cancellationPolicy)
+              ? hotels.combineRoom[0].combineRooms[0].cancellationPolicy
+              : null) ||
+            (hasPolicy(hotels.combineRoom?.[0]?.cancellationPolicy)
+              ? hotels.combineRoom[0].cancellationPolicy
+              : null) ||
+            (hasPolicy(selectedHotelInfo?.selectedRooms?.[0]?.cancellationPolicy)
+              ? selectedHotelInfo.selectedRooms[0].cancellationPolicy
+              : null) ||
             [];
 
           setHotelPriceData({

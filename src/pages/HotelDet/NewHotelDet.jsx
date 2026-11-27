@@ -382,13 +382,46 @@ const HotelDet = () => {
     const roomIsRefundable = (room) =>
         room?.ratePlans?.some(rp => rp.refundable === true);
 
+    const DATE_FORMATS = [
+        "DD-MM-YYYY HH:mm:ss",
+        "DD-MM-YYYY hh:mm:ss A",
+        "DD-MM-YYYY hh:mm A",
+        "DD-MM-YYYY HH:mm",
+        "DD-MM-YYYY",
+        "DD/MM/YYYY HH:mm:ss",
+        "DD/MM/YYYY hh:mm:ss A",
+        "DD/MM/YYYY hh:mm A",
+        "DD/MM/YYYY HH:mm",
+        "DD/MM/YYYY",
+        "YYYY-MM-DDTHH:mm:ss.SSSZ",
+        "YYYY-MM-DDTHH:mm:ss",
+        "YYYY-MM-DD HH:mm:ss",
+        "YYYY-MM-DD",
+    ];
+
+    const parseRuleDateMoment = (dateStr) => {
+        if (!dateStr || typeof dateStr !== "string") return null;
+        const clean = dateStr.trim();
+        if (clean.startsWith("0001") || clean.startsWith("1900")) return null;
+        const m = moment(clean, DATE_FORMATS, true);
+        if (m.isValid()) return m;
+        const fallback = moment(clean);
+        return fallback.isValid() ? fallback : null;
+    };
+
     const getCancellationDateDisplay = (ratePlan) => {
-        if (ratePlan?.lastCancellationDate && !ratePlan.lastCancellationDate.startsWith("0001") && moment(ratePlan.lastCancellationDate).isValid()) {
-            return `Before ${moment(ratePlan.lastCancellationDate).format("DD MMM, YYYY")}`;
+        const penaltyRule = ratePlan?.cancellationPolicy?.find(p => {
+            const pNum = Number(String(p?.penaltyAmount ?? p?.amount ?? p?.penalty ?? 0).replace(/[^0-9.-]/g, ""));
+            return pNum > 0;
+        });
+        const penaltyDateStr = penaltyRule?.fromDate || penaltyRule?.FromDate || penaltyRule?.from || penaltyRule?.startDate;
+        if (penaltyDateStr) {
+            const m = parseRuleDateMoment(penaltyDateStr);
+            return m ? `Before ${m.format("DD-MM-YYYY")}` : `Before ${penaltyDateStr.split(" ")[0]}`;
         }
-        const penaltyRule = ratePlan?.cancellationPolicy?.find(p => Number(p.penaltyAmount) > 0);
-        if (penaltyRule?.fromDate) {
-            return `Before ${penaltyRule.fromDate.split(" ")[0]}`;
+        if (ratePlan?.lastCancellationDate && !ratePlan.lastCancellationDate.startsWith("0001")) {
+            const m = parseRuleDateMoment(ratePlan.lastCancellationDate);
+            if (m) return `Before ${m.format("DD-MM-YYYY")}`;
         }
         return null;
     };
@@ -509,8 +542,8 @@ const HotelDet = () => {
 
     const formatRuleDate = (dateStr) => {
         if (!dateStr || dateStr.startsWith("0001") || dateStr.startsWith("1900")) return null;
-        const m = moment(dateStr);
-        return m.isValid() ? m.format("DD MMM YYYY") : dateStr.split(" ")[0];
+        const m = parseRuleDateMoment(dateStr);
+        return m ? m.format("DD-MM-YYYY") : dateStr.split(" ")[0];
     };
 
     const handelCancellationPolicy = (roomInfo) => {

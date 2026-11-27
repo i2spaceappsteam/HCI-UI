@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Row, Col, Tag, Badge, Tooltip, Modal, Button } from "antd";
+import { Row, Col, Tag, Badge, Tooltip, Modal, Button, Popover } from "antd";
 import moment from "moment";
 import queryString from "query-string";
 import parse from "html-react-parser";
@@ -15,7 +15,8 @@ import {
   ArrowLeftOutlined,
   CoffeeOutlined,
   InfoCircleOutlined,
-  CheckOutlined
+  CheckOutlined,
+  QuestionCircleOutlined
 } from "@ant-design/icons";
 import "./HotelDetailsBox.scss";
 
@@ -119,21 +120,85 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
   // Inclusions
   const inclusions = hotelDetailsObj?.combineRoom?.[0]?.inclusions || roomData?.inclusions || [];
 
+  const extractPolicyList = (rawPolicy) => {
+    if (!rawPolicy) return [];
+    if (Array.isArray(rawPolicy)) return rawPolicy;
+    if (typeof rawPolicy === "object") {
+      if (Array.isArray(rawPolicy.cancellationPolicy)) return rawPolicy.cancellationPolicy;
+      if (Array.isArray(rawPolicy.cancellationPolicies)) return rawPolicy.cancellationPolicies;
+      if (Array.isArray(rawPolicy.policies)) return rawPolicy.policies.map(p => typeof p === "string" ? { policies: p } : p);
+      if (Array.isArray(rawPolicy.rules)) return rawPolicy.rules;
+      return [rawPolicy];
+    }
+    if (typeof rawPolicy === "string" && rawPolicy.trim()) {
+      return [{ policies: rawPolicy }];
+    }
+    return [];
+  };
+
+  const getRulePenaltyAmount = (rule) => {
+    if (!rule) return 0;
+    const val = rule.penaltyAmount ?? rule.PenaltyAmount ?? rule.amount ?? rule.Amount ?? rule.penalty ?? rule.Penalty ?? rule.chargeAmount ?? 0;
+    return Number(String(val).replace(/[^0-9.-]/g, "")) || 0;
+  };
+
+  const getRuleFromDate = (rule) => {
+    if (!rule) return "";
+    return (
+      rule.fromDate ||
+      rule.FromDate ||
+      rule.from ||
+      rule.From ||
+      rule.startDate ||
+      rule.StartDate ||
+      rule.cancellationFromDate ||
+      rule.CancellationFromDate ||
+      rule.policyDate ||
+      ""
+    );
+  };
+
+  const getRuleToDate = (rule) => {
+    if (!rule) return "";
+    return (
+      rule.toDate ||
+      rule.ToDate ||
+      rule.to ||
+      rule.To ||
+      rule.endDate ||
+      rule.EndDate ||
+      rule.cancellationToDate ||
+      rule.CancellationToDate ||
+      ""
+    );
+  };
+
   // Cancellation policies from all possible API locations
   const cancellationPolicies = useMemo(() => {
-    const list =
-      hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0]?.cancellationPolicy ||
-      hotelDetailsObj?.combineRoom?.[0]?.cancellationPolicy ||
-      hotelDetailsObj?.rooms?.[0]?.ratePlans?.[0]?.cancellationPolicy ||
-      hotelDetailsObj?.rooms?.[0]?.cancellationPolicy ||
-      hotelDetailsObj?.cancellationPolicy ||
-      roomData?.cancellationPolicy ||
-      [];
-    return Array.isArray(list) ? list : (list ? [list] : []);
-  }, [hotelDetailsObj, roomData]);
+    const candidates = [
+      hotelDetailsObj?.cancellationPolicy,
+      hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0]?.cancellationPolicy,
+      hotelDetailsObj?.combineRoom?.[0]?.cancellationPolicy,
+      hotelDetailsObj?.rooms?.[0]?.ratePlans?.[0]?.cancellationPolicy,
+      hotelDetailsObj?.rooms?.[0]?.cancellationPolicy,
+      roomData?.ratePlans?.[0]?.cancellationPolicy,
+      roomData?.cancellationPolicy,
+      hotelDetailsObj?.cancellationPolicies,
+      selectedHotelInfo?.selectedRooms?.[0]?.cancellationPolicy,
+      selectedHotelInfo?.cancellationPolicy,
+    ];
+
+    for (const cand of candidates) {
+      const list = extractPolicyList(cand);
+      if (Array.isArray(list) && list.length > 0) {
+        return list;
+      }
+    }
+    return [];
+  }, [hotelDetailsObj, roomData, selectedHotelInfo]);
 
   const formatCancellationPenalty = (rule) => {
-    if (!rule) return "0";
+    if (!rule) return "Free";
     const penalty = rule.penaltyAmount ?? rule.amount ?? rule.penalty ?? 0;
     const penaltyStr = String(penalty).trim();
     const penaltyNum = Number(penaltyStr.replace(/[^0-9.-]/g, ""));
@@ -158,7 +223,37 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
       return `${penaltyNum} Night${penaltyNum > 1 ? "s" : ""}`;
     }
 
+    if (penaltyNum > 0 && penaltyNum <= 100 && !rule.currency && !rule.currencyCode) {
+      return `${penaltyNum}%`;
+    }
+
     return `₹${penaltyNum.toLocaleString("en-IN")}`;
+  };
+
+  const parseDateStr = (d, format = "DD MMM, YYYY") => {
+    if (!d || typeof d !== "string") return "";
+    const clean = d.trim();
+    if (clean.startsWith("0001") || clean.startsWith("1900")) return "";
+    const formats = [
+      "DD-MM-YYYY HH:mm:ss",
+      "DD-MM-YYYY hh:mm:ss A",
+      "DD-MM-YYYY hh:mm A",
+      "DD-MM-YYYY HH:mm",
+      "DD-MM-YYYY",
+      "DD/MM/YYYY HH:mm:ss",
+      "DD/MM/YYYY hh:mm:ss A",
+      "DD/MM/YYYY hh:mm A",
+      "DD/MM/YYYY HH:mm",
+      "DD/MM/YYYY",
+      "YYYY-MM-DDTHH:mm:ss.SSSZ",
+      "YYYY-MM-DDTHH:mm:ss",
+      "YYYY-MM-DD HH:mm:ss",
+      "YYYY-MM-DD",
+    ];
+    const m = moment(clean, formats, true);
+    if (m.isValid()) return m.format(format);
+    const fallback = moment(clean);
+    return fallback.isValid() ? fallback.format(format) : clean.split(" ")[0];
   };
 
   const renderCancellationText = (cancel) => {
@@ -179,34 +274,39 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
       return <span>{parse(rawPolicies)}</span>;
     }
 
-    const parseDateStr = (d) => {
-      if (!d) return "";
-      const m = moment(d, ["DD-MM-YYYY HH:mm:ss", "DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ss", "YYYY-MM-DD"]);
-      return m.isValid() ? m.format("DD MMM, YYYY") : String(d).split(" ")[0];
-    };
-
-    const fromDateStr = parseDateStr(cancel.fromDate);
-    const toDateStr = parseDateStr(cancel.toDate);
-    const penalty = cancel.penaltyAmount ?? cancel.amount ?? cancel.penalty ?? 0;
-    const penaltyNum = Number(String(penalty).replace(/[^0-9.-]/g, ""));
+    const fromDateVal = getRuleFromDate(cancel);
+    const toDateVal = getRuleToDate(cancel);
+    const fromDateStr = parseDateStr(fromDateVal);
+    const toDateStr = parseDateStr(toDateVal);
+    const penalty = cancel.penaltyAmount ?? cancel.PenaltyAmount ?? cancel.amount ?? cancel.Amount ?? cancel.penalty ?? cancel.Penalty ?? 0;
+    const penaltyNum = getRulePenaltyAmount(cancel);
     const penaltyDisplay = formatCancellationPenalty(cancel);
 
     if (penaltyNum === 0 || String(penalty) === "0") {
-      if (fromDateStr && toDateStr) {
+      // Find the first rule that introduces charges to determine the free cancellation deadline
+      const firstPenaltyRule = cancellationPolicies.find((p) => {
+        return getRulePenaltyAmount(p) > 0;
+      });
+      const penaltyDate = getRuleFromDate(firstPenaltyRule);
+      const penaltyFromDateStr = penaltyDate ? parseDateStr(penaltyDate) : "";
+      // The deadline before which cancellation is free is the start of charges (penaltyFromDateStr)
+      const freeDeadlineStr = penaltyFromDateStr || toDateStr;
+
+      if (freeDeadlineStr) {
         return (
           <span>
-            From <strong>{fromDateStr}</strong> to <strong>{toDateStr}</strong>: <strong style={{ color: "#16a34a" }}>Free Cancellation (₹0 charge)</strong>
+            Cancellation before <strong>{freeDeadlineStr}</strong>: <strong style={{ color: "#16a34a" }}>Free Cancellation (₹0 charge)</strong>
           </span>
         );
       }
       if (fromDateStr) {
         return (
           <span>
-            Cancellation before <strong>{fromDateStr}</strong>: <strong style={{ color: "#16a34a" }}>Free Cancellation (₹0 charge)</strong>
+            From <strong>{fromDateStr}</strong>: <strong style={{ color: "#16a34a" }}>Free Cancellation (₹0 charge)</strong>
           </span>
         );
       }
-      return <strong style={{ color: "#16a34a" }}>Free Cancellation</strong>;
+      return <strong style={{ color: "#16a34a" }}>Free Cancellation (₹0 charge)</strong>;
     }
 
     if (fromDateStr && toDateStr) {
@@ -237,6 +337,93 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
         const pNum = Number(p.penaltyAmount || 0);
         return pNum === 0 || String(p.penaltyAmount) === "0";
       }));
+
+  const displayPolicies = useMemo(() => {
+    let list = Array.isArray(cancellationPolicies) ? [...cancellationPolicies] : [];
+    if (list.length === 0) return [];
+
+    const hasFreeRule = list.some((p) => {
+      const pNum = Number(String(p?.penaltyAmount ?? p?.amount ?? p?.penalty ?? 0).replace(/[^0-9.-]/g, ""));
+      return pNum === 0 || String(p?.penaltyAmount) === "0";
+    });
+
+    const firstPenalty = list.find((p) => {
+      return getRulePenaltyAmount(p) > 0;
+    });
+
+    if (isRefundable && !hasFreeRule && firstPenalty?.fromDate) {
+      list.unshift({
+        fromDate: hotelSearchData?.checkInDate || hotelDetailsObj?.request?.checkInDate || "",
+        toDate: firstPenalty.fromDate,
+        penaltyAmount: 0,
+        chargeType: "free"
+      });
+    }
+
+    return list;
+  }, [cancellationPolicies, isRefundable, hotelSearchData, hotelDetailsObj]);
+
+  const resolvedLastCancellationDate = useMemo(() => {
+    // 1. Look for the first rule that introduces charges to determine the true cancellation deadline
+    const firstPenaltyRule = cancellationPolicies.find((p) => {
+      return getRulePenaltyAmount(p) > 0;
+    });
+
+    const penaltyDate = getRuleFromDate(firstPenaltyRule);
+    if (penaltyDate) {
+      const penaltyDateStr = parseDateStr(penaltyDate, "DD-MMM-YYYY");
+      if (penaltyDateStr) return penaltyDateStr;
+    }
+
+    // 2. Look for free rule's toDate if available
+    const freeRule = cancellationPolicies.find((p) => {
+      const pNum = getRulePenaltyAmount(p);
+      return pNum === 0;
+    });
+    const freeToDate = getRuleToDate(freeRule);
+    if (freeToDate) {
+      const toDateParsed = parseDateStr(freeToDate, "DD-MMM-YYYY");
+      if (toDateParsed) return toDateParsed;
+    }
+
+    // 3. Fallback to supplier's explicit lastCancellationDate (from room, selectedHotelInfo, or hotelDetailsObj)
+    const rawDate =
+      selectedHotelInfo?.selectedRooms?.[0]?.lastCancellationDate ||
+      selectedHotelInfo?.selectedRooms?.[0]?.LastCancellationDate ||
+      selectedHotelInfo?.lastCancellationDate ||
+      roomData?.lastCancellationDate ||
+      roomData?.LastCancellationDate ||
+      hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0]?.lastCancellationDate ||
+      hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0]?.LastCancellationDate ||
+      hotelDetailsObj?.combineRoom?.[0]?.lastCancellationDate ||
+      hotelDetailsObj?.combineRoom?.[0]?.LastCancellationDate ||
+      hotelDetailsObj?.rooms?.[0]?.ratePlans?.[0]?.lastCancellationDate ||
+      hotelDetailsObj?.rooms?.[0]?.ratePlans?.[0]?.LastCancellationDate ||
+      hotelDetailsObj?.rooms?.[0]?.lastCancellationDate ||
+      hotelDetailsObj?.lastCancellationDate;
+
+    if (rawDate && typeof rawDate === "string" && !rawDate.startsWith("0001") && !rawDate.startsWith("1900")) {
+      const parsed = parseDateStr(rawDate, "DD-MMM-YYYY");
+      if (parsed) return parsed;
+    }
+
+    return "";
+  }, [roomData, hotelDetailsObj, cancellationPolicies, selectedHotelInfo]);
+
+  const resolvedLastVoucherDate = useMemo(() => {
+    const rawDate =
+      roomData?.lastVoucherDate ||
+      hotelDetailsObj?.combineRoom?.[0]?.combineRooms?.[0]?.lastVoucherDate ||
+      hotelDetailsObj?.combineRoom?.[0]?.lastVoucherDate ||
+      hotelDetailsObj?.rooms?.[0]?.ratePlans?.[0]?.lastVoucherDate ||
+      hotelDetailsObj?.rooms?.[0]?.lastVoucherDate ||
+      hotelDetailsObj?.lastVoucherDate;
+
+    if (rawDate && typeof rawDate === "string" && !rawDate.startsWith("0001") && !rawDate.startsWith("1900")) {
+      return parseDateStr(rawDate, "DD-MMM-YYYY");
+    }
+    return "";
+  }, [roomData, hotelDetailsObj]);
 
   return (
     <div className="modern-hotel-details-box">
@@ -404,7 +591,7 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
         )}
 
         {/* Cancellation Policy Alert Banner */}
-        {cancellationPolicies?.length > 0 && (
+        {(displayPolicies?.length > 0 || resolvedLastCancellationDate) && (
           <div className={`cancellation-policy-banner ${isRefundable ? "refundable" : "non-refundable"}`}>
             <div className="policy-banner-header">
               <InfoCircleOutlined className="banner-icon" />
@@ -416,11 +603,24 @@ const HotelDetailsBox = ({ Ids, hotelDetailsObj, hotelSearchData = {} }) => {
               )}
             </div>
             <div className="policy-text-list">
-              {cancellationPolicies.map((cancel, index) => (
+              {resolvedLastCancellationDate && (
+                <p className="policy-rule-desc" style={{ fontSize: "13.5px", fontWeight: 600, color: "#1e293b", margin: "2px 0 4px" }}>
+                  Last Cancellation Date:{" "}
+                  <strong style={{ color: isRefundable ? "#16a34a" : "#dc2626" }}>
+                    {resolvedLastCancellationDate}
+                  </strong>
+                </p>
+              )}
+              {displayPolicies.map((cancel, index) => (
                 <p key={index} className="policy-rule-desc">
                   {renderCancellationText(cancel)}
                 </p>
               ))}
+              {resolvedLastVoucherDate && (
+                <p className="policy-rule-desc" style={{ fontSize: "13px", color: "#475569", margin: "4px 0 2px" }}>
+                  Last Voucher Date: <strong style={{ color: "#dc2626" }}>{resolvedLastVoucherDate}</strong>
+                </p>
+              )}
             </div>
           </div>
         )}

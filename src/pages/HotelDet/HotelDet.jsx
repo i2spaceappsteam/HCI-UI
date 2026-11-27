@@ -1484,13 +1484,13 @@ const HotelDet = () => {
                           <div className="modal-popup-cancellation1">
                             <p style={{ margin: "0px 0px 0px" }}>
                               <strong>From-</strong>{" "}
-                              {moment(can.fromDate).format(
+                              {moment(can.fromDate, ["DD-MM-YYYY HH:mm:ss", "DD-MM-YYYY", "DD/MM/YYYY HH:mm:ss", "DD/MM/YYYY", "YYYY-MM-DDTHH:mm:ss", "YYYY-MM-DD"]).format(
                                 "DD MMM YYYY HH:mm:ss"
                               )}
                             </p>
                             <p style={{ margin: "0px 0px 0px" }}>
                               <strong>To-</strong>{" "}
-                              {moment(can.toDate).format(
+                              {moment(can.toDate, ["DD-MM-YYYY HH:mm:ss", "DD-MM-YYYY", "DD/MM/YYYY HH:mm:ss", "DD/MM/YYYY", "YYYY-MM-DDTHH:mm:ss", "YYYY-MM-DD"]).format(
                                 "DD MMM YYYY HH:mm:ss"
                               )}
                             </p>
@@ -1552,13 +1552,13 @@ const HotelDet = () => {
                           <div className="modal-popup-cancellation1">
                             <p style={{ margin: "0px 0px 0px" }}>
                               <strong>From-</strong>{" "}
-                              {moment(can.fromDate).format(
+                              {moment(can.fromDate, ["DD-MM-YYYY HH:mm:ss", "DD-MM-YYYY", "DD/MM/YYYY HH:mm:ss", "DD/MM/YYYY", "YYYY-MM-DDTHH:mm:ss", "YYYY-MM-DD"]).format(
                                 "DD MMM YYYY HH:mm:ss"
                               )}
                             </p>
                             <p style={{ margin: "0px 0px 0px" }}>
                               <strong>To-</strong>{" "}
-                              {moment(can.toDate).format(
+                              {moment(can.toDate, ["DD-MM-YYYY HH:mm:ss", "DD-MM-YYYY", "DD/MM/YYYY HH:mm:ss", "DD/MM/YYYY", "YYYY-MM-DDTHH:mm:ss", "YYYY-MM-DD"]).format(
                                 "DD MMM YYYY HH:mm:ss"
                               )}
                             </p>
